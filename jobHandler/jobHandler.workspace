@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="jobHandler" Database="">
+  <Project Name="jobCommander" Path="jobCommander.project" Active="Yes"/>
+  <Project Name="jobExecutor" Path="jobExecutor.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="jobCommander" ConfigName="Debug"/>
+      <Project Name="" ConfigName="Debug"/>
+      <Project Name="jobExecutor" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="jobCommander" ConfigName="Release"/>
+      <Project Name="" ConfigName="Release"/>
+      <Project Name="jobExecutor" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
