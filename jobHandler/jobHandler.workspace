@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="jobHandler" Database="">
-  <Project Name="jobCommander" Path="jobCommander.project" Active="Yes"/>
-  <Project Name="jobExecutor" Path="jobExecutor.project" Active="No"/>
+  <Project Name="jobCommander" Path="jobCommander.project" Active="No"/>
+  <Project Name="jobExecutor" Path="jobExecutor.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="jobCommander" ConfigName="Debug"/>

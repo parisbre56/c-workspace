@@ -3,6 +3,8 @@
 //		FOLLOWED BY 
 //		<ORDER NAME (CHAR ARRAY OF SIZE <ORDER SIZE>)> 
 //		what follows depends on the order
+//		
+//		ALWAYS RECEIVE AN INT WHICH SIGNALS ERROR IF LESS THAN 0
 
 #include <iostream>
 #include <string>

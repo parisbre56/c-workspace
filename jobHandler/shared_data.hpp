@@ -14,8 +14,12 @@
 #define NUM_OF_SEMA 1
 
 //Define bools here
+
+//The shared memory is ready to be used
 #define SMS_READY_BOOL 0
+//The executor is exiting
 #define EXEC_EXITING_BOOL 1
+//The executor is no longer running
 #define EXEC_NO_LONGER_RUNNING_BOOL 2
 
 //Define ints here

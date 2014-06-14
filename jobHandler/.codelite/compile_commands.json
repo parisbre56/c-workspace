@@ -1,17 +1,9 @@
 [{
 		"directory":	"/home/parisbre56/.codelite/jobHandler",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -I. -I. -MG -MP -MT./Debug/CM_Main.cpp.o -MF./Debug/CM_Main.cpp.o.d -MM CM_Main.cpp",
-		"file":	"/home/parisbre56/.codelite/jobHandler/CM_Main.cpp"
+		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -I. -I. -MG -MP -MT./Debug/EX_Main.cpp.o -MF./Debug/EX_Main.cpp.o.d -MM EX_Main.cpp",
+		"file":	"/home/parisbre56/.codelite/jobHandler/EX_Main.cpp"
 	}, {
 		"directory":	"/home/parisbre56/.codelite/jobHandler",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -I. -I. -MG -MP -MT./Debug/shared_data.cpp.o -MF./Debug/shared_data.cpp.o.d -MM shared_data.cpp",
-		"file":	"/home/parisbre56/.codelite/jobHandler/shared_data.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/jobHandler",
-		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/jobHandler/shared_data.cpp -g -O0 -Wall -std=c++0x -o ./Debug/shared_data.cpp.o -I. -I.",
-		"file":	"/home/parisbre56/.codelite/jobHandler/shared_data.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/jobHandler",
-		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/jobHandler/CM_Main.cpp -g -O0 -Wall -std=c++0x -o ./Debug/CM_Main.cpp.o -I. -I.",
-		"file":	"/home/parisbre56/.codelite/jobHandler/CM_Main.cpp"
+		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/jobHandler/EX_Main.cpp -g -O0 -Wall -std=c++0x -o ./Debug/EX_Main.cpp.o -I. -I.",
+		"file":	"/home/parisbre56/.codelite/jobHandler/EX_Main.cpp"
 	}]

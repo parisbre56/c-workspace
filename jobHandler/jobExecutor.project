@@ -23,6 +23,8 @@
     <File Name="EX_Main.cpp"/>
     <File Name="shared_data.cpp"/>
     <File Name="shared_data.hpp"/>
+    <File Name="jobList.hpp"/>
+    <File Name="jobList.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
