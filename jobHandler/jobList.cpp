@@ -122,7 +122,7 @@ Job* JobList::popJobWithPID(pid_t pid) {
 	}
 	JobListItem* tempJobItem=start;
 	while(tempJobItem!=NULL) {
-		if(tempJobItem->job->jobID==pid) {
+		if(tempJobItem->job->PID==pid) {
 			if(start==tempJobItem) {
 				start=tempJobItem->nextJob;
 				if(start!=NULL) {

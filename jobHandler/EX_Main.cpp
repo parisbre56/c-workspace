@@ -3,6 +3,8 @@
 #include <string>
 
 
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <sys/mman.h>
 #include <sys/stat.h>			/* For mode constants */
 #include <unistd.h>
@@ -90,6 +92,13 @@ int main(int argc, char **argv)
 	
 	//Set up data
 	//Pipes
+	if(unlink("comm_pipe.temp")<0) {
+		if(errno!=ENOENT) {
+			cerr<<"ERROR: Unable to delete old named pipe."<<endl;
+			perror("jobExecutor");
+			exit(EXIT_FAILURE);
+		}
+	}
 	if(mkfifo("comm_pipe.temp",S_IRWXU|S_IRWXG|S_IRWXO)<0) {
 		cerr	<<"ERROR: Unable to create named pipe."<<endl;
 		perror("jobExecutor");
@@ -108,15 +117,17 @@ int main(int argc, char **argv)
 	sigset_t mask;
 	sigemptyset(&mask);
 	sigaddset(&mask,SIGUSR1);
-	//sigaddset(&mask,SIGUSR2);
+	sigaddset(&mask,SIGUSR2);
 	sigaddset(&mask,SIGCHLD);
 	
 	//Notify the shared memory that you are ready
+	bool_arr[EXEC_EXITING_BOOL]=false;
+	bool_arr[EXEC_NO_LONGER_RUNNING_BOOL]=false;
 	bool_arr[SMS_READY_BOOL]=true;
 	
 	//Start looping, waiting for signals and handling them
 	//Exit condition is EXEC_EXITING_BOOL is true and there are no jobs left in the queue
-	while(!bool_arr[EXEC_EXITING_BOOL]&&jobAll.inList>0) {
+	while(!(bool_arr[EXEC_EXITING_BOOL]&&jobAll.inList==0)) {
 		//Wait for signal
 		if(sigwaitinfo(&mask,&signalInfo)<0) {
 			if(errno==EINTR) {
@@ -133,12 +144,17 @@ int main(int argc, char **argv)
 			tempJob=jobAll.popJobWithPID(signalInfo.si_pid);
 			if(tempJob==NULL) {
 				cerr<<"ERROR: Received a signal from a child that is not in the job list."<<endl;
+				clog<<"DEBUG: PID: "<<signalInfo.si_pid<<endl;
+				waitpid(signalInfo.si_pid,NULL,WUNTRACED);
 				continue;
 			}
-			if((tempJob=jobRunning.popJobWithID(signalInfo.si_pid))==NULL) {
+			if((tempJob=jobRunning.popJobWithPID(signalInfo.si_pid))==NULL) {
 				cerr<<"ERROR: Received a signal from a child that is not in the running job list."<<endl;
+				clog<<"DEBUG: PID: "<<signalInfo.si_pid<<endl;
+				waitpid(signalInfo.si_pid,NULL,WUNTRACED);
 				continue;
 			}
+			waitpid(signalInfo.si_pid,NULL,WUNTRACED);
 			delete tempJob;
 			
 			//Start executing the next job if necessary.
@@ -284,22 +300,30 @@ int main(int argc, char **argv)
 				}
 				else {
 					if(tempJob->running) {
-						jobRunning.popJobWithID(exec_int);
+						//Put it back in so that when this receives sigchld
+						//it will recognize it
+						jobAll.insertAtStart(tempJob);
 						if(kill(tempJob->PID,SIGKILL)<0) {
 							cerr<<"ERROR: Error while terminating process "<<tempJob->PID<<endl;
 							perror("jobExecutor");
+							//Inform the commander that there was a problem
 							exec_int=-1;
 						}
 						else {
+							//Inform the commander that it was succesfully given
+							//the kill signal. This will make it terminate no matter
+							//what
 							exec_int=2;
 						}
-						delete tempJob;
 						write(pipe_fd,&exec_int,sizeof(int));
 					}
 					//If it is not running
 					else {
+						//Also pop it from the queue to prevent it from
+						//being excuted and then delete to prevent memory loss
 						jobQueued.popJobWithID(exec_int);
 						delete tempJob;
+						//Inform the commander that it was removed from queue
 						exec_int=1;
 						write(pipe_fd,&exec_int,sizeof(int));
 					}
@@ -420,6 +444,7 @@ int main(int argc, char **argv)
 	//The pipe will remain open until the last proccess closes it
 	unlink("comm_pipe.temp");
 	
+	clog<<"DEBUG: Exited normally."<<endl;
 	exit(EXIT_SUCCESS);
 }
 
@@ -456,5 +481,6 @@ inline void executeNextJobIfNecessary(JobList& jobRunning, JobList& jobQueued, i
 		tempJob->PID=pid;
 		tempJob->running=true;
 		jobRunning.insertAtStart(tempJob);
+		clog<<"DEBUG: Starting job: "<<tempJob->name<<" PID: "<<pid<<endl;
 	}
 }

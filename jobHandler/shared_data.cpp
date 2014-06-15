@@ -23,10 +23,49 @@ int getSMSAdress(int fd, bool*& bool_arr, int*& int_arr, sem_t*& sema_arr) {
 	else {
 		sema_arr=(sem_t*)((int*)(bool_arr+NUM_OF_BOOL)+NUM_OF_INT);
 	}
+	#ifdef ACCESSING_MEMORY_INT
+		#ifdef ACCESSING_INT_MUTEX
+			sem_wait(&(sema_arr[ACCESSING_INT_MUTEX]));
+		#endif
+		
+		int_arr[ACCESSING_MEMORY_INT]=int_arr[ACCESSING_MEMORY_INT]+1;
+		
+		#ifdef ACCESSING_INT_MUTEX
+			sem_post(&(sema_arr[ACCESSING_INT_MUTEX]));
+		#endif
+	#endif
 	return 0;
 }
 
 void detachSharedMemory() {
-	munmap(bool_arr,SMS_SIZE);
-	shm_unlink("/jobCommander");
+	#ifdef ACCESSING_MEMORY_INT
+		
+		int* int_arr=(int*)(bool_arr+NUM_OF_BOOL);
+		
+		#ifdef ACCESSING_INT_MUTEX
+			
+			sem_t* sema_arr=(sem_t*)((int*)(bool_arr+NUM_OF_BOOL)+NUM_OF_INT);
+			
+			sem_wait(&(sema_arr[ACCESSING_INT_MUTEX]));
+			
+		#endif
+		
+		int_arr[ACCESSING_MEMORY_INT]=int_arr[ACCESSING_MEMORY_INT]-1;
+		
+		if(int_arr[ACCESSING_MEMORY_INT]==0) {
+			munmap(bool_arr,SMS_SIZE);
+			shm_unlink("/jobCommander");
+		}
+		else {
+			#ifdef ACCESSING_INT_MUTEX
+			
+				sem_post(&(sema_arr[ACCESSING_INT_MUTEX]));
+
+			#endif
+			munmap(bool_arr,SMS_SIZE);
+		}
+	#else
+		munmap(bool_arr,SMS_SIZE);
+		shm_unlink("/jobCommander");
+	#endif
 }

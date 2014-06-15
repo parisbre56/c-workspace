@@ -524,7 +524,8 @@ int main(int argc, char **argv)
 				cout<<"Job "<<arg_int<<" succesfully removed from queue."<<endl;
 			}
 			else if(exec_int==2) {
-				cout<<"Job "<<arg_int<<" killed while running."<<endl;
+				cout	<<"Job "<<arg_int<<" was given the kill signal while running.\n"<<
+						"It should stop soon, if it hasn't already."<<endl;
 			}
 			else {
 				cerr<<"WARNING: Received unknown success indicator "<<exec_int<<" from jobExecutor."<<endl;
@@ -930,6 +931,10 @@ int createJobExecutorIfNecessaryAndReturnSharedMemory(bool*& bool_arr, int*& int
 			return -1;
 		}
 	}
+	//Double check bools are set correctly, just in case
+	bool_arr[EXEC_EXITING_BOOL]=false;
+	bool_arr[EXEC_NO_LONGER_RUNNING_BOOL]=false;
+	bool_arr[SMS_READY_BOOL]=false;
 	//Make a mask of ignored signals (mask is inherited after fork and execv)
 	sigset_t mask;
 	sigemptyset(&mask);

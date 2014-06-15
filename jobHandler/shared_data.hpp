@@ -10,8 +10,8 @@
 
 //Number of variables in shared memory
 #define NUM_OF_BOOL 3
-#define NUM_OF_INT 2
-#define NUM_OF_SEMA 1
+#define NUM_OF_INT 3
+#define NUM_OF_SEMA 2
 
 //Define bools here
 
@@ -25,9 +25,12 @@
 //Define ints here
 #define EXEC_PID_INT 0
 #define READER_PID_INT 1
+//How many processes are currently accessing this memory segment
+#define ACCESSING_MEMORY_INT 2
 
 //Define semas here
 #define EXEC_ACCESS_SEMA 0
+#define ACCESSING_INT_MUTEX 1
 
 #define SMS_SIZE sizeof(bool)*NUM_OF_BOOL+sizeof(int)*NUM_OF_INT+sizeof(sem_t)*NUM_OF_SEMA
 

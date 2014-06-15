@@ -1,8 +1,8 @@
 .PHONY: clean All
 
 All:
-	@echo "----------Building project:[ jobExecutor - Debug ]----------"
-	@$(MAKE) -f  "jobExecutor.mk"
+	@echo "----------Building project:[ test - Debug ]----------"
+	@$(MAKE) -f  "test.mk"
 clean:
-	@echo "----------Cleaning project:[ jobExecutor - Debug ]----------"
-	@$(MAKE) -f  "jobExecutor.mk" clean
+	@echo "----------Cleaning project:[ test - Debug ]----------"
+	@$(MAKE) -f  "test.mk" clean

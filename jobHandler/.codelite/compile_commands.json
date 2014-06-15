@@ -1,9 +1,9 @@
 [{
 		"directory":	"/home/parisbre56/.codelite/jobHandler",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -I. -I. -MG -MP -MT./Debug/EX_Main.cpp.o -MF./Debug/EX_Main.cpp.o.d -MM EX_Main.cpp",
-		"file":	"/home/parisbre56/.codelite/jobHandler/EX_Main.cpp"
+		"command":	"/usr/bin/g++ -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/TST_Main.cpp.o -MF./Debug/TST_Main.cpp.o.d -MM TST_Main.cpp",
+		"file":	"/home/parisbre56/.codelite/jobHandler/TST_Main.cpp"
 	}, {
 		"directory":	"/home/parisbre56/.codelite/jobHandler",
-		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/jobHandler/EX_Main.cpp -g -O0 -Wall -std=c++0x -o ./Debug/EX_Main.cpp.o -I. -I.",
-		"file":	"/home/parisbre56/.codelite/jobHandler/EX_Main.cpp"
+		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/jobHandler/TST_Main.cpp -g -O0 -Wall -o ./Debug/TST_Main.cpp.o -I. -I.",
+		"file":	"/home/parisbre56/.codelite/jobHandler/TST_Main.cpp"
 	}]
