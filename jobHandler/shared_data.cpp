@@ -52,7 +52,7 @@ void detachSharedMemory() {
 		
 		int_arr[ACCESSING_MEMORY_INT]=int_arr[ACCESSING_MEMORY_INT]-1;
 		
-		if(int_arr[ACCESSING_MEMORY_INT]==0) {
+		if(int_arr[ACCESSING_MEMORY_INT]<=0) {
 			munmap(bool_arr,SMS_SIZE);
 			shm_unlink("/jobCommander");
 		}

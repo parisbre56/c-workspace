@@ -910,6 +910,7 @@ int createJobExecutorIfNecessaryAndReturnSharedMemory(bool*& bool_arr, int*& int
 			shm_unlink("/jobCommander");
 			return -1;
 		}
+		atexit(detachSharedMemory);
 		return retval;
 	}
 	//Else if it was succesfully created, 
