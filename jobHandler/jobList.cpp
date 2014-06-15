@@ -3,11 +3,19 @@
 #include <cstdlib>
 #include <cassert>
 
-Job::Job(int jobIDc,pid_t PIDc,std::string namec,bool runningc) {
+Job::Job(int jobIDc,pid_t PIDc,std::string namec,bool runningc,char** argvc) {
 	jobID=jobIDc;
 	PID=PIDc;
 	name.assign(namec);
 	running=runningc;
+	argv=argvc;
+}
+
+Job::~Job() {
+	for(int i=0;argv[i]!=NULL;++i) {
+		delete argv[i];
+	}
+	delete argv;
 }
 
 JobListItem::JobListItem(Job* jobc) {

@@ -5,12 +5,21 @@
 
 class Job {
 public:
+	//JobID. Greater than or equal to 0.
 	int jobID;
+	//-1 if the process isn't running.
 	pid_t PID;
+	//What's the job's name? What file will it execute?
 	std::string name;
+	//Is the job running?
 	bool running;
+	//NULL terminated array with arguments
+	char** argv;
 	
-	Job(int jobIDc,pid_t PIDc,std::string namec,bool runningc);
+	//argvc is not copied but is deleted when the object is destroyed.
+	Job(int jobIDc,pid_t PIDc,std::string namec,bool runningc,char** argvc);
+	//Deletes the argv
+	~Job();
 };
 
 class JobListItem {

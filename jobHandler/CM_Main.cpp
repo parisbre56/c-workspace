@@ -232,8 +232,7 @@ int main(int argc, char **argv)
 			//Remove pid from shared memory
 			int_arr[READER_PID_INT]=-1;
 			
-		//Allow others to communicate with the executor
-		sem_post(&(sema_arr[EXEC_ACCESS_SEMA]));
+		//The executor will post the semaphore to allow others to communicate
 		
 	}
 	else if(!firstArg.compare("setConcurrency")) {
@@ -383,8 +382,7 @@ int main(int argc, char **argv)
 			//Remove pid from shared memory
 			int_arr[READER_PID_INT]=-1;
 			
-		//Allow others to communicate with the executor
-		sem_post(&(sema_arr[EXEC_ACCESS_SEMA]));
+		//The executor will post the semaphore to allow others to communicate
 		
 	}
 	else if(!firstArg.compare("stop")) {
@@ -544,8 +542,7 @@ int main(int argc, char **argv)
 			//Remove pid from shared memory
 			int_arr[READER_PID_INT]=-1;
 			
-		//Allow others to communicate with the executor
-		sem_post(&(sema_arr[EXEC_ACCESS_SEMA]));
+		//The executor will post the semaphore to allow others to communicate
 	}
 	else if(!firstArg.compare("poll")) {
 		//Check for the existence of second argument
@@ -733,8 +730,7 @@ int main(int argc, char **argv)
 			//Remove pid from shared memory
 			int_arr[READER_PID_INT]=-1;
 			
-		//Allow others to communicate with the executor
-		sem_post(&(sema_arr[EXEC_ACCESS_SEMA]));
+		//The executor will post the semaphore to allow others to communicate
 	}
 	else if(!firstArg.compare("exit")) {
 		//Check for the existance of Job commander
@@ -858,8 +854,7 @@ int main(int argc, char **argv)
 			//Remove pid from shared memory
 			int_arr[READER_PID_INT]=-1;
 			
-		//Allow others to communicate with the executor
-		sem_post(&(sema_arr[EXEC_ACCESS_SEMA]));
+		//The executor will post the semaphore to allow others to communicate
 	}
 	else {
 		cerr<<"ERROR: Unkown argument \""<<firstArg<<"\""<<endl;
@@ -916,7 +911,9 @@ int createJobExecutorIfNecessaryAndReturnSharedMemory(bool*& bool_arr, int*& int
 		}
 		return retval;
 	}
-	//Else if it was succesfully created, resize it
+	//Else if it was succesfully created, 
+	clog<<"DEBUG: Starting executor..."<<endl;
+	//resize it
 	ftruncate(retval,SMS_SIZE);
 	//Get the memmory mappings
 	if(getSMSAdress(retval,bool_arr,int_arr,sema_arr)<0) {
@@ -949,7 +946,7 @@ int createJobExecutorIfNecessaryAndReturnSharedMemory(bool*& bool_arr, int*& int
 		shm_unlink("/jobCommander");
 		return pid;
 	}
-	//If this is the child, start the executot
+	//If this is the child, start the executor
 	if(pid==0) {
 		char * const args[2]={"./jobExecutor",NULL};
 		execv("./jobExecutor",args);
