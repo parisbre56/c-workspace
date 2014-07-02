@@ -1,0 +1,9 @@
+[{
+		"directory":	"/home/parisbre56/.codelite/DataTransfer",
+		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/connectionReaderThread.cpp.o -MF./Debug/connectionReaderThread.cpp.o.d -MM connectionReaderThread.cpp",
+		"file":	"/home/parisbre56/.codelite/DataTransfer/connectionReaderThread.cpp"
+	}, {
+		"directory":	"/home/parisbre56/.codelite/DataTransfer",
+		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/DataTransfer/connectionReaderThread.cpp -g -O0 -Wall -std=c++0x -pthread -o ./Debug/connectionReaderThread.cpp.o -I. -I.",
+		"file":	"/home/parisbre56/.codelite/DataTransfer/connectionReaderThread.cpp"
+	}]

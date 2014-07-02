@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="DataTransfer" Database="/home/parisbre56/.codelite/DataTransfer/.codelite/DataTransfer.tags">
+  <Project Name="dataServer" Path="dataServer.project" Active="Yes"/>
+  <Project Name="remoteClient" Path="remoteClient.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="dataServer" ConfigName="Debug"/>
+      <Project Name="remoteClient" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="dataServer" ConfigName="Release"/>
+      <Project Name="remoteClient" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
