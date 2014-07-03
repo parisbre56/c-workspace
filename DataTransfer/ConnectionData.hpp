@@ -15,10 +15,10 @@ private:
 	int links;
 	/* Mutex to ensure only one can access this at the same time.
 	 */
+	pthread_mutex_t mtx;
 	
 	~ConnectionData();
 public:
-	pthread_mutex_t mtx;
 	int sock;
 	struct sockaddr_in client;
 	socklen_t clientlen;
@@ -44,6 +44,7 @@ public:
 	/* Call this when removing a pointer to this object.
 	 * The object will be deleted when the last link is removed.
 	 * Deleting the object closes the socket.
+	 * Before closing the socket, it sends 1 to indicate no more data incoming
 	 */
 	void linksDecrement();
 };

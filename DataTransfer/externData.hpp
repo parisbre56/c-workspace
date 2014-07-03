@@ -15,5 +15,7 @@ extern bool exitCond;
 extern ThreadList threadList;
 //Used for concurrent writing
 extern pthread_mutex_t wMtx;
+//Number of worker threads
+extern int thread_pool_size;
 
 #endif //__EXTERNDATA__INCLUDED__

@@ -16,6 +16,7 @@ public:
  */
 class ThreadList {
 private:
+	int _size;
 	pthread_mutex_t mtx;
 	ThreadListObject * root;
 public:
@@ -31,6 +32,9 @@ public:
 	 * if it exists.
 	 */
 	void remove(pthread_t data);
+	/* Returns the size of the list.
+	 */
+	int size();
 	/* Deletes all ThreadListObjects and thread_t objects in the list.
 	 */
 	~ThreadList();

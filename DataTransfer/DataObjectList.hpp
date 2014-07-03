@@ -18,7 +18,7 @@ private:
 	DataObjectListObject * root;
 public:
 	DataObjectList();
-	/* Inserts a DataObject in the beginning of the list.
+	/* Inserts a DataObject at the end of the list.
 	 */
 	void push(DataObject * data);
 	/* Removes a DataObject from the beginning of the list and returns it.

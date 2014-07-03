@@ -65,7 +65,7 @@ int Pool::obtainIfNotEmpty(DataObject*& store) {
 	//Get the mutex
 	if(pthread_mutex_lock(&mtx)<0) {
 		writeTimedLock();
-		cerr<<"ERROR:"<<to_string(pthread_self())<<":obtain:mutex_lock:"<<strerror(errno)<<endl;
+		cerr<<"ERROR:"<<to_string(pthread_self())<<":obtainINE:mutex_lock:"<<strerror(errno)<<endl;
 		writeTimedUnlock();
 		return -1;
 	}
@@ -73,24 +73,11 @@ int Pool::obtainIfNotEmpty(DataObject*& store) {
 	if(this->count<=0) {
 		if(pthread_mutex_unlock(&mtx)<0) {
 			writeTimedLock();
-			cerr<<"ERROR:"<<to_string(pthread_self())<<":obtain:mutex_unlock:"<<strerror(errno)<<endl;
+			cerr<<"ERROR:"<<to_string(pthread_self())<<":obtainINE:mutex_unlock:"<<strerror(errno)<<endl;
 			writeTimedUnlock();
 			return -1;
 		}
 		return __POOL__EMPTY__;
-	}
-	//Release the lock and wait for the pool to become nonempty
-	while(count<=0) {
-		if(pthread_cond_timedwait(&cond_nonempty,&mtx,&timeout)<0) {
-			if(errno==ETIMEDOUT) {
-				return __POOL__TIMEOUT__;
-			}
-			writeTimedLock();
-			cerr<<"ERROR:"<<to_string(pthread_self())<<":obtain:cond_wait:"<<strerror(errno)<<endl;
-			writeTimedUnlock();
-			pthread_mutex_unlock(&mtx);
-			return -1;
-		}
 	}
 	//Retrieve the data
 	store=data[start];
