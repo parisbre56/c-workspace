@@ -3,8 +3,8 @@
 
 void writeTimedLock() {
 	struct timespec timeout;
-	timeout.tv_nsec=0;
-	timeout.tv_sec=__WRITELOCK__TIMEOUTSECS__;
+	clock_gettime(CLOCK_REALTIME, &timeout);
+	timeout.tv_sec+=__WRITELOCK__TIMEOUTSECS__;
 	pthread_mutex_timedlock(&wMtx,&timeout);
 }
 

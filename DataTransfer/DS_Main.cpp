@@ -75,6 +75,7 @@ int makeSocket(int port);
 /* Accepts a connection from socket and then creates a new thread to handle that connection.
  * Puts the thread in the list of active threads.
  * Returns 0 for success and negative for failure.
+ * Returns 1 for timeout.
  */
 int processConnection(int socket);
 
@@ -94,6 +95,10 @@ void deleteWMutex();
 /* Maximum number of connections waiting to be accepted.
  */
 #define BACKLOG 5
+
+/* How long it will wait for a connection before it times out
+ */
+#define CONNECTION_TIMEOUT 10
 
 //Keeps all the data that must be retrieved. Accesed atomically.
 Pool* dataPool;
@@ -115,7 +120,10 @@ int main(int argc, char **argv)
 	int queue_size=-1;
 	int sock;
 	
-	pthread_mutex_init(&wMtx, 0);
+	pthread_mutexattr_t mtx_attr;
+	pthread_mutexattr_init(&mtx_attr);
+	pthread_mutex_init(&wMtx, &mtx_attr);
+	pthread_mutexattr_destroy(&mtx_attr);
 	atexit(deleteWMutex);
 	
 	//Get and check arguments
@@ -130,25 +138,44 @@ int main(int argc, char **argv)
 	atexit(joinThreads);
 	for(int i=0;i<thread_pool_size;++i) {
 		if(createWorker()<0) {
+			writeTimedLock();
 			cerr<<"ERROR: Unable to create worker. Exiting..."<<endl;
+			writeTimedUnlock();
 			exit(EXIT_FAILURE);
 		}
 	}
 	//Create the socket
 	sock=makeSocket(port);
-	//Set options
+	if(sock<0) {
+		writeTimedLock();
+		cerr<<"ERROR: Unable to create socket."<<endl;
+		writeTimedUnlock();
+		exit(EXIT_FAILURE);
+	}
+	//Set options to allow socket to be reused
 	int option_value=1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&option_value,sizeof(option_value));
 	setsockopt(sock,SOL_SOCKET,SO_REUSEPORT,&option_value,sizeof(option_value));
+	//Set timeout for accepting connections
+	option_value=CONNECTION_TIMEOUT;
+	setsockopt(sock,SOL_SOCKET,SO_RCVTIMEO,&option_value,sizeof(option_value));
+	setsockopt(sock,SOL_SOCKET,SO_SNDTIMEO,&option_value,sizeof(option_value));
 	//Start the server and wait for a connection
+	writeTimedLock();
+	clog<<"DEBUG: Server started."<<endl;
+	writeTimedUnlock();
 	while(!exitCond) {
 		if(processConnection(sock)<0) {
 			close(sock);
+			writeTimedLock();
 			cerr<<"ERROR: Unable to accept connection. Exiting..."<<endl;
+			writeTimedUnlock();
 			exit(EXIT_FAILURE);
 		}
 	}
+	writeTimedLock();
 	clog<<"DEBUG: Exit condition set. Exiting..."<<endl;
+	writeTimedUnlock();
 	close(sock);
 	exit(EXIT_SUCCESS);
 }
@@ -239,9 +266,11 @@ int makeSocket(int port) {
 	int sock;
 	struct sockaddr_in server;
 	//Create socket
-	sock=socket(PF_INET,SOCK_STREAM,0);
+	sock=socket(PF_INET,SOCK_STREAM|SOCK_NONBLOCK,0);
 	if(socket<0) {
+		writeTimedLock();
 		cerr<<"ERROR:makeSocket:socket:"<<strerror(errno)<<endl;
+		writeTimedUnlock();
 		return -1;
 	}
 	//Bind socket to port
@@ -249,12 +278,16 @@ int makeSocket(int port) {
 	server.sin_addr.s_addr=htonl(INADDR_ANY) ;
 	server.sin_port=htons(port);
 	if(bind(sock,(struct sockaddr *)(&server),sizeof(server)) < 0) {
+		writeTimedLock();
 		cerr<<"ERROR:makeSocket:bind:"<<strerror(errno)<<endl;
+		writeTimedUnlock();
 		return -1;
 	}
 	//Mark socket as passive listener
 	if(listen(sock,BACKLOG)<0) {
+		writeTimedLock();
 		cerr<<"ERROR:makeSocket:listen:"<<strerror(errno)<<endl;
+		writeTimedUnlock();
 		return -1;
 	}
 	
@@ -273,18 +306,27 @@ void joinThreads() {
 int processConnection(int sock) {
 	int newsock=-1;
 	struct sockaddr_in client;
-	socklen_t clientlen;
+	socklen_t clientlen=sizeof(struct sockaddr_in);
 	//Get the new connection data
-	if ((newsock=accept(sock,(struct sockaddr *)(&client),&clientlen))<0) {
+	if((newsock=accept(sock,(struct sockaddr *)(&client),&clientlen))<0) {
+		//If this is a timeout, return 1
+		//(Remember, timeout is set by the define)
+		if(errno==EAGAIN||errno==EWOULDBLOCK) {
+			return 1;
+		}
 		writeTimedLock();
 		cerr<<"ERROR:processConnection:accept:"<<strerror(errno)<<endl;
 		writeTimedUnlock();
 		return -1;
 	}
-	//Set options
+	//Allow socket to be reused
 	int option_value=1;
 	setsockopt(newsock,SOL_SOCKET,SO_REUSEADDR,&option_value,sizeof(option_value));
 	setsockopt(newsock,SOL_SOCKET,SO_REUSEPORT,&option_value,sizeof(option_value));
+	//Make it block
+	option_value=0;
+	setsockopt(newsock,SOL_SOCKET,SO_SNDTIMEO,&option_value,sizeof(option_value));
+	setsockopt(newsock,SOL_SOCKET,SO_SNDTIMEO,&option_value,sizeof(option_value));
 	//Package it in an object
 	ConnectionData * connData = new ConnectionData(newsock,client,clientlen);
 	pthread_t* thread = new pthread_t;
@@ -309,7 +351,9 @@ int createWorker() {
 	//Start the new thread
 	pthread_t* thread = new pthread_t;
 	if(pthread_create(thread,NULL,workerThread,NULL)<0) {
+		writeTimedLock();
 		cerr<<"ERROR:createWorker:pthread_create:"<<strerror(errno)<<endl;
+		writeTimedUnlock();
 		delete thread;
 		return -1;
 	}

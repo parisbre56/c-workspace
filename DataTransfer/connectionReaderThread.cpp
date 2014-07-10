@@ -72,6 +72,11 @@ void fileError(string fileName, string pos);
 int fillWithDataObjects(ConnectionData * connectionData,DataObjectList& tempDataStack,string file_name);
 
 void * connectionReaderThread(void* connectionData_temp) {
+	writeTimedLock();
+	clog<<"DEBUG:"<<to_string(pthread_self())<<": Reader started"<<endl;
+	writeTimedUnlock();
+	
+	
 	DataObjectList tempDataStack;
 	
 	size_t socket_size;
@@ -82,10 +87,11 @@ void * connectionReaderThread(void* connectionData_temp) {
 	
 	
 	ConnectionData* connectionData=static_cast<ConnectionData*>(connectionData_temp);
-	//Ignore failed write signals. We'll process them in the write level
+	//Ignore failed write signals. We'll process them synchronously
 	struct sigaction action;
 	sigemptyset(&(action.sa_mask));
 	action.sa_handler=SIG_IGN;
+	action.sa_flags=0;
 	sigaction(SIGPIPE, &action, NULL);
 	//Client sends length of string (size_t) or 0 for error
 	if(read(connectionData->sock,&socket_size,sizeof(size_t))!=sizeof(size_t)) {
@@ -102,7 +108,7 @@ void * connectionReaderThread(void* connectionData_temp) {
 	}
 	//Client sends string (char array with the above length)
 	socket_data=new char[socket_size];
-	if(read(connectionData->sock,&socket_data,socket_size)!=socket_size) {
+	if(read(connectionData->sock,socket_data,socket_size)!=socket_size) {
 		readError("read_initial_string");
 		delete[] socket_data;
 		threadList.remove(pthread_self());
@@ -162,6 +168,10 @@ void * connectionReaderThread(void* connectionData_temp) {
 	threadList.remove(pthread_self());
 	//and decrements the links to connection data so that it will be deleted eventually
 	connectionData->linksDecrement();
+	
+	writeTimedLock();
+	clog<<"DEBUG:"<<to_string(pthread_self())<<": Reader exited normally"<<endl;
+	writeTimedUnlock();
 	return NULL;
 }
 

@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <signal.h>
 #include <fcntl.h>
 
 #include "externData.hpp"
@@ -52,9 +53,20 @@ using namespace std;
 int processData(DataObject* currentData);
 
 void * workerThread(void* not_used) {
+	writeTimedLock();
+	clog<<"DEBUG:"<<to_string(pthread_self())<<": Worker started"<<endl;
+	writeTimedUnlock();
+	
+	
 	DataObject* currentData;
 	//Return value for obtaining data
 	int retVal;
+	//Ignore failed write signals. We'll process them synchronously
+	struct sigaction action;
+	sigemptyset(&(action.sa_mask));
+	action.sa_handler=SIG_IGN;
+	action.sa_flags=0;
+	sigaction(SIGPIPE, &action, NULL);
 	//Keep looping until the exit signal is received
 	while(!exitCond) {
 		//Get the data
@@ -68,28 +80,43 @@ void * workerThread(void* not_used) {
 		}
 		//If all is well, process data
 		if(processData(currentData)<0) {
-			//If there's a problem, exit.
+			//If there's a problem, continue.
+			writeTimedLock();
+			clog<<"DEBUG:"<<to_string(pthread_self())<<":exitloop: Error while processing."<<endl;
+			writeTimedUnlock();
 			delete currentData;
-			threadList.remove(pthread_self());
-			return NULL;
+			continue;
 		}
+		writeTimedLock();
+		clog<<"DEBUG:"<<to_string(pthread_self())<<":exitloop: Data sent to client succesfully."<<endl;
+		writeTimedUnlock();
+		delete currentData;
 	}
+	writeTimedLock();
+	clog<<"DEBUG:"<<to_string(pthread_self())<<":Entering exit loop"<<endl;
+	writeTimedUnlock();
 	//When the exit signal has been received
 	//Keep looping until the pool is empty and no readers are active
 	while(true) {
 		//Get the data
-		if((retVal=dataPool->obtain(currentData))<0) {
+		if((retVal=dataPool->obtainIfNotEmpty(currentData))<0) {
 			threadList.remove(pthread_self());
 			return NULL;
 		}
 		//If this timed out, keep trying to get more data
 		if(retVal==__POOL__TIMEOUT__) {
+			writeTimedLock();
+			clog<<"DEBUG:"<<to_string(pthread_self())<<":Timeout in exit loop."<<endl;
+			writeTimedUnlock();
 			continue;
 		}
 		//If the pool is empty
 		if(retVal==__POOL__EMPTY__) {
 			//If there are more reader threads, continue waiting for data
 			if(threadList.size()>thread_pool_size) {
+				writeTimedLock();
+				clog<<"DEBUG:"<<to_string(pthread_self())<<":Continue in empty branch of exit loop."<<endl;
+				writeTimedUnlock();
 				continue;
 			}
 			//If there are no more reader threads, exit
@@ -99,13 +126,21 @@ void * workerThread(void* not_used) {
 		}
 		//If all is well, process data
 		if(processData(currentData)<0) {
-			//If there's a problem, exit.
+			//If there's a problem, continue
+			writeTimedLock();
+			clog<<"DEBUG:"<<to_string(pthread_self())<<":exitloop: Error while processing."<<endl;
+			writeTimedUnlock();
 			delete currentData;
-			threadList.remove(pthread_self());
-			return NULL;
+			continue;
 		}
+		writeTimedLock();
+		clog<<"DEBUG:"<<to_string(pthread_self())<<":exitloop: Data sent to client succesfully."<<endl;
+		writeTimedUnlock();
 		delete currentData;
 	}
+	writeTimedLock();
+	clog<<"DEBUG:"<<to_string(pthread_self())<<": Worker exited normally"<<endl;
+	writeTimedUnlock();
 	return NULL;
 }
 
@@ -140,7 +175,7 @@ int processData(DataObject* currentData) {
 		close(file_fd);
 		return 0;
 	}
-	//If all OK, sends 0 to indicate data incoming. Else sends -1 to indicate error.
+	//If all OK, sends 0 to indicate data incoming. Else sends -error_string_size to indicate error and then the error string
 	socket_int=0;
 	if(write(currentData->retLoc->sock,&socket_int,sizeof(int))!=sizeof(int)) {
 		writeTimedLock();

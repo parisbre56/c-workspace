@@ -1,27 +1,7 @@
 [{
 		"directory":	"/home/parisbre56/.codelite/DataTransfer",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/DS_Main.cpp.o -MF./Debug/DS_Main.cpp.o.d -MM DS_Main.cpp",
-		"file":	"/home/parisbre56/.codelite/DataTransfer/DS_Main.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/DataTransfer",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/Pool.cpp.o -MF./Debug/Pool.cpp.o.d -MM Pool.cpp",
-		"file":	"/home/parisbre56/.codelite/DataTransfer/Pool.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/DataTransfer",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/ConnectionData.cpp.o -MF./Debug/ConnectionData.cpp.o.d -MM ConnectionData.cpp",
-		"file":	"/home/parisbre56/.codelite/DataTransfer/ConnectionData.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/DataTransfer",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/DataObject.cpp.o -MF./Debug/DataObject.cpp.o.d -MM DataObject.cpp",
-		"file":	"/home/parisbre56/.codelite/DataTransfer/DataObject.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/DataTransfer",
 		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/connectionReaderThread.cpp.o -MF./Debug/connectionReaderThread.cpp.o.d -MM connectionReaderThread.cpp",
 		"file":	"/home/parisbre56/.codelite/DataTransfer/connectionReaderThread.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/DataTransfer",
-		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/workerThread.cpp.o -MF./Debug/workerThread.cpp.o.d -MM workerThread.cpp",
-		"file":	"/home/parisbre56/.codelite/DataTransfer/workerThread.cpp"
 	}, {
 		"directory":	"/home/parisbre56/.codelite/DataTransfer",
 		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/ThreadList.cpp.o -MF./Debug/ThreadList.cpp.o.d -MM ThreadList.cpp",
@@ -30,6 +10,10 @@
 		"directory":	"/home/parisbre56/.codelite/DataTransfer",
 		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/writeLock.cpp.o -MF./Debug/writeLock.cpp.o.d -MM writeLock.cpp",
 		"file":	"/home/parisbre56/.codelite/DataTransfer/writeLock.cpp"
+	}, {
+		"directory":	"/home/parisbre56/.codelite/DataTransfer",
+		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/workerThread.cpp.o -MF./Debug/workerThread.cpp.o.d -MM workerThread.cpp",
+		"file":	"/home/parisbre56/.codelite/DataTransfer/workerThread.cpp"
 	}, {
 		"directory":	"/home/parisbre56/.codelite/DataTransfer",
 		"command":	"/usr/bin/g++ -g -O0 -Wall -std=c++0x -pthread -I. -I. -MG -MP -MT./Debug/DataObjectList.cpp.o -MF./Debug/DataObjectList.cpp.o.d -MM DataObjectList.cpp",
@@ -60,12 +44,12 @@
 		"file":	"/home/parisbre56/.codelite/DataTransfer/ThreadList.cpp"
 	}, {
 		"directory":	"/home/parisbre56/.codelite/DataTransfer",
-		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/DataTransfer/workerThread.cpp -g -O0 -Wall -std=c++0x -pthread -o ./Debug/workerThread.cpp.o -I. -I.",
-		"file":	"/home/parisbre56/.codelite/DataTransfer/workerThread.cpp"
-	}, {
-		"directory":	"/home/parisbre56/.codelite/DataTransfer",
 		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/DataTransfer/writeLock.cpp -g -O0 -Wall -std=c++0x -pthread -o ./Debug/writeLock.cpp.o -I. -I.",
 		"file":	"/home/parisbre56/.codelite/DataTransfer/writeLock.cpp"
+	}, {
+		"directory":	"/home/parisbre56/.codelite/DataTransfer",
+		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/DataTransfer/workerThread.cpp -g -O0 -Wall -std=c++0x -pthread -o ./Debug/workerThread.cpp.o -I. -I.",
+		"file":	"/home/parisbre56/.codelite/DataTransfer/workerThread.cpp"
 	}, {
 		"directory":	"/home/parisbre56/.codelite/DataTransfer",
 		"command":	"/usr/bin/g++ -c /home/parisbre56/.codelite/DataTransfer/DataObjectList.cpp -g -O0 -Wall -std=c++0x -pthread -o ./Debug/DataObjectList.cpp.o -I. -I.",

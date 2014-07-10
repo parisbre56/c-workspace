@@ -1,9 +1,1 @@
-/home/parisbre56/.codelite/DataTransfer/DS_Main.cpp
-/home/parisbre56/.codelite/DataTransfer/Pool.cpp
-/home/parisbre56/.codelite/DataTransfer/ConnectionData.cpp
-/home/parisbre56/.codelite/DataTransfer/DataObject.cpp
-/home/parisbre56/.codelite/DataTransfer/connectionReaderThread.cpp
-/home/parisbre56/.codelite/DataTransfer/ThreadList.cpp
-/home/parisbre56/.codelite/DataTransfer/workerThread.cpp
-/home/parisbre56/.codelite/DataTransfer/writeLock.cpp
-/home/parisbre56/.codelite/DataTransfer/DataObjectList.cpp
+/home/parisbre56/.codelite/DataTransfer/RC_Main.cpp

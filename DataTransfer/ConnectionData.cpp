@@ -1,6 +1,10 @@
 #include "ConnectionData.hpp"
 #include <unistd.h>
 
+#include <iostream>
+
+#include "writeLock.hpp"
+
 using namespace std;
 
 ConnectionData::ConnectionData(int Csock, struct sockaddr_in Cclient, socklen_t Cclientlen)
@@ -36,17 +40,26 @@ void ConnectionData::linksIncrement() {
 void ConnectionData::linksDecrement() {
 	pthread_mutex_lock(&mtx);
 	--links;
-	pthread_mutex_unlock(&mtx);
+	writeTimedLock();
+	clog<<"DEBUG: Links:"<<links<<endl;
+	writeTimedUnlock();
 	if(links<=0) {
 		delete this;
+	}
+	else {
+		pthread_mutex_unlock(&mtx);
 	}
 }
 
 ConnectionData::~ConnectionData()
 {
+	writeTimedLock();
+	clog<<"DEBUG: Suicide"<<endl;
+	writeTimedUnlock();
 	int temp=1;
 	write(sock,&temp,sizeof(int));
 	close(sock);
+	pthread_mutex_unlock(&mtx);
 	pthread_mutex_destroy(&mtx);
 }
 

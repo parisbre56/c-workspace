@@ -25,7 +25,7 @@ private:
 	pthread_mutex_t mtx;
 	pthread_cond_t cond_nonempty;
 	pthread_cond_t cond_nonfull;
-	struct timespec timeout;
+	const unsigned short timeout;
 public:
 	/* Creates a pool with size <size>.
 	 */
