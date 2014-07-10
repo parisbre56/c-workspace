@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include <time.h>
+
 using namespace std;
 
 Pool::Pool(int size,unsigned short timeout_secs):poolSize(size),timeout(timeout_secs) {

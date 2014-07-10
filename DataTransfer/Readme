@@ -1,0 +1,7 @@
+Use the command 
+./remoteClient -e -i <server_ip> -p <server_port>
+to remotely close the server
+
+Each file (DataObject class) has a pointer to a socket (ConnectionData class).
+Each socket uses a mutex to allow only one thread to write to it at the same time.
+Each socket has a counter with the number of links (pointers) to the object.  When the counter reaches 0, the ConnectionData object sends the end of transmission signal to the client, closes the socket and commits suicide (deletes itself). We are certain that this will not reach zero while DataObjects are still being created, because they are created first and then fed into the pool.

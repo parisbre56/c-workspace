@@ -106,6 +106,7 @@ Pool* dataPool;
 bool exitCond;
 //List of all active threads except for main. Accessed atomically.
 ThreadList threadList;
+ThreadList readerThreadList;
 //Used for concurrent writing
 pthread_mutex_t wMtx;
 //Number of worker threads
@@ -155,7 +156,6 @@ int main(int argc, char **argv)
 	//Set options to allow socket to be reused
 	int option_value=1;
 	setsockopt(sock,SOL_SOCKET,SO_REUSEADDR,&option_value,sizeof(option_value));
-	setsockopt(sock,SOL_SOCKET,SO_REUSEPORT,&option_value,sizeof(option_value));
 	//Set timeout for accepting connections
 	option_value=CONNECTION_TIMEOUT;
 	setsockopt(sock,SOL_SOCKET,SO_RCVTIMEO,&option_value,sizeof(option_value));
@@ -297,6 +297,10 @@ int makeSocket(int port) {
 void joinThreads() {
 	pthread_t* thread=NULL;
 	exitCond=true;
+	while((thread=readerThreadList.pop())!=NULL) {
+		pthread_join(*thread,NULL);
+		delete thread;
+	}
 	while((thread=threadList.pop())!=NULL) {
 		pthread_join(*thread,NULL);
 		delete thread;
@@ -322,7 +326,6 @@ int processConnection(int sock) {
 	//Allow socket to be reused
 	int option_value=1;
 	setsockopt(newsock,SOL_SOCKET,SO_REUSEADDR,&option_value,sizeof(option_value));
-	setsockopt(newsock,SOL_SOCKET,SO_REUSEPORT,&option_value,sizeof(option_value));
 	//Make it block
 	option_value=0;
 	setsockopt(newsock,SOL_SOCKET,SO_SNDTIMEO,&option_value,sizeof(option_value));

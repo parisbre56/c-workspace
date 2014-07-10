@@ -13,6 +13,7 @@ extern Pool* dataPool;
 extern bool exitCond;
 //List of all active threads except for main. Accessed atomically.
 extern ThreadList threadList;
+extern ThreadList readerThreadList;
 //Used for concurrent writing
 extern pthread_mutex_t wMtx;
 //Number of worker threads

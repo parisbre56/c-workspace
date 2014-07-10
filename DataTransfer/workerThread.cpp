@@ -82,13 +82,13 @@ void * workerThread(void* not_used) {
 		if(processData(currentData)<0) {
 			//If there's a problem, continue.
 			writeTimedLock();
-			clog<<"DEBUG:"<<to_string(pthread_self())<<":exitloop: Error while processing."<<endl;
+			clog<<"DEBUG:"<<to_string(pthread_self())<<": Error while processing."<<endl;
 			writeTimedUnlock();
 			delete currentData;
 			continue;
 		}
 		writeTimedLock();
-		clog<<"DEBUG:"<<to_string(pthread_self())<<":exitloop: Data sent to client succesfully."<<endl;
+		clog<<"DEBUG:"<<to_string(pthread_self())<<": Data sent to client succesfully."<<endl;
 		writeTimedUnlock();
 		delete currentData;
 	}
@@ -113,7 +113,7 @@ void * workerThread(void* not_used) {
 		//If the pool is empty
 		if(retVal==__POOL__EMPTY__) {
 			//If there are more reader threads, continue waiting for data
-			if(threadList.size()>thread_pool_size) {
+			if(readerThreadList.size()>0) {
 				writeTimedLock();
 				clog<<"DEBUG:"<<to_string(pthread_self())<<":Continue in empty branch of exit loop."<<endl;
 				writeTimedUnlock();

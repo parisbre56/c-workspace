@@ -96,13 +96,13 @@ void * connectionReaderThread(void* connectionData_temp) {
 	//Client sends length of string (size_t) or 0 for error
 	if(read(connectionData->sock,&socket_size,sizeof(size_t))!=sizeof(size_t)) {
 		readError("read_initial_string_length");
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
 	if(socket_size==0) {
 		receivedError(0,"read_initial_string_length");
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
@@ -111,7 +111,7 @@ void * connectionReaderThread(void* connectionData_temp) {
 	if(read(connectionData->sock,socket_data,socket_size)!=socket_size) {
 		readError("read_initial_string");
 		delete[] socket_data;
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
@@ -122,7 +122,7 @@ void * connectionReaderThread(void* connectionData_temp) {
 		writeTimedUnlock();
 		exitCond=true;
 		delete[] socket_data;
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
@@ -139,7 +139,7 @@ void * connectionReaderThread(void* connectionData_temp) {
 		socket_int=-socket_data_string.size();
 		write(connectionData->sock,&socket_int,sizeof(int));
 		write(connectionData->sock,socket_data_string.c_str(),socket_data_string.size());
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
@@ -147,7 +147,7 @@ void * connectionReaderThread(void* connectionData_temp) {
 	if(fillWithDataObjects(connectionData,tempDataStack,socket_data_string)<0) {
 		//The function sends the error to the client and writes it in stderr automatically, 
 		//so there's no need to write it here
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
@@ -155,7 +155,7 @@ void * connectionReaderThread(void* connectionData_temp) {
 	socket_int=getpagesize();
 	if(write(connectionData->sock,&socket_int,sizeof(int))!=sizeof(int)) {
 		writeError("return_page_size");
-		threadList.remove(pthread_self());
+		readerThreadList.remove(pthread_self());
 		connectionData->linksDecrement();
 		return NULL;
 	}
@@ -164,8 +164,8 @@ void * connectionReaderThread(void* connectionData_temp) {
 	while((tempObject=tempDataStack.pop())!=NULL) {
 		dataPool->place(tempObject);
 	}
-	//Reader removes self from threadList
-	threadList.remove(pthread_self());
+	//Reader removes self from readerThreadList
+	readerThreadList.remove(pthread_self());
 	//and decrements the links to connection data so that it will be deleted eventually
 	connectionData->linksDecrement();
 	

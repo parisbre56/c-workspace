@@ -54,7 +54,7 @@ void ConnectionData::linksDecrement() {
 ConnectionData::~ConnectionData()
 {
 	writeTimedLock();
-	clog<<"DEBUG: Suicide"<<endl;
+	clog<<"DEBUG: No links left to connection data object. Commiting suicide..."<<endl;
 	writeTimedUnlock();
 	int temp=1;
 	write(sock,&temp,sizeof(int));

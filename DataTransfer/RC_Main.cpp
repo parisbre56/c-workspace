@@ -269,6 +269,7 @@ int main(int argc, char **argv)
 			//When there are no more data in this file to transmit
 			//		Server sends 0 (int). Writer unlocks mutex.
 			if(socket_int==0) {
+				clog<<"DEBUG: File "<<filePathString<<" written successfully."<<endl;
 				break;
 			}
 			//While there are more data in this file to transmit
@@ -309,9 +310,13 @@ int main(int argc, char **argv)
 				close(file_fd);
 				exit(EXIT_FAILURE);
 			}
+			clog<<"DEBUG: "<<socket_int<<" bytes written to file."<<endl;
 		}
 		//Writer reads from pool again while Client waits for response again
-		close(file_fd);
+		if(close(file_fd)<0) {
+			cerr<<"ERROR: Unable to close file "<<filePathString<<endl;
+			cerr<<"ERROR: "<<strerror(errno)<<endl;
+		}
 	}
 	exit(EXIT_SUCCESS);
 }
@@ -494,12 +499,11 @@ int createDirIfNecessaryAndOpen(string filePathString) {
 		}
 	}
 	//Open file, delete its contents and return the file descriptor
-	int retVal=-1;
-	retVal=open(filePathString.c_str(),O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU|S_IRWXG|S_IRWXO);
-	if(retVal<0) {
+	int retFD=open(filePathString.c_str(),O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU|S_IRWXG|S_IRWXO);
+	if(retFD<0) {
 		cerr<<"ERROR: Unable to create and open file "<<filePathString<<endl;
 		cerr<<"ERROR: "<<strerror(errno)<<endl;
 		return -1;
 	}
-	return retVal;
+	return retFD;
 }

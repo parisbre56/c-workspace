@@ -1,6 +1,8 @@
 #include "writeLock.hpp"
 #include "externData.hpp"
 
+#include <time.h>
+
 void writeTimedLock() {
 	struct timespec timeout;
 	clock_gettime(CLOCK_REALTIME, &timeout);
