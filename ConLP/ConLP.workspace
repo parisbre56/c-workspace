@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Workspace Name="ConLP" Database="">
+  <Project Name="fractions" Path="fractions/fractions.project" Active="No"/>
+  <Project Name="job_shop_opt" Path="job_shop_opt/job_shop_opt.project" Active="Yes"/>
+  <Project Name="rehearsal" Path="rehearsal/rehearsal.project" Active="No"/>
+  <Project Name="naxos" Path="naxos/naxos.project" Active="No"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="fractions" ConfigName="Debug"/>
+      <Project Name="job_shop_opt" ConfigName="Debug"/>
+      <Project Name="rehearsal" ConfigName="Debug"/>
+      <Project Name="naxos" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="fractions" ConfigName="Release"/>
+      <Project Name="job_shop_opt" ConfigName="Release"/>
+      <Project Name="rehearsal" ConfigName="Release"/>
+      <Project Name="naxos" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+  <Environment>
+    <![CDATA[]]>
+  </Environment>
+</CodeLite_Workspace>

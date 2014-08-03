@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace>
+  <WorkspaceParserFlags flags="1"/>
+  <WorkspaceParserPaths>
+    <Include Path="~/.codelite/ConLP/naxos"/>
+  </WorkspaceParserPaths>
+  <Environment Name="&lt;Use Defaults&gt;"/>
+  <SubversionPath>
+    <![CDATA[/home/parisbre56/.codelite/ConLP]]>
+  </SubversionPath>
+</Workspace>

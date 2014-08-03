@@ -1,0 +1,17 @@
+[{
+		"directory":	"/home/parisbre56/.codelite/ConLP/naxos",
+		"command":	"/usr/bin/g++ -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/expressions.cpp.o -MF./Debug/expressions.cpp.o.d -MM expressions.cpp",
+		"file":	"/home/parisbre56/.codelite/ConLP/naxos/expressions.cpp"
+	}, {
+		"directory":	"/home/parisbre56/.codelite/ConLP/naxos",
+		"command":	"/usr/bin/g++ -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/constraints.cpp.o -MF./Debug/constraints.cpp.o.d -MM constraints.cpp",
+		"file":	"/home/parisbre56/.codelite/ConLP/naxos/constraints.cpp"
+	}, {
+		"directory":	"/home/parisbre56/.codelite/ConLP/naxos",
+		"command":	"/usr/bin/g++ -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/intvar.cpp.o -MF./Debug/intvar.cpp.o.d -MM intvar.cpp",
+		"file":	"/home/parisbre56/.codelite/ConLP/naxos/intvar.cpp"
+	}, {
+		"directory":	"/home/parisbre56/.codelite/ConLP/naxos",
+		"command":	"/usr/bin/g++ -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/problemmanager.cpp.o -MF./Debug/problemmanager.cpp.o.d -MM problemmanager.cpp",
+		"file":	"/home/parisbre56/.codelite/ConLP/naxos/problemmanager.cpp"
+	}]
