@@ -32,7 +32,7 @@ using namespace std;
  * @param matrPart Where the part of the matrix corresponding to this thread will be returned
  * @param partSize The size of the returned part
  */
-void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n,double **& matrPart, int& partSize);
+void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n,double *** matrPart, int& partSize);
 
 /**
  * @brief Prints a matrix with n rows and n+1 collumns by combining the individual parts
@@ -43,7 +43,7 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n,double **& mat
  * @param matrPart Where the part of the matrix corresponding to this thread will be returned
  * @param partSize The size of the returned part
  */
-void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& matrPart, int partSize);
+void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** matrPart, int partSize);
 
 /**
  * @brief Checks if the collumn given (in global collumn number) is for this thread.
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
 	int wrapAround=1;
 	
 	//Initialize the MPI environment
-	if(MPI_Init(&argc,&argv)!=MPI_SUCCESS) {
+	if(MPI_Init(NULL,NULL)!=MPI_SUCCESS) {
 		cerr<<"ERROR"<<endl;
 	}
 	
@@ -139,9 +139,9 @@ int main(int argc, char **argv)
 	double ** matrPart; //Holds this thread's part of the matrix
 	int partSize;
 	
-	createMatrix(cartComm,tid,nthreads,n,matrPart,partSize);
+	createMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
 	
-	printMatrix(cartComm,tid,nthreads,n,matrPart,partSize);
+	printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
 	
 	cout<<"------------------------------------------"<<endl;
 	
@@ -168,7 +168,7 @@ int main(int argc, char **argv)
 			//For row k, divide it so that it becomes 1 and send what you divided it with to the other rows
 			//First send what we need to do to it to the other threads (which is [k,k])
 			//(Data sent is number to divide with (the other threads should have the correct k and sender))
-			MPI_Send(&matrPart[curCol][k],1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+			MPI_Send(&(matrPart[curCol][k]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
 			//Then divide with that number
 			for(int jj=curCol+1;jj<partSize;++jj) {
 				matrPart[jj][k]=matrPart[jj][k]/matrPart[curCol][k];
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
 			//Then for all rows, subtract and send what we are multiplying to subtract to the other threads
 			for(int i=k+1;i<n;++i) {
 				//First send
-				MPI_Send(&matrPart[curCol][i],1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
 				//Then subtract
 				matrPart[curCol][i]=0;
 				//For all partcollumns, check to see if we can subtract anything
@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 			//Get the collumn you need
 			int curCol=globColToPartCol(tid,nthreads,n,k);
 			for(int i=k-1;i>=0;--i) {
-				MPI_Send(&matrPart[curCol][i],1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
 				if(isValid) {
 					matrPart[endCol][i]=matrPart[endCol][i]-matrPart[endCol][k]*matrPart[curCol][i];
 				}
@@ -274,8 +274,8 @@ int main(int argc, char **argv)
 				}
 			}
 		}
-		//Finally, increment kappa
-		++k;
+		//Finally, decrement kappa
+		--k;
 	}
 	
 	if(tid==0) {
@@ -284,7 +284,7 @@ int main(int argc, char **argv)
 	}
 	
 	//Print the solution
-	printMatrix(cartComm,tid,nthreads,n,matrPart,partSize);
+	printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
 	
 	if(tid==0) {
 		//Write some info
@@ -306,14 +306,14 @@ int main(int argc, char **argv)
 	return EXIT_SUCCESS;
 }
 
-void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& matrPart, int& partSize) {
+void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** matrPart, int& partSize) {
 	//Create empty matrix
 	partSize=0;
 	//If this is thread will hold the extra collumn
 	if(colValidForThread(tid,nthreads,n,n)) {
-		matrPart=new double*[kappa+1];
+		(*matrPart)=new double*[kappa+1];
 	} else {
-		matrPart=new double*[kappa];
+		(*matrPart)=new double*[kappa];
 	}
 	
 	int destinationN;
@@ -340,8 +340,8 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& ma
 		for(int j=0;j<n+1;++j) { 
 			//If this collumn is for this thread
 			if(colValidForThread(tid,nthreads,n,j)) {
-				matrPart[partSize]=new double[n];
-				memcpy(matrPart[partSize],matr[j],sizeof(double)*n);
+				(*matrPart)[partSize]=new double[n];
+				memcpy(&((*matrPart)[partSize][0]),&(matr[j][0]),sizeof(double)*n);
 				++partSize;
 			}
 			//If this collumn is for another thread
@@ -349,7 +349,7 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& ma
 				//Send the global collumn number
 				MPI_Send(&j,1,MPI_INT,destinationN,COL_NUM_TAG,cartComm);
 				//Send the collumn
-				MPI_Send(matr[j],n,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				MPI_Send(&(matr[j][0]),n,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
 			}
 		}
 		
@@ -374,8 +374,8 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& ma
 			MPI_Recv(tempBuffer,n,MPI_DOUBLE,destinationP,COL_TAG,cartComm,MPI_STATUS_IGNORE);
 			//If they are for this thread, keep them
 			if(colValidForThread(tid,nthreads,n,globColNum)) {
-				matrPart[partSize]=new double[n];
-				memcpy(matrPart[partSize],tempBuffer,sizeof(double)*n);
+				(*matrPart)[partSize]=new double[n];
+				memcpy(&((*matrPart)[partSize][0]),tempBuffer,sizeof(double)*n);
 				++partSize;
 			}
 			//Else pass them on
@@ -387,7 +387,7 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& ma
 	}
 }
 
-void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& matrPart, int partSize) {
+void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** matrPart, int partSize) {
 	
 	//For process 0,
 	if(tid==0) {
@@ -398,7 +398,7 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& mat
 		//Put your data in it
 		for(int j=0;j<partSize;++j) {
 			colnum=partColToGlobCol(tid,nthreads,n,j);
-			memcpy(matr[colnum],matrPart[j],sizeof(double)*n);
+			memcpy(&(matr[colnum][0]),&((*matrPart)[j][0]),sizeof(double)*n);
 		}
 		//Put everyone else's data in it
 		for(int t=1;t<nthreads;++t) {
@@ -409,7 +409,7 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& mat
 					break;
 				}
 				//Else keep copying data
-				MPI_Recv(matr[colnum],n,MPI_DOUBLE,t,COL_TAG,cartComm,MPI_STATUS_IGNORE);
+				MPI_Recv(&(matr[colnum][0]),n,MPI_DOUBLE,t,COL_TAG,cartComm,MPI_STATUS_IGNORE);
 			}
 		}
 		
@@ -428,7 +428,7 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double **& mat
 		for(int j=0;j<partSize;++j) {
 			colnum=partColToGlobCol(tid,nthreads,n,j);
 			MPI_Send(&colnum,1,MPI_INT,0,COL_NUM_TAG,cartComm);
-			MPI_Send(matrPart[j],n,MPI_DOUBLE,0,COL_TAG,cartComm);
+			MPI_Send(&((*matrPart)[j][0]),n,MPI_DOUBLE,0,COL_TAG,cartComm);
 		}
 		colnum=-1;
 		MPI_Send(&colnum,1,MPI_INT,0,COL_NUM_TAG,cartComm);

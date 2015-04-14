@@ -5,16 +5,16 @@
 ## Debug
 ProjectName            :=Ex1
 ConfigurationName      :=Debug
-WorkspacePath          := "/home/parisbre56/.codelite/MPI"
-ProjectPath            := "/home/parisbre56/.codelite/MPI/Ex1"
+WorkspacePath          := "/home/paris/.codelite/MPI"
+ProjectPath            := "/home/paris/.codelite/MPI/Ex1"
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=parisbre56
+User                   :=Paris
 Date                   :=04/14/15
-CodeLitePath           :="/home/parisbre56/.codelite"
+CodeLitePath           :="/home/paris/.codelite"
 LinkerName             :=/usr/bin/mpic++ 
 SharedObjectLinkerName :=/usr/bin/mpic++ -shared -fPIC
 ObjectSuffix           :=.o
@@ -88,7 +88,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/parisbre56/.codelite/MPI/Ex1/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/paris/.codelite/MPI/Ex1/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM "main.cpp"
 
