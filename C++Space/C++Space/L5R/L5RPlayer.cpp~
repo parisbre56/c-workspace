@@ -1,0 +1,151 @@
+#include "L5RPlayer.hpp"
+#include "L5RStronghold.hpp"
+#include "L5RTypeConverter.hpp"
+
+
+Player::Player(int n): id(n){
+	cout << "Creating player -dynast number " << n<< endl;
+	numberOfProvinces=4;
+	DeckBuilder Deck;
+    	FateDeck = *Deck.createFateDeck();
+    	dynastyDeck = *Deck.createDynastyDeck();
+    	Deck.deckShuffler(&FateDeck);
+    	Deck.deckShuffler(&dynastyDeck);  
+	while ( hand.size() < 6)
+		if (!drawFateCard())
+			break;
+			
+	holdings.push_back(new Stronghold("strong", STRONGHOLD));
+	
+	int initialDefence = (static_cast<Stronghold*>(holdings.front()))->getInitialDefence();
+
+	while ( provinces.size() < numberOfProvinces)
+		provinces.push_back(new Province(initialDefence));
+
+}
+
+Player::~Player(){
+	cout << "player number " << id << " is about to leave" << endl;
+	cout << "holdings are about to be destroyed" << endl;
+	for(list<Holding*>::const_iterator it = holdings.begin(); ; it++)
+	{
+	    delete *it;
+	    if (it == holdings.end())
+		break;
+	} 
+	holdings.clear();
+
+	for(list<Personality*>::const_iterator it = army.begin(); ; it++)
+	{
+	    delete *it;
+		if (it == army.end())
+			break;
+
+	} 
+	army.clear();
+	 
+	for(list<GreenCard*>::const_iterator it = hand.begin(); ; it++)
+	{
+	    delete *it;
+		if (it == hand.end())
+		break;
+	} 
+
+	hand.clear();
+
+	for(list<GreenCard*>::const_iterator it = FateDeck.begin(); ; it++)
+	{
+	    delete *it;
+		if (it == FateDeck.end())
+		break;
+	} 
+	FateDeck.clear();
+
+	for(list<BlackCard*>::const_iterator it = dynastyDeck.begin(); ; it++)
+	{
+	    delete *it;
+		if (it == dynastyDeck.end())
+			break;
+	} 
+
+	dynastyDeck.clear();
+// clear for provinces or Province*
+}
+
+
+bool Player::drawFateCard(void){
+	//Get a Card from FateDeck and put it in hand.
+	 if(!FateDeck.empty())
+	 {
+	 		hand.push_front(FateDeck.front());
+	 		FateDeck.pop_front();
+			return 1;
+	 }
+	 else return 0;
+}
+
+void Player::untapEverything(void){
+	for (list<Holding*>::iterator i = holdings.begin(); i != holdings.end(); i++)
+		(*i)->setIsTapped(0); // carefull it untaps Stronghold
+
+	for (list<Personality*>::iterator j = army.begin(); j != army.end(); j++)
+		(*j)->setIsTapped(0);
+}
+
+void Player::revealProvinces(void){
+	for (vector<Province*>::iterator it = provinces.begin(); it != provinces.end(); it++)
+		if (!it->isDead())
+			it->reveal();
+}
+
+void Player::printHand(void){
+	cout << "Cards in hand for Player " << id << " are:" << endl;
+	for (list<GreenCard*>::iterator it = hand.begin(); it != hand.end(); it++)
+	{
+		if((*it)->getType()==ITEM)
+		{
+			TypeConverter().getItem(*it)->print();
+		}
+		else
+		{
+			TypeConverter().getFollower(*it)->print();
+		}
+	}
+	cout << endl;
+}
+
+void Player::printProvinces(void){
+	cout << "Remaining Provinces for Player " << id << " are:" << endl;
+	for (vector<Province*>::iterator it = provinces.begin(); it != provinces.end(); it++)
+		it->print();
+	cout << endl;
+}
+
+void Player::print(void){
+	cout << "Honour is " << static_cast<Stronghold*>(holdings.front())->getHonour() << endl;
+	cout << "player " << id << " : "  <<numberOfProvinces  << " provinces remaining" << endl;
+}
+
+void Player::printArena(void){
+	cout << "Current army for Player " << id << " is:" << endl;
+	for (list<Personality*>::iterator it = army.begin(); it != army.end(); it++) // cout endl;
+		(*it)->print();
+	cout << endl;
+}
+
+void Player::printHoldings(void){
+	cout << "Current Holdings for Player " << id << " are:" << endl;
+	//if they are connected must they be printed in a row?
+	for (list<Holding*>::iterator it = holdings.begin(); it != holdings.end(); it++) // cout endl;
+		(*it)->print(); // carefull it prints Stronghold too
+	cout << endl;
+}
+
+void Player::initialPhase(void){
+	untapEverything();
+	if (hand.size() < 6)
+		drawFateCard();
+	revealProvinces();
+	printHand();
+	printProvinces();
+}

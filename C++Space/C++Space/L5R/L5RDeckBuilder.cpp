@@ -1,0 +1,108 @@
+#include "L5RDeckBuilder.hpp"
+
+using namespace std;
+
+DeckBuilder :: DeckBuilder()
+{
+	black = new list<BlackCard*>();
+	green = new list<GreenCard*>();
+}
+
+DeckBuilder :: ~DeckBuilder()
+{
+	// TODO: Insert code here according to your
+	//	 memory management policy
+}
+
+list<GreenCard *>* DeckBuilder :: createFateDeck()
+{
+	int i;
+	for(i=0;i<NO_FOOTSOLDIER;i++)
+		green->push_back(new Follower("Peasants",FOOTSOLDIER));
+	for(i=0;i<NO_ARCHER;i++)
+		green->push_back(new Follower("Elite Troops",ARCHER));
+	for(i=0;i<NO_SIEGER;i++)
+		green->push_back(new Follower("Immortal Bushi",SIEGER));
+	for(i=0;i<NO_CAVALRY;i++)
+		green->push_back(new Follower("Unicorn Horses",CAVALRY));
+	for(i=0;i<NO_NAVAL;i++)
+		green->push_back(new Follower("Yomi Ships",NAVAL));
+	for(i=0;i<NO_BUSHIDO;i++)
+		green->push_back(new Follower("7 Samurai",BUSHIDO));
+
+	for(i=0;i<NO_KATANA;i++)
+		green->push_back(new Item("Daijtso",KATANA));
+	for(i=0;i<NO_BOW;i++)
+		green->push_back(new Item("Yumi",BOW));
+	for(i=0;i<NO_SPEAR;i++)
+		green->push_back(new Item("Kama",SPEAR));
+	for(i=0;i<NO_NINJATO;i++)
+		green->push_back(new Item("Butterfly Dagger",NINJATO));
+	for(i=0;i<NO_WAKIZASHI;i++)
+		green->push_back(new Item("Kusanagi",KATANA));
+
+	return green;
+}
+
+list<BlackCard *>* DeckBuilder :: createDynastyDeck()
+{
+	int i;
+	
+	for(i=0;i<NO_DEFENSIVE;i++)
+		black->push_back(new Personality("Footsoldiers",DEFENDER));
+	for(i=0;i<NO_ATTACKING;i++)
+		black->push_back(new Personality("Steadfast bushi",ATTACKER));
+	
+	black->push_back(new Personality("Akodo Kaneka",SHOGUN));
+	black->push_back(new Personality("Isawa Shi en",SHOGUN));
+	black->push_back(new Personality("Hida Shozen",CHANCELLOR));
+	black->push_back(new Personality("Mirimuto Enishi",CHANCELLOR));
+	black->push_back(new Personality("Hida Kisada",CHAMPION));
+	
+	for(i=0;i<NO_PLAIN;i++)
+		black->push_back(new Holding("Rice Fields",PLAIN));
+	for(i=0;i<NO_FARMS;i++)
+		black->push_back(new Holding("Fish Farms",FARMS));
+	for(i=0;i<NO_MINE;i++)
+		black->push_back(new Holding("Ashio Copper Mine",MINE));
+	for(i=0;i<NO_GOLD_MINE;i++)
+		black->push_back(new Holding("Konomai Gold Mine",GOLD_MINE));
+	for(i=0;i<NO_CRYSTAL_MINE;i++)
+		black->push_back(new Holding("Ichinokawa Crystal Mine",CRYSTAL_MINE));
+	for(i=0;i<NO_SOLO;i++)
+		black->push_back(new Holding("Gifts and Favors",SOLO));
+
+	return black;
+}
+
+void DeckBuilder :: deckShuffler(list<BlackCard*>* black)
+{
+	vector<BlackCard *> vect;
+	list<BlackCard*>::iterator it;
+	for(it = black->begin();it!=black->end();it++)
+		vect.push_back((*it));
+
+	random_shuffle ( vect.begin(), vect.end() );
+
+	black->clear();
+
+	vector<BlackCard*>:: iterator it2;
+	for(it2 = vect.begin();it2!=vect.end();it2++)
+		black->push_back((*it2));
+}
+
+void DeckBuilder :: deckShuffler(list<GreenCard*>* green)
+{
+	vector<GreenCard *> vect;
+	list<GreenCard*>::iterator it;
+	for(it = green->begin();it!=green->end();it++)
+		vect.push_back((*it));
+
+	random_shuffle ( vect.begin(), vect.end() );
+
+	green->clear();
+
+	vector<GreenCard*>::iterator it2;
+	for(it2 = vect.begin();it2!=vect.end();it2++)
+		green->push_back((*it2));
+}

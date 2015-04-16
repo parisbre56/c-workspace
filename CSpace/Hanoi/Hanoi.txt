@@ -1,0 +1,1 @@
+./Debug/Hanoi.o ./Debug/ch4_Stack.o ./Debug/TStoixeioyStoivas.o

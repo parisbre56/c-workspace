@@ -1,0 +1,1 @@
+./Debug/main.o ./Debug/lake.o ./Debug/exceptions.o ./Debug/IceSkater.o ./Debug/pos2D.o

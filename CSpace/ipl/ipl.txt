@@ -1,0 +1,1 @@
+./Debug/paris_ipli.o ./Debug/paris_iplicommands.o ./Debug/paris_iplieval.o ./Debug/paris_iplisig.o ./Debug/paris_iplistruct.o ./Debug/paris_iplistring.o

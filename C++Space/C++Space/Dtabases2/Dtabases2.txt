@@ -1,0 +1,1 @@
+./Debug/main.o ./Debug/DB2_DHeap.o ./Debug/DB2_Record.o ./Debug/DB2_CStore.o ./Debug/DB2_CSHT.o ./Debug/DB2_DHash.o

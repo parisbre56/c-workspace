@@ -6,13 +6,19 @@
 
 #include <iostream>
 
-#define __Question1__
-//#define __Question2__
+//#define __DEBUG__MODE_EX1__
+
+//#define __SingleProc__
+//#define __Question1__
+#define __Question2__
+
+//#define __QuestionExtra__
 
 #define kappa 4
 //#define kappa 16
 //#define kappa 32
 //#define kappa 64
+//#define kappa 128
 
 //This generates a random matrix with numbers between [-MAX_DEVIATION,MAX_DEVIATION]
 #define MAX_DEVIATION 10
@@ -141,9 +147,15 @@ int main(int argc, char **argv)
 	
 	createMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
 	
+	#ifdef __DEBUG__MODE_EX1__
+	if(tid==0) {
+		cout<<"------------------------------------------"<<endl;
+	}
 	printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
-	
-	cout<<"------------------------------------------"<<endl;
+	if(tid==0) {
+		cout<<"------------------------------------------"<<endl;
+	}
+	#endif
 	
 	//Set the active diagonal to 0
 	int k=0;
@@ -152,10 +164,6 @@ int main(int argc, char **argv)
 	if(tid==0) {
 		//Get the start time
 		time_initial  = MPI_Wtime();
-	}
-	//And a barrier to try to ensure no process jumps ahead
-	if(MPI_Barrier(cartComm)!=MPI_SUCCESS) {
-		cerr<<tid<<" ERROR"<<endl;
 	}
 	
 	//Start solving
@@ -168,7 +176,9 @@ int main(int argc, char **argv)
 			//For row k, divide it so that it becomes 1 and send what you divided it with to the other rows
 			//First send what we need to do to it to the other threads (which is [k,k])
 			//(Data sent is number to divide with (the other threads should have the correct k and sender))
+			#ifndef __SingleProc__
 			MPI_Send(&(matrPart[curCol][k]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+			#endif
 			//Then divide with that number
 			for(int jj=curCol+1;jj<partSize;++jj) {
 				matrPart[jj][k]=matrPart[jj][k]/matrPart[curCol][k];
@@ -178,14 +188,16 @@ int main(int argc, char **argv)
 			//Then for all rows, subtract and send what we are multiplying to subtract to the other threads
 			for(int i=k+1;i<n;++i) {
 				//First send
+				#ifndef __SingleProc__
 				MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-				//Then subtract
-				matrPart[curCol][i]=0;
+				#endif
 				//For all partcollumns, check to see if we can subtract anything
 				//(their global col must be greater than k and current collumn)
 				for(int jj=curCol+1;jj<partSize;++jj) {
 					matrPart[jj][i]=matrPart[jj][i]-matrPart[jj][k]*matrPart[curCol][i];
 				}
+				//Then subtract
+				matrPart[curCol][i]=0; //NO need to do real subtraction for the first element
 			}
 		}
 		//Else, if this is not the owner of kappa
@@ -235,11 +247,18 @@ int main(int argc, char **argv)
 		}
 		//Finally, increment k
 		++k;
+		
+		#ifdef __DEBUG__MODE_EX1__
+		printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
+		if(tid==0) {
+			cout<<"------------------------------------------"<<endl;
+		}
+		#endif
 	}
 	
 	k=n-1;
 	
-	while(k>=0) {
+	while(k>0) {
 		//Used for optimisation
 		bool isValid=colValidForThread(tid,nthreads,n,n);
 		int endCol;
@@ -252,11 +271,13 @@ int main(int argc, char **argv)
 			//Get the collumn you need
 			int curCol=globColToPartCol(tid,nthreads,n,k);
 			for(int i=k-1;i>=0;--i) {
+				#ifndef __SingleProc__
 				MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				#endif
 				if(isValid) {
 					matrPart[endCol][i]=matrPart[endCol][i]-matrPart[endCol][k]*matrPart[curCol][i];
 				}
-				matrPart[curCol][i]=0;
+				matrPart[curCol][i]=0; //No need to do real subtraction.
 			}
 		}
 		//Else, if this is not the owner of kappa
@@ -276,6 +297,13 @@ int main(int argc, char **argv)
 		}
 		//Finally, decrement kappa
 		--k;
+		
+		#ifdef __DEBUG__MODE_EX1__
+			printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
+			if(tid==0) {
+				cout<<"------------------------------------------"<<endl;
+			}
+		#endif
 	}
 	
 	if(tid==0) {
@@ -283,19 +311,31 @@ int main(int argc, char **argv)
 		time_end = MPI_Wtime();
 	}
 	
-	//Print the solution
-	printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
+	#ifdef __DEBUG__MODE_EX1__
+		//Print the solution
+		printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
+	#endif
 	
 	if(tid==0) {
-		//Write some info
-		cout<<"Solved in "<<(time_end-time_initial)<<" seconds in "<<nthreads<<" threads using configuration ";
-		#ifdef __Question1__
-		cout<<"1:\"serial\""<<endl;
-		#endif
-		#ifdef __Question2__
-		cout<<"2:\"shuffle\""<<endl;
+		#ifdef __DEBUG__MODE_EX1__
+			//Write some info
+			cout<<"Solved in "<<(time_end-time_initial)<<" seconds in "<<nthreads<<" threads using configuration ";
+			#ifdef __Question1__
+			cout<<"1:\"serial\""<<endl;
+			#endif
+			#ifdef __Question2__
+			cout<<"2:\"shuffle\""<<endl;
+			#endif
+		#else
+			cout<<(time_end-time_initial)<<endl;
 		#endif
 	}
+	
+	//Delete data
+	for(int j=0;j<partSize;++j) {
+		delete[] matrPart[j];
+	}
+	delete[] matrPart;
 	
 	//Finalize the MPI environment
 	if(MPI_Finalize()!=MPI_SUCCESS) {
@@ -324,7 +364,11 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** ma
 	if(tid==0) {
 		//Create an array to hold the matrix (right now we just hope the determinant is non-zero)
 		//!!!CHECK DETERMINANT
-		double matr[n+1][n];
+		//Create the matrix (dynamic creation prevents stack overflow)
+		double ** matr = new double*[n+1];
+		for(int j=0;j<n+1;++j) {
+			matr[j]=new double[n];
+		}
 		
 		//For all matrix collumns
 		for(int j=0;j<n+1;++j) {
@@ -346,17 +390,27 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** ma
 			}
 			//If this collumn is for another thread
 			else {
+				#ifndef __SingleProc__
 				//Send the global collumn number
 				MPI_Send(&j,1,MPI_INT,destinationN,COL_NUM_TAG,cartComm);
 				//Send the collumn
 				MPI_Send(&(matr[j][0]),n,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				#endif
 			}
 		}
 		
+		#ifndef __SingleProc__
 		//Send the end of data signal and wait for it to come back from behind
 		int temp=-1;
 		MPI_Send(&temp,1,MPI_INT,destinationN,COL_NUM_TAG,cartComm);
 		MPI_Recv(&temp,1,MPI_INT,destinationP,COL_NUM_TAG,cartComm,MPI_STATUS_IGNORE);
+		#endif
+		
+		//Free the memory
+		for(int j=0;j<n+1;++j) {
+			delete[] matr[j];
+		}
+		delete[] matr;
 	}
 	//For all processes except zero
 	else {
@@ -391,8 +445,11 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** mat
 	
 	//For process 0,
 	if(tid==0) {
-		//Create the matrix
-		double matr[n+1][n];
+		//Create the matrix (dynamic creation prevents stack overflow)
+		double ** matr = new double*[n+1];
+		for(int j=0;j<n+1;++j) {
+			matr[j]=new double[n];
+		}
 		
 		int colnum;
 		//Put your data in it
@@ -400,6 +457,7 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** mat
 			colnum=partColToGlobCol(tid,nthreads,n,j);
 			memcpy(&(matr[colnum][0]),&((*matrPart)[j][0]),sizeof(double)*n);
 		}
+		#ifndef __SingleProc__
 		//Put everyone else's data in it
 		for(int t=1;t<nthreads;++t) {
 			while(true) {
@@ -412,6 +470,7 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** mat
 				MPI_Recv(&(matr[colnum][0]),n,MPI_DOUBLE,t,COL_TAG,cartComm,MPI_STATUS_IGNORE);
 			}
 		}
+		#endif
 		
 		//Print once we have everything
 		for(int i=0;i<n;++i) {
@@ -420,6 +479,12 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** mat
 			}
 			cout<<endl;
 		}
+		
+		//Free memory
+		for(int j=0;j<n+1;++j) {
+			delete[] matr[j];
+		}
+		delete[] matr;
 	}
 	//Else, for all other processes
 	else {

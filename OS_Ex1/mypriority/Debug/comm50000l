@@ -1,0 +1,16 @@
+load data50000
+sumstats
+sumstats
+del
+del
+print
+sumstats
+top
+print
+top 0.83
+del
+stats Mac
+print
+print
+del
+exit dumpfile

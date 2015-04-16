@@ -1,0 +1,92 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(void)
+{
+	int i;
+	int j;
+	int ch;
+	int number;
+	int** men;
+	int** women;
+	int** temp1;
+	int* temp2;
+	
+	number=0;
+	
+	ch=getchar();
+	while (ch!='\n')
+	{
+		if (ch>='0'&&ch<='9')
+		{
+			number=number*10+(ch-'0');
+		}
+		ch=getchar();
+	}
+	
+	men=malloc(number*sizeof(int*));
+	women=malloc(number*sizeof(int*));
+	
+	for (i=0;i<number;i++)
+	{
+		temp1=men+i;
+		*temp1=malloc(number*sizeof(int));
+		for (j=0;j<number;j++)
+		{
+			temp2=*temp1+j;
+			*temp2=0;
+			while (ch==' '||ch=='\t'||ch=='\n')
+			{
+				ch=getchar();
+			}
+			while (ch>='0'&&ch<='9')
+			{
+				*temp2=*temp2*10+(ch-'0');
+				ch=getchar();
+			}
+		}
+	}
+	for (i=0;i<number;i++)
+	{
+		temp1=women+i;
+		*temp1=malloc(number*sizeof(int));
+		for (j=0;j<number;j++)
+		{
+			temp2=*temp1+j;
+			*temp2=0;
+			while (ch==' '||ch=='\t'||ch=='\n')
+			{
+				ch=getchar();
+			}
+			while (ch>='0'&&ch<='9')
+			{
+				*temp2=*temp2*10+(ch-'0');
+				ch=getchar();
+			}
+		}
+	}
+	
+	printf("%d\n",number);
+	for (i=0;i<number;i++)
+	{
+		temp1=men+i;
+		for (j=0;j<number;j++)
+		{
+			temp2=*temp1+j;
+			printf(" %d",*temp2);
+		}
+		putchar('\n');
+	}
+	for (i=0;i<number;i++)
+	{
+		temp1=women+i;
+		for (j=0;j<number;j++)
+		{
+			temp2=*temp1+j;
+			printf(" %d",*temp2);
+		}
+		putchar('\n');
+	}
+
+	return EXIT_SUCCESS;
+}

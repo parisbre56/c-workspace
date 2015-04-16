@@ -1,0 +1,2750 @@
+AAC Egypt	HEAR
+AAE Algeria	DABB
+AAL Denmark	EKYT
+AAM South Africa	FAMD
+AAN United Arab Em	OMAL
+AAQ Russian Federa	URKA
+AAR Denmark	EKAH
+AAT People's Repub	ZWAT
+AAX Unknown	NONE
+ABC Unknown	NONE
+ABE United States	KABE
+ABI United States	KABI
+ABJ Cote d'Ivoire	DIAP
+ABK Ethiopia	HAKD
+ABL Alaska	PAFM
+ABM Unknown	NONE
+ABQ United States	KABQ
+ABR United States	KABR
+ABS Egypt	HEBL
+ABT Saudi Arabia	OEBA
+ABV Nigeria	DNAA
+ABX Australia	YMAY
+ABY United States	KABY
+ABZ United Kingdom	EGPD
+ACA Mexico	MMAA
+ACC Ghana	DGAA
+ACE Canary Islands	GCRR
+ACH Switzerland	LSZR
+ACI United Kingdom	EGJA
+ACK United States	KACK
+ACT United States	KACT
+ACV United States	KACV
+ACY United States	KACY
+ADA Turkey	LTAF
+ADB Turkey	LTBJ
+ADD Ethiopia	HAAB
+ADE Yemen	OYAA
+ADJ Jordan	OJAM
+ADK Alaska	PADK
+ADL Australia	YPAD
+ADQ Alaska	PADQ
+ADZ Colombia	SKSP
+AED Unknown	NONE
+AEP Argentina	SABE
+AER Russian Federa	URSS
+AES Norway	ENAL
+AET Alaska	PFAL
+AEX United States	KAEX
+AEY Unknown	NONE
+AFA Argentina	SAMR
+AGA Morocco	GMAD
+AGB Germany	EDMA
+AGC United States	KAGC
+AGF France	LFBA
+AGH Sweden	ESTA
+AGN Alaska	PAGN
+AGP Spain	LEMG
+AGR India	VIAG
+AGS United States	KAGS
+AGT Paraguay	SGES
+AGU Mexico	MMAS
+AHB Saudi Arabia	OEAB
+AHN United States	KAHN
+AHO Italy	LIEA
+AHU Morocco	GMTA
+AIA United States	KAIA
+AIN Alaska	PAWI
+AIY United States	KAIY
+AJA France	LFKJ
+AJF Saudi Arabia	OESK
+AJI Turkey	LTCO
+AJN Comoros	FMCV
+AJR Sweden	ESNX
+AJU Brazil	SBAR
+AKF Libya	HLKF
+AKJ Japan	RJEC
+AKL New Zealand	NZAA
+AKN Alaska	PAKN
+AKU People's Repub	ZWAK
+AKV Canada	CYKO
+ALA Kazakhstan	UAAA
+ALB United States	KALB
+ALC Spain	LEAL
+ALE Unknown	NONE
+ALF Norway	ENAT
+ALG Algeria	DAAG
+ALL Italy	LIMG
+ALM United States	KALM
+ALO United States	KALO
+ALP Syria	OSAP
+ALS United States	KALS
+ALW United States	KALW
+ALY Egypt	HEAX
+AMA United States	KAMA
+AMD India	VAAH
+AMH Ethiopia	HAAM
+AMI Indonesia	WRRA
+AMM Jordan	OJAI
+AMQ Indonesia	WAPP
+AMS Netherlands	EHAM
+ANB United States	KANB
+ANC Alaska	PANC
+ANF Chile	SCFA
+ANG France	LFBU
+ANI Alaska	PANI
+ANR Belgium	EBAW
+ANU Antigua	TAPA
+ANV Alaska	PANV
+AOG People's Repub	ZYAS
+AOI Italy	LIPY
+AOJ Japan	RJSA
+AOK Greece	LGKP
+AOO United States	KAOO
+AOR Malaysia	WMKA
+AOU Laos	VLAP
+APF United States	KAPF
+APL Mozambique	FQNP
+APN United States	KAPN
+APW Samoa	NSFA
+AQG People's Repub	ZSAQ
+AQI Saudi Arabia	OEPA
+AQJ Jordan	OJAQ
+AQP Peru	SPQU
+ARH Russian Federa	ULAA
+ARI Chile	SCAR
+ARM Australia	YARM
+ARN Sweden	ESSA
+ART United States	KART
+ASB Turkmenistan	UTAA
+ASD Bahamas	MYAF
+ASE United States	KASE
+ASF Russian Federa	URWA
+ASJ Japan	RJKA
+ASM Eritrea	HHAS
+ASO Ethiopia	HASO
+ASP Australia	YBAS
+ASR Turkey	LTAU
+ASU Paraguay	SGAS
+ASW Egypt	HESN
+ATC Bahamas	MYCA
+ATH Greece	LGAV
+ATL United States	KATL
+ATM Brazil	SBHT
+ATQ India	VIAR
+ATW United States	KATW
+ATY United States	KATY
+ATZ Egypt	HEAT
+AUA Aruba	TNCA
+AUC Colombia	SKUC
+AUG United States	KAUG
+AUH United Arab Em	OMAA
+AUS United States	KAUS
+AUX Unknown	NONE
+AVK Mongolia	ZMAH
+AVL United States	KAVL
+AVN France	LFMV
+AVP United States	KAVP
+AVV Australia	YMAV
+AWZ Iran	OIAW
+AXA Anguilla	TQPF
+AXD Greece	LGAL
+AXM Colombia	SKAR
+AXP Bahamas	MYAP
+AXT Japan	RJSK
+AYQ Australia	YAYE
+AYT Turkey	LTAI
+AZA Unknown	NONE
+AZD Iran	OIYY
+AZN Uzbekistan	UTFA
+AZO United States	KAZO
+AZS Dominican Repu	MDCY
+BAH Bahrain	OBBI
+BAK Azerbaijan	UBBB
+BAL Turkey	LTCJ
+BAQ Colombia	SKBQ
+BAU Brazil	SBBU
+BAV People's Repub	ZBOW
+BAX Russian Federa	UNBB
+BAY Romania	LRBM
+BBA Chile	SCBA
+BBI India	VEBS
+BBK Botswana	FBKE
+BBN Malaysia	WBGZ
+BBU Romania	LRBS
+BCD Philippines	RPVB
+BCI Australia	YBAR
+BCN Spain	LEBL
+BCQ Unknown	NONE
+BDA Bermuda	TXKF
+BDB Australia	YBUD
+BDJ Indonesia	WRBB
+BDL United States	KBDL
+BDO Indonesia	WICC
+BDQ India	VABO
+BDR United States	KBDR
+BDS Italy	LIBR
+BDU Norway	ENDU
+BEB United Kingdom	EGPL
+BED United States	KBED
+BEG Serbia	LYBE
+BEH United States	KBEH
+BEI Ethiopia	HABE
+BEK Unknown	NONE
+BEL Brazil	SBBE
+BEN Libya	HLLB
+BEO Unknown	NONE
+BER Unknown	NONE
+BES France	LFRB
+BET Alaska	PABE
+BEW Mozambique	FQBR
+BEY Lebanon	OLBA
+BFD United States	KBFD
+BFF United States	KBFF
+BFI United States	KBFI
+BFL United States	KBFL
+BFN South Africa	FABL
+BFS United Kingdom	EGAA
+BGA Colombia	SKBG
+BGF Central Africa	FEFF
+BGI Barbados	TBPB
+BGK Unknown	NONE
+BGM United States	KBGM
+BGO Norway	ENBR
+BGR United States	KBGR
+BGY Italy	LIME
+BHB United States	KBHB
+BHD United Kingdom	EGAC
+BHE New Zealand	NZWB
+BHH Saudi Arabia	OEBH
+BHI Argentina	SAZB
+BHK Uzbekistan	UTSB
+BHM United States	KBHM
+BHO India	VABP
+BHQ Australia	YBHI
+BHS Australia	YBTH
+BHU India	VABV
+BHV Pakistan	OPBW
+BHX United Kingdom	EGBB
+BHY People's Repub	ZGBH
+BIA France	LFKB
+BIK Indonesia	WABB
+BIL United States	KBIL
+BIM Bahamas	MYBS
+BIO Spain	LEBB
+BIQ France	LFBZ
+BIS United States	KBIS
+BJI United States	KBJI
+BJL The Gambia	GBYD
+BJM Burundi	HBBA
+BJR Ethiopia	HABD
+BJX Mexico	MMLO
+BKI Malaysia	WBKK
+BKK Thailand	VTBS
+BKL United States	KBKL
+BKM Malaysia	WBGQ
+BKO Mali	GABS
+BKQ Australia	YBCK
+BKW United States	KBKW
+BKX United States	KBKX
+BLA Venezuela	SVBC
+BLE Sweden	ESSD
+BLF United States	KBLF
+BLG Malaysia	WBGC
+BLI United States	KBLI
+BLK United Kingdom	EGNH
+BLL Denmark	EKBI
+BLQ Italy	LIPE
+BLR India	VOBL
+BLT Australia	YBTR
+BLZ Malawi	FWCL
+BMA Sweden	ESSB
+BME Australia	YBRM
+BMG United States	KBMG
+BMI United States	KBMI
+BMP Unknown	NONE
+BMV Vietnam	VVBM
+BNA United States	KBNA
+BND Iran	OIKB
+BNE Australia	YBBN
+BNJ Unknown	NONE
+BNK Australia	YBNA
+BNN Norway	ENBN
+BNS Venezuela	SVBI
+BNX Bosnia and Her	LQBK
+BOB French Polynes	NTTB
+BOD France	LFBD
+BOG Colombia	SKBO
+BOI United States	KBOI
+BOJ Bulgaria	LBBG
+BOM India	VABB
+BON Netherlands An	TNCB
+BOO Norway	ENBO
+BOS United States	KBOS
+BPN Indonesia	WALL
+BPS Brazil	SBPS
+BPT United States	KBPT
+BPX Unknown	NONE
+BQK United States	KBQK
+BQN Puerto Rico	TJBQ
+BQU Saint Vincent 	TVSB
+BRC Argentina	SAZS
+BRD United States	KBRD
+BRE Germany	EDDW
+BRI Italy	LIBD
+BRL United States	KBRL
+BRM Venezuela	SVBM
+BRN Switzerland	LSZB
+BRO United States	KBRO
+BRQ Czech Republic	LKTB
+BRR United Kingdom	EGPR
+BRS United Kingdom	EGGD
+BRT Australia	YBTI
+BRU Belgium	EBBR
+BRW Alaska	PABR
+BSB Brazil	SBBR
+BSK Algeria	DAUB
+BSL Switzerland	LFSB
+BTH Indonesia	WIDD
+BTI Alaska	PABU
+BTM United States	KBTM
+BTR United States	KBTR
+BTS Slovakia	LZIB
+BTU Malaysia	WBGB
+BTV United States	KBTV
+BUD Hungary	LHBP
+BUF United States	KBUF
+BUQ Zimbabwe	FVBU
+BUR United States	KBUR
+BUX Democratic Rep	FZKA
+BUZ Iran	OIBB
+BVB Brazil	SBBV
+BVC Cape Verde	GVBA
+BVE France	LFBV
+BVG Norway	ENBV
+BVI Australia	YBDV
+BWA Nepal	VNBW
+BWD United States	KBWD
+BWI United States	KBWI
+BWN Brunei	WBSB
+BWT Australia	YWYY
+BXN Turkey	LTBV
+BXU Philippines	RPME
+BYN Mongolia	ZMBH
+BYU Germany	EDQD
+BZE Belize	MZBZ
+BZG Poland	EPBY
+BZN United States	KBZN
+BZO Italy	LIPB
+BZR France	LFMU
+BZV Republic of th	FCBB
+CAC Brazil	SBCA
+CAE United States	KCAE
+CAG Italy	LIEE
+CAI Egypt	HECA
+CAJ Venezuela	SVCN
+CAK United States	KCAK
+CAL United Kingdom	EGEC
+CAN People's Repub	ZGGG
+CAS Morocco	GMMC
+CAY French Guiana	SOCA
+CBB Bolivia	SLCB
+CBE United States	KCAV
+CBG United Kingdom	EGSC
+CBL Venezuela	SVCB
+CBO Philippines	RPMC
+CBR Australia	YSCB
+CCF France	LFMK
+CCJ India	VOCL
+CCP Chile	SCIE
+CCS Venezuela	SVMI
+CCU India	VECC
+CDB Alaska	PACD
+CDC United States	KCDC
+CDG France	LFPG
+CDH Unknown	NONE
+CDR United States	KCDR
+CDV Alaska	PACV
+CDW United States	KCDW
+CEB Philippines	RPVM
+CEC United States	KCEC
+CED Australia	YCDU
+CEI Thailand	VTCT
+CEK Russian Federa	USCC
+CEN Mexico	MMCN
+CER France	LFRC
+CEZ United States	KCEZ
+CFA Unknown	NONE
+CFE France	LFLC
+CFR France	LFRK
+CFS Australia	YCFS
+CFU Greece	LGKR
+CGA Unknown	NONE
+CGB Brazil	SBCY
+CGD Unknown	NONE
+CGH Brazil	SBSP
+CGI United States	KCGI
+CGK Indonesia	WIII
+CGN Germany	EDDK
+CGO People's Repub	ZHCC
+CGP Bangladesh	VGEG
+CGQ People's Repub	ZYCC
+CGR Brazil	SBCG
+CGX Unknown	NONE
+CGY Philippines	RPML
+CHA United States	KCHA
+CHC New Zealand	NZCH
+CHI Unknown	NONE
+CHO United States	KCHO
+CHQ Greece	LGSA
+CHS United States	KCHS
+CIA Italy	LIRA
+CIC United States	KCIC
+CID United States	KCID
+CIH People's Repub	ZBCZ
+CIU United States	KCIU
+CIW Saint Vincent 	TVSC
+CIX Peru	SPHI
+CJA Peru	SPJR
+CJB India	VOCB
+CJC Chile	SCCF
+CJJ South Korea	RKTU
+CJL Pakistan	OPCH
+CJS Mexico	MMCS
+CJT Unknown	NONE
+CJU South Korea	RKPC
+CKB United States	KCKB
+CKG People's Repub	ZUCK
+CKS Brazil	SBCJ
+CKY Guinea	GUCY
+CLD United States	KCRQ
+CLE United States	KCLE
+CLJ Romania	LRCL
+CLL United States	KCLL
+CLM United States	KCLM
+CLO Colombia	SKCL
+CLQ Mexico	MMIA
+CLT United States	KCLT
+CLY France	LFKC
+CMB Sri Lanka	VCBI
+CME Mexico	MMCE
+CMF France	LFLB
+CMG Brazil	SBCR
+CMH United States	KCMH
+CMI United States	KCMI
+CMN Morocco	GMMN
+CMX United States	KCMX
+CND Romania	LRCK
+CNF Brazil	SBCF
+CNJ Australia	YCCY
+CNM United States	KCNM
+CNQ Argentina	SARC
+CNS Australia	YBCS
+CNX Thailand	VTCC
+CNY United States	KCNY
+COD United States	KCOD
+COK India	VOCI
+COO Benin	DBBB
+COQ Mongolia	ZMCD
+COR Argentina	SACO
+COS United States	KCOS
+COU United States	KCOU
+CPC Argentina	SAZY
+CPD Australia	YCBP
+CPE Mexico	MMCP
+CPH Denmark	EKCH
+CPO Chile	SCHA
+CPQ Unknown	NONE
+CPR United States	KCPR
+CPT South Africa	FACT
+CPV Brazil	SBKG
+CPX Puerto Rico	TJCP
+CRD Argentina	SAVC
+CRG United States	KCRG
+CRI Bahamas	MYCI
+CRK Philippines	RPLC
+CRP United States	KCRP
+CRU Grenada	TGPZ
+CRV Italy	LIBC
+CRW United States	KCRW
+CSG United States	KCSG
+CSX People's Repub	ZGHA
+CTA Italy	LICC
+CTG Colombia	SKCG
+CTL Australia	YBCV
+CTM Mexico	MMCM
+CTS Japan	RJCC
+CTU People's Repub	ZUUU
+CUC Colombia	SKCC
+CUE Ecuador	SECU
+CUL Mexico	MMCL
+CUM Venezuela	SVCU
+CUN Mexico	MMUN
+CUP Venezuela	SVCP
+CUR Netherlands An	TNCC
+CUU Mexico	MMCU
+CUZ Peru	SPZO
+CVG United States	KCVG
+CVJ Mexico	MMCB
+CVM Mexico	MMCV
+CVN United States	KCVN
+CWA United States	KCWA
+CWB Brazil	SBCT
+CWL United Kingdom	EGFF
+CWT Australia	YCWR
+CXH Canada	CYHC
+CXI Line Islands	PLCH
+CXJ Brazil	SBCX
+CYB Cayman Islands	MWCB
+CYF Alaska	PACK
+CYI Taiwan	RCKU
+CYR Uruguay	SUCA
+CYS United States	KCYS
+CZE Venezuela	SVCR
+CZL Algeria	DABC
+CZM Mexico	MMCZ
+CZS Brazil	SBCZ
+CZX People's Repub	ZSCG
+DAB Unknown	NONE
+DAC Bangladesh	VGZR
+DAD Vietnam	VVDN
+DAL Unknown	NONE
+DAM Syria	OSDI
+DAN Unknown	NONE
+DAR Tanzania	HTDA
+DAY Unknown	NONE
+DBM Ethiopia	HADM
+DBO Australia	YSDU
+DBQ Unknown	NONE
+DBV Croatia	LDDU
+DCA Unknown	NONE
+DCF Dominica	TDCF
+DDC Unknown	NONE
+DDG People's Repub	ZYDD
+DEA Pakistan	OPDG
+DEB Hungary	LHDC
+DEC Unknown	NONE
+DEL India	VIDP
+DEM Ethiopia	HADD
+DEN Unknown	NONE
+DET Unknown	NONE
+DFW Unknown	NONE
+DGA Unknown	NONE
+DGO Mexico	MMDO
+DGT Philippines	RPVD
+DHA Saudi Arabia	OEDR
+DHM India	VIGG
+DHN Unknown	NONE
+DIB India	VEMN
+DIG Unknown	NONE
+DIJ France	LFSD
+DIK Unknown	NONE
+DIL East Timor 	WPDL
+DIN Vietnam	VVDB
+DIR Ethiopia	HADR
+DIU Unknown	NONE
+DIY Turkey	LTCC
+DJE Tunisia	DTTJ
+DJJ Indonesia	WAJJ
+DKR Senegal	GOOY
+DLA Cameroo	FKKD
+DLC People's Repub	ZYTL
+DLG Alaska	PADL
+DLH Unknown	NONE
+DLI Vietnam	VVDL
+DLM Turkey	LTBS
+DLU Unknown	NONE
+DLZ Mongolia	ZMDZ
+DME Russian Federa	UUDD
+DMM Saudi Arabia	OEDF
+DNA Japan	RODN
+DND United Kingdom	EGPN
+DNF Unknown	NONE
+DNH People's Repub	ZLDH
+DNK Ukraine	UKDD
+DNM Australia	YSHK
+DNV Unknown	NONE
+DNZ Turkey	LTAY
+DOH Qatar	OTBD
+DOK Ukraine	UKCC
+DOL France	LFRG
+DOM Dominica	TDPD
+DPA Unknown	NONE
+DPL Philippines	RPMG
+DPO Australia	YDPO
+DPS Indonesia	WADD
+DRO Unknown	NONE
+DRS Germany	EDDC
+DRT Unknown	NONE
+DRW Australia	YPDN
+DSA United Kingdom	EGCN
+DSE Ethiopia	HADC
+DSI Unknown	NONE
+DSK Pakistan	OPDI
+DSM Unknown	NONE
+DTM Germany	EDLW
+DTW Unknown	NONE
+DUB Ireland	EIDW
+DUD New Zealand	NZDN
+DUJ Unknown	NONE
+DUQ Unknown	NONE
+DUR South Africa	FALE
+DUS Germany	EDDL
+DUT Alaska	PADU
+DVL Unknown	NONE
+DVO Philippines	RPMD
+DWD Unknown	NONE
+DXB United Arab Em	OMDB
+DYG Unknown	NONE
+EAM Saudi Arabia	OENG
+EAR Unknown	NONE
+EAS Spain	LESO
+EAT Unknown	NONE
+EAU Unknown	NONE
+EBA Italy	LIRJ
+EBB Uganda	HUEN
+EBJ Denmark	EKEB
+ECH Australia	YECH
+EDI United Kingdom	EGPH
+EDR Unknown	NONE
+EEN Unknown	NONE
+EFD Unknown	NONE
+EFL Greece	LGKF
+EGC France	LFBE
+EGE Unknown	NONE
+EGO Russian Federa	UUOB
+EHM Alaska	PAEH
+EIN Netherlands	EHEH
+EIS British Virgin	TUPJ
+EJA Colombia	SKEJ
+EJH Saudi Arabia	OEWJ
+EKO Unknown	NONE
+ELD Unknown	NONE
+ELH Bahamas	MYEH
+ELM Unknown	NONE
+ELP Unknown	NONE
+ELQ Saudi Arabia	OEGS
+ELS South Africa	FAEL
+ELY Unknown	NONE
+EMA United Kingdom	EGNX
+EMD Australia	YEML
+ENA Alaska	PAEN
+ENS Netherlands	EHTW
+ENV Unknown	NONE
+EOH Colombia	SKMD
+EPR Australia	YESP
+EQS Argentina	SAVE
+ERF Germany	EDDE
+ERI Unknown	NONE
+ERS Namibia	FYWE
+ERZ Turkey	LTCE
+ESB Turkey	LTAC
+ESC Unknown	NONE
+ESD Unknown	NONE
+ESR Chile	SCES
+ETH Israel	LLET
+ETZ France	LFJL
+EUG Unknown	NONE
+EUN Western Sahara	GSAI
+EVE Norway	ENEV
+EVN Armenia	UDYZ
+EVV Unknown	NONE
+EWB Unknown	NONE
+EWN Unknown	NONE
+EWR Unknown	NONE
+EXT United Kingdom	EGTE
+EYW Unknown	NONE
+EZE Argentina	SAEZ
+EZF Unknown	NONE
+FAE Faroe Islands	EKVG
+FAI Alaska	PAFA
+FAO Portugal	LPFR
+FAR Unknown	NONE
+FAT Unknown	NONE
+FAY Unknown	NONE
+FCA Unknown	NONE
+FCO Italy	LIRF
+FDE Norway	ENBL
+FDF Martinique	TFFF
+FDH Germany	EDNY
+FEN Brazil	SBFN
+FEZ Morocco	GMFF
+FFM Unknown	NONE
+FHU Unknown	NONE
+FIH Democratic Rep	FZAA
+FKB Germany	EDSB
+FKL Unknown	NONE
+FLG Unknown	NONE
+FLL Unknown	NONE
+FLN Brazil	SBFL
+FLO Unknown	NONE
+FLR Italy	LIRQ
+FMA Argentina	SARF
+FMN Unknown	NONE
+FMO Germany	EDDG
+FNC Portugal	LPMA
+FNI France	LFTW
+FNL Unknown	NONE
+FNT Unknown	NONE
+FOC People's Repub	ZSFZ
+FOD Unknown	NONE
+FOE Unknown	NONE
+FOR Brazil	SBFZ
+FPO Bahamas	MYGF
+FRA Germany	EDDF
+FRD Unknown	NONE
+FRM Unknown	NONE
+FRO Norway	ENFL
+FRS Guatemala	MGTK
+FRU Kyrgyzstan	UAFM
+FSD Unknown	NONE
+FSM Unknown	NONE
+FSP Saint Pierre a	LFVP
+FTE Argentina	SAWC
+FUE Canary Islands	GCFV
+FUG People's Repub	ZSFY
+FUK Japan	RJFF
+FUN Tuvalu	NGFU
+FWA Unknown	NONE
+FYV Unknown	NONE
+GAJ Japan	RJSC
+GAL Alaska	PAGA
+GAU India	VEGT
+GBD Unknown	NONE
+GBE Botswana	FBSK
+GBG Unknown	NONE
+GCC Unknown	NONE
+GCI United Kingdom	EGJB
+GCK Unknown	NONE
+GCM Cayman Islands	MWCR
+GCN Unknown	NONE
+GCY Unknown	NONE
+GDC Unknown	NONE
+GDL Mexico	MMGL
+GDN Poland	EPGD
+GDT Turks and Caic	MBGT
+GDV Unknown	NONE
+GDX Russian Federa	UHMM
+GEA New Caledonia	NWWM
+GEG Unknown	NONE
+GEO Guyana	SYTM
+GET Australia	YGEL
+GFF Australia	YGTH
+GFK Unknown	NONE
+GGG Unknown	NONE
+GGT Bahamas	MYEF
+GGW Unknown	NONE
+GHB Bahamas	MYEM
+GHT Libya	HLGT
+GIB Gibraltar	LXGB
+GIG Brazil	SBGL
+GIL Pakistan	OPGT
+GIZ Saudi Arabia	OEGN
+GJT Unknown	NONE
+GKA Papua New Guin	AYGA
+GLA United Kingdom	EGPF
+GLD Unknown	NONE
+GLF Costa Rica	MRGF
+GLH Unknown	NONE
+GLS Unknown	NONE
+GLT Australia	YGLA
+GLV Alaska	PAGL
+GMU Unknown	NONE
+GNB France	LFLS
+GND Grenada	TGPY
+GNV Unknown	NONE
+GOA Italy	LIMJ
+GOH Greenland	BGGH
+GOI India	VAGO
+GOJ Russian Federa	UWGG
+GON Unknown	NONE
+GOT Sweden	ESGG
+GOV Australia	YPGV
+GPI Colombia	SKGP
+GPS Ecuador	SEGS
+GPT Unknown	NONE
+GRB Unknown	NONE
+GRE Unknown	NONE
+GRI Unknown	NONE
+GRJ South Africa	FAGG
+GRO Spain	LEGE
+GRQ Netherlands	EHGG
+GRR Unknown	NONE
+GRU Brazil	SBGR
+GRX Spain	LEGR
+GRZ Austria	LOWG
+GSO Unknown	NONE
+GSP Unknown	NONE
+GST Alaska	PAGS
+GTF Unknown	NONE
+GTO Unknown	NONE
+GTR Unknown	NONE
+GUA Guatemala	MGGT
+GUB Mexico	MMGR
+GUC Unknown	NONE
+GUM Guam	PGUM
+GUP Unknown	NONE
+GUR Papua New Guin	AYGN
+GVA Switzerland	LSGG
+GVT Unknown	NONE
+GWD Pakistan	OPGD
+GWT Germany	EDXW
+GWY Ireland	EICM
+GXQ Chile	SCCY
+GYA Bolivia	SLGY
+GYD Unknown	NONE
+GYE Ecuador	SEGU
+GYM Mexico	MMGM
+GYN Brazil	SBGO
+GYY Unknown	NONE
+HAC Japan	RJTH
+HAD Sweden	ESMT
+HAG Unknown	NONE
+HAH Comoros	FMCH
+HAJ Germany	EDDV
+HAK People's Repub	ZJHK
+HAM Germany	EDDH
+HAN Vietnam	VVNB
+HAS Saudi Arabia	OEHL
+HAU Norway	ENHD
+HAV Cuba	MUHA
+HBA Australia	YMHB
+HBE Egypt	HEBA
+HBT Saudi Arabia	OEKK
+HDB Germany	EDIU
+HDF Unknown	NONE
+HDN Unknown	NONE
+HDS Unknown	NONE
+HDY Thailand	VTSS
+HEA Afghanistan	OAHR
+HEH Myanmar (Burma	VYHH
+HEL Finland	EFHK
+HER Greece	LGIR
+HET People's Repub	ZBHH
+HFA Israel	LLHA
+HFE People's Repub	ZSOF
+HFT Norway	ENHF
+HGA Somalia	HCMH
+HGH People's Repub	ZSHC
+HGN Thailand	VTCH
+HGR Unknown	NONE
+HGU Papua New Guin	AYMH
+HHH Unknown	NONE
+HHN Germany	EDFH
+HIB Unknown	NONE
+HID Australia	YHID
+HII Unknown	NONE
+HIJ Japan	RJOA
+HIL Philippines	RPVH
+HIN South Korea	RKPS
+HIR Solomon Island	AGGH
+HIS Unknown	NONE
+HJR India	VIKJ
+HJT Mongolia	ZMHU
+HKD Japan	RJCH
+HKG Hong Kong, Chi	VHHX
+HKK New Zealand	NZHK
+HKN Papua New Guin	AYHK
+HKT Thailand	VTSP
+HKY Unknown	NONE
+HLA South Africa	FALA
+HLD People's Repub	ZBLA
+HLN Unknown	NONE
+HLP Indonesia	WIHH
+HLZ New Zealand	NZHN
+HMA Russian Federa	USHH
+HMO Mexico	MMHO
+HNA Japan	RJSI
+HNH Alaska	PAOH
+HNL Hawaii	PHNL
+HNM Hawaii	PHHN
+HNS Alaska	PAHN
+HOB Unknown	NONE
+HOE Laos	VLHS
+HOF Saudi Arabia	OEAH
+HOM Alaska	PAHO
+HON Unknown	NONE
+HOQ Germany	EDQM
+HOR Portugal	LPHR
+HOT Unknown	NONE
+HOU Unknown	NONE
+HPA Tonga	NFTL
+HPB Alaska	PAHP
+HPH Vietnam	VVCI
+HPN Unknown	NONE
+HPV Unknown	NONE
+HRB People's Repub	ZYHB
+HRE Zimbabwe	FVHA
+HRG Egypt	HEGN
+HRK Ukraine	UKHH
+HRL Unknown	NONE
+HRO Unknown	NONE
+HSG Japan	RJFS
+HSI Unknown	NONE
+HSM Australia	YHSM
+HSN People's Repub	ZSZS
+HSV Unknown	NONE
+HTI Australia	YBHM
+HTN People's Repub	ZWTN
+HTS Unknown	NONE
+HUF Unknown	NONE
+HUH French Polynes	NTTH
+HUI Vietnam	VVPB
+HUM Unknown	NONE
+HUN Taiwan	RCYU
+HUQ Unknown	NONE
+HUX Mexico	MMBT
+HUY United Kingdom	EGNJ
+HVB Australia	YHBA
+HVD Mongolia	ZMKD
+HVG Norway	ENHV
+HVN Unknown	NONE
+HVR Unknown	NONE
+HWN Zimbabwe	FVWN
+HYA Unknown	NONE
+HYD India	VOHS
+HYG Alaska	PAHY
+HYN People's Repub	ZSLQ
+HYS Unknown	NONE
+IAD Unknown	NONE
+IAH Unknown	NONE
+IAS Romania	LRIA
+IBZ Spain	LEIB
+ICN South Korea	RKSI
+ICT Unknown	NONE
+IDA Unknown	NONE
+IDR India	VAID
+IEG Poland	EPZG
+IEV Ukraine	UKKK
+IFN Iran	OIFM
+IFO Ukraine	UKLI
+IFP Unknown	NONE
+IGA Bahamas	MYIG
+IGG Alaska	PAIG
+IGM Unknown	NONE
+IGR Argentina	SARI
+IGU Brazil	SBFI
+IJK Russian Federa	USPI
+IKO Alaska	PAKO
+IKT Russian Federa	UIII
+ILE Unknown	NONE
+ILF Canada	CZBD
+ILG Unknown	NONE
+ILI Alaska	PAIL
+ILM Unknown	NONE
+ILO Philippines	RPVI
+ILQ Unknown	NONE
+ILY United Kingdom	EGPI
+IMF India	VEIM
+IMP Brazil	SBIZ
+IMT Unknown	NONE
+INC People's Repub	ZLIC
+IND Unknown	NONE
+INL Unknown	NONE
+INN Austria	LOWI
+INT Unknown	NONE
+INU Nauru	ANYN
+INV United Kingdom	EGPE
+IOA Greece	LGIO
+IOM United Kingdom	EGNS
+IOS Brazil	SBIL
+IPC Chile	SCIP
+IPH Malaysia	WMKI
+IPI Colombia	SKIP
+IPT Unknown	NONE
+IQM Unknown	NONE
+IQQ Chile	SCDA
+IQT Peru	SPQT
+IRJ Argentina	SANL
+IRK Unknown	NONE
+ISA Australia	YBMA
+ISB Pakistan	OPRN
+ISC United Kingdom	EGHE
+ISG Japan	ROIG
+ISH Unknown	NONE
+ISN Unknown	NONE
+ISO Unknown	NONE
+ISP Unknown	NONE
+IST Turkey	LTBA
+ITB Brazil	SBIH
+ITH Unknown	NONE
+ITM Japan	RJOO
+ITO Hawaii	PHTO
+IUE Niue	NIUE
+IVC New Zealand	NZNV
+IVL Finland	EFIV
+IWD Unknown	NONE
+IWJ Japan	RJOW
+IXA India	VEAT
+IXB India	VEBD
+IXC India	VICG
+IXD India	VIAL
+IXE India	VOML
+IXG India	VABM
+IXH India	VEKR
+IXI India	VELR
+IXJ India	VIJU
+IXK India	VAKS
+IXL India	VILH
+IXM India	VOMD
+IXN India	VEKW
+IXP India	VIPK
+IXQ India	VEKM
+IXR India	VERC
+IXS India	VEKU
+IXT India	VEPG
+IXU India	VAAU
+IXV India	VEAN
+IXW India	VEJS
+IXY India	VAKE
+IXZ India	VOPB
+IYK Unknown	NONE
+IZO Japan	RJOC
+JAC Unknown	NONE
+JAG Pakistan	OPJA
+JAI India	VIJP
+JAL Mexico	MMJA
+JAN Unknown	NONE
+JAT Unknown	NONE
+JAV Greenland	BGJN
+JAX Unknown	NONE
+JBR Unknown	NONE
+JCA Unknown	NONE
+JDH India	VIJO
+JDO Unknown	NONE
+JDP Unknown	NONE
+JED Saudi Arabia	OEJN
+JER United Kingdom	EGJJ
+JFK Unknown	NONE
+JGA India	VAJM
+JHB Malaysia	WMKJ
+JHE Unknown	NONE
+JHG People's Repub	ZPJH
+JHM Hawaii	PHJH
+JHW Unknown	NONE
+JIB Djibouti	HDAM
+JIJ Unknown	NONE
+JIK Greece	LGIK
+JIL People's Repub	ZYJL
+JIM Ethiopia	HAJM
+JJN People's Repub	ZSQZ
+JKG Sweden	ESGJ
+JKH Greece	LGHI
+JLN Unknown	NONE
+JMC Unknown	NONE
+JMK Greece	LGMK
+JMM Unknown	NONE
+JMO Unknown	NONE
+JMS Unknown	NONE
+JNB South Africa	FAJS
+JNS Greenland	BGNS
+JNU Alaska	PAJN
+JNX Greece	LGNX
+JOE Finland	EFJO
+JOG Indonesia	WIIJ
+JOI Brazil	SBJV
+JON Johnston Atoll	PJON
+JOS Nigeria	DNJO
+JPA Brazil	SBJP
+JRA Unknown	NONE
+JRH India	VEJT
+JRO Tanzania	HTKJ
+JSH Greece	LGST
+JSI Greece	LGSK
+JST Unknown	NONE
+JSY Greece	LGSO
+JTR Greece	LGSR
+JTY Greece	LGPL
+JUJ Argentina	SASJ
+JUL Peru	SPJL
+JYV Finland	EFJY
+JZH People's Repub	ZUJZ
+KAB Zimbabwe	FVKB
+KAE Alaska	PAFE
+KAG South Korea	RKNN
+KAJ Finland	EFKI
+KAL Alaska	PAKV
+KAN Nigeria	DNKN
+KAO Finland	EFKS
+KAT New Zealand	NZKT
+KBL Afghanistan	OAKB
+KBP Ukraine	UKBB
+KBR Malaysia	WMKC
+KBV Thailand	VTSG
+KCA People's Repub	ZWKC
+KCG Unknown	NONE
+KCH Malaysia	WBGG
+KCL Unknown	NONE
+KCQ Alaska	PAJC
+KCZ Japan	RJOK
+KDH Afghanistan	OAKN
+KDU Pakistan	OPSD
+KEF Unknown	NONE
+KEH Unknown	NONE
+KEJ Russian Federa	UNEE
+KEL Germany	EDHK
+KEM Finland	EFKE
+KEP Nepal	VNNG
+KER Iran	OIKK
+KGC Australia	YKSC
+KGD Belarus	UMKK
+KGI Australia	YPKG
+KGK Alaska	PAJZ
+KGL Rwanda	HRYR
+KGS Greece	LGKO
+KHG People's Repub	ZWSH
+KHH Taiwan	RCKH
+KHI Pakistan	OPKC
+KHN People's Repub	ZSCN
+KHR Mongolia	ZMHH
+KHV Russian Federa	UHHH
+KID Sweden	ESMK
+KIF Unknown	NONE
+KIJ Japan	RJSN
+KIM South Africa	FAKM
+KIN Jamaica	MKJP
+KIR Ireland	EIKY
+KIT Greece	LGKC
+KIV Moldova	LUKK
+KIX Japan	RJBB
+KJA Russian Federa	UNKL
+KKC Thailand	VTUK
+KKE New Zealand	NZKK
+KKH Alaska	PADY
+KKJ Japan	RJFR
+KKN Norway	ENKR
+KLH India	VAKP
+KLL Unknown	NONE
+KLO Philippines	RPVK
+KLR Sweden	ESMQ
+KLU Austria	LOWK
+KLV Czech Republic	LKKV
+KLW Alaska	PAKW
+KMA Papua New Guin	AYKM
+KMG People's Repub	ZPPP
+KMI Japan	RJFM
+KMJ Japan	RJFT
+KMO Alaska	PAMB
+KMQ Japan	RJNK
+KNH Taiwan	RCBS
+KNS Australia	YKII
+KNW Alaska	PANW
+KNX Australia	YPKU
+KOA Hawaii	PHKO
+KOG Laos	VLKG
+KOI United Kingdom	EGPA
+KOJ Japan	RJFK
+KOK Finland	EFKK
+KOW People's Repub	ZSGZ
+KPN Alaska	PAKI
+KPO South Korea	RKTH
+KPS Australia	YKMP
+KPV Alaska	PAPE
+KQA Unknown	NONE
+KRF Sweden	ESNK
+KRK Poland	EPKK
+KRL People's Repub	ZWKL
+KRN Sweden	ESNQ
+KRP Denmark	EKKA
+KRR Russian Federa	URKK
+KRS Unknown	NONE
+KRT Sudan	HSSS
+KSA Federated Stat	PTSA
+KSC Slovakia	LZKZ
+KSD Sweden	ESOK
+KSF Germany	EDVK
+KSH Iran	OICC
+KSJ Greece	LGKS
+KSO Greece	LGKA
+KSQ Uzbekistan	UTSK
+KSU Norway	ENKB
+KSY Turkey	LTCF
+KTA Australia	YPKA
+KTM Nepal	VNKT
+KTN Alaska	PAKT
+KTP Jamaica	MKTP
+KTR Australia	YPTN
+KTT Finland	EFKT
+KTW Poland	EPKT
+KUA Malaysia	WMKD
+KUD Malaysia	WBKT
+KUF Russian Federa	UWWW
+KUH Japan	RJCK
+KUL Malaysia	WMKK
+KUN Lithuania	EYKA
+KUO Finland	EFKU
+KUS Greenland	BGKK
+KUV South Korea	RKJK
+KVA Greece	LGKV
+KVC Alaska	PAVC
+KVL Alaska	PAVL
+KWA Marshall Islan	PKWA
+KWE People's Repub	ZUGY
+KWI Kuwait	OKBK
+KWJ South Korea	RKJJ
+KWL People's Repub	ZGKL
+KWN Alaska	PAQH
+KYA Turkey	LTAN
+KZI Greece	LGKZ
+KZN Russian Federa	UWKD
+KZS Greece	LGKJ
+LAD Angola	FNLU
+LAE Papua New Guin	AYNZ
+LAF Unknown	NONE
+LAI France	LFRO
+LAN Unknown	NONE
+LAO Philippines	RPLI
+LAP Mexico	MMLP
+LAQ Libya	HLLQ
+LAR Unknown	NONE
+LAS Unknown	NONE
+LAW Unknown	NONE
+LAX Unknown	NONE
+LBA United Kingdom	EGNM
+LBB Unknown	NONE
+LBE Unknown	NONE
+LBF Unknown	NONE
+LBG Unknown	NONE
+LBL Unknown	NONE
+LBP Unknown	NONE
+LBS Fiji	NFNL
+LBU Malaysia	WBKL
+LBV Gabon	FOOL
+LCA Cyprus	LCLK
+LCE Honduras	MHLC
+LCG Spain	LECO
+LCH Unknown	NONE
+LCJ Poland	EPLL
+LCY United Kingdom	EGLC
+LDB Brazil	SBLO
+LDE France	LFBT
+LDH Australia	YLHI
+LDU Malaysia	WBKD
+LDY United Kingdom	EGAE
+LEA Australia	YPLM
+LEB Unknown	NONE
+LEC Brazil	SNDM
+LED Russian Federa	ULLI
+LEH France	LFOH
+LEI Spain	LEAM
+LEJ Germany	EDDP
+LEN Spain	LELN
+LET Colombia	SKLT
+LEX Unknown	NONE
+LFT Unknown	NONE
+LFW Togo	DXXX
+LGA Unknown	NONE
+LGB Unknown	NONE
+LGG Belgium	EBLG
+LGI Bahamas	MYLD
+LGK Malaysia	WMKL
+LGL Malaysia	WBGF
+LGP Philippines	RPLP
+LGW United Kingdom	EGKK
+LHE Pakistan	OPLA
+LHR United Kingdom	EGLL
+LHW People's Repub	ZLAN
+LIF New Caledonia	NWWL
+LIG France	LFBL
+LIH Hawaii	PHLI
+LIL France	LFQQ
+LIM Peru	SPIM
+LIN Italy	LIML
+LIR Costa Rica	MRLB
+LIS Portugal	LPPT
+LIT Unknown	NONE
+LJG People's Repub	ZPLJ
+LJU Slovenia	LJLJ
+LKE Unknown	NONE
+LKH Malaysia	WBGL
+LKL Norway	ENNA
+LKN Norway	ENLK
+LKO India	VILK
+LLA Sweden	ESPA
+LLI Unknown	NONE
+LLW Malawi	FWKI
+LLY Unknown	NONE
+LMM Mexico	MMLM
+LMN Malaysia	WBGJ
+LMP Italy	LICD
+LMQ Libya	HLMB
+LMT Unknown	NONE
+LNJ Unknown	NONE
+LNK Unknown	NONE
+LNS Unknown	NONE
+LNV Unknown	NONE
+LNY Hawaii	PHNY
+LNZ Austria	LOWL
+LOS Nigeria	DNMM
+LOV Mexico	MMMV
+LPA Canary Islands	GCLP
+LPB Bolivia	SLLP
+LPI Sweden	ESSL
+LPL United Kingdom	EGGP
+LPP Finland	EFLP
+LPQ Laos	VLLB
+LPS Unknown	NONE
+LPT Thailand	VTCL
+LRD Unknown	NONE
+LRE Australia	YLRE
+LRH France	LFBH
+LRM Dominican Repu	MDLR
+LRS Unknown	NONE
+LRT France	LFRH
+LRU Unknown	NONE
+LSC Chile	SCSE
+LSE Unknown	NONE
+LSI United Kingdom	EGPB
+LSP Venezuela	SVJC
+LSQ Chile	SCAG
+LSS Guadeloupe	TFFS
+LST Australia	YMLT
+LSY Australia	YLIS
+LTD Libya	HLTD
+LTI Mongolia	ZMAT
+LTN United Kingdom	EGGW
+LTO Australia	YLTN
+LUA Nepal	VNLK
+LUD Namibia	FYLZ
+LUG Switzerland	LSZA
+LUK Unknown	NONE
+LUM People's Repub	ZPLX
+LUN Zambia	FLLS
+LUP Hawaii	PHLU
+LUQ Argentina	SAOU
+LUX Luxembourg	ELLX
+LVI Zambia	FLLI
+LVT Laos	VLAO
+LWB Unknown	NONE
+LWK United Kingdom	EGET
+LWO Ukraine	UKLL
+LWS Unknown	NONE
+LWT Unknown	NONE
+LWY Malaysia	WBGW
+LXA People's Repub	ZULS
+LXG Laos	VLLN
+LXR Egypt	HELX
+LYA People's Repub	ZHLY
+LYB Cayman Islands	MWCL
+LYC Sweden	ESNL
+LYG People's Repub	ZSLG
+LYH Unknown	NONE
+LYP Pakistan	OPFA
+LYR Norway	ENSB
+LYS France	LFLL
+LZC Mexico	MMLC
+LZH People's Repub	ZGZH
+LZO Unknown	NONE
+MAA India	VOMM
+MAB Brazil	SBMA
+MAD Spain	LEMD
+MAF Unknown	NONE
+MAG Papua New Guin	AYMD
+MAH Spain	LEMH
+MAJ Marshall Islan	PKMJ
+MAM Mexico	MMMA
+MAN United Kingdom	EGCC
+MAO Brazil	SBEG
+MAR Venezuela	SVMC
+MAY Bahamas	MYAB
+MAZ Puerto Rico	TJMZ
+MBA Kenya	HKMO
+MBD South Africa	FAMM
+MBE Japan	RJEB
+MBJ Jamaica	MKJS
+MBL Unknown	NONE
+MBS Unknown	NONE
+MBX Slovenia	LJMB
+MCE Unknown	NONE
+MCG Alaska	PAMC
+MCI Unknown	NONE
+MCK Unknown	NONE
+MCM Monaco	LNMC
+MCN Unknown	NONE
+MCO Unknown	NONE
+MCP Brazil	SBMQ
+MCQ Unknown	NONE
+MCT Oman	OOMS
+MCW Unknown	NONE
+MCY Australia	YBMC
+MCZ Brazil	SBMO
+MDC Indonesia	WAMM
+MDE Colombia	SKRG
+MDG People's Repub	ZYMD
+MDH Unknown	NONE
+MDL Myanmar (Burma	VYMD
+MDQ Argentina	SAZM
+MDT Unknown	NONE
+MDW Unknown	NONE
+MDZ Argentina	SAME
+MED Saudi Arabia	OEMA
+MEH Norway	ENMH
+MEI Unknown	NONE
+MEL Australia	YMML
+MEM Unknown	NONE
+MER Unknown	NONE
+MES Indonesia	WIMM
+MEU Brazil	SBMD
+MEX Mexico	MMMX
+MEY Nepal	VNMG
+MFE Unknown	NONE
+MFM Macau, China	VMMC
+MFN New Zealand	NZMF
+MFR Unknown	NONE
+MGA Nicaragua	MNMG
+MGB Australia	YMTG
+MGF Brazil	SBMG
+MGH South Africa	FAMG
+MGL Germany	EDLN
+MGM Unknown	NONE
+MGQ Somalia	HCMM
+MGW Unknown	NONE
+MHD Iran	OIMM
+MHG Germany	EDFM
+MHH Bahamas	MYAM
+MHK Unknown	NONE
+MHQ Finland	EFMA
+MHT Unknown	NONE
+MHU Australia	YHOT
+MIA Unknown	NONE
+MID Mexico	MMMD
+MIE Unknown	NONE
+MIG Unknown	NONE
+MIM Australia	YMER
+MIR Tunisia	DTMB
+MJD Pakistan	OPMJ
+MJF Norway	ENMS
+MJT Greece	LGMT
+MJV Spain	LELC
+MKC Unknown	NONE
+MKE Unknown	NONE
+MKG Unknown	NONE
+MKK Hawaii	PHMK
+MKL Unknown	NONE
+MKM Malaysia	WBGK
+MKS Unknown	NONE
+MKW Indonesia	WASR
+MKY Australia	YBMK
+MLA Malta	LMML
+MLB Unknown	NONE
+MLE Maldives	VRMM
+MLG Indonesia	WIAS
+MLH France	LFSB
+MLI Unknown	NONE
+MLM Mexico	MMMM
+MLN Ceuta and Meli	GEML
+MLO Greece	LGML
+MLS Unknown	NONE
+MLT Unknown	NONE
+MLU Unknown	NONE
+MLW Liberia	GLMR
+MLX Turkey	LTAT
+MMB Japan	RJCM
+MME United Kingdom	EGNV
+MMH Unknown	NONE
+MMJ Japan	RJAF
+MMK Russian Federa	ULMM
+MMO Cape Verde	GVMA
+MMU Unknown	NONE
+MMX Sweden	ESMS
+MMY Japan	ROMY
+MNF Fiji	NFMA
+MNI Montserrat	TRPM
+MNL Philippines	RPLL
+MNM Unknown	NONE
+MOB Unknown	NONE
+MOC Brazil	SBMK
+MOD Unknown	NONE
+MOL Norway	ENML
+MOT Unknown	NONE
+MOW Russian Federa	UUWV
+MOZ French Polynes	NTTM
+MPA Namibia	FYMP
+MPB Unknown	NONE
+MPK South Korea	RKJM
+MPL France	LFMT
+MPM Mozambique	FQMA
+MPN United Kingdom	EGYP
+MQL Australia	YMIA
+MQM Turkey	LTCR
+MQN Norway	ENRA
+MQP South Africa	FAKN
+MQS Saint Vincent 	TVSM
+MQT Unknown	NONE
+MQX Ethiopia	HAMK
+MRA Unknown	NONE
+MRD Venezuela	SVMD
+MRK Unknown	NONE
+MRS France	LFML
+MRU Mauritius	FIMP
+MRV Russian Federa	URMM
+MRY Unknown	NONE
+MRZ Australia	YMOR
+MSE United Kingdom	EGMH
+MSJ Japan	RJSM
+MSL Unknown	NONE
+MSN Unknown	NONE
+MSO Unknown	NONE
+MSP Unknown	NONE
+MSQ Belarus	UMMS
+MSR Turkey	LTCK
+MSS Unknown	NONE
+MST Netherlands	EHBK
+MSU Lesotho	FXMM
+MSY Unknown	NONE
+MTF Ethiopia	HAMT
+MTH Unknown	NONE
+MTJ Unknown	NONE
+MTS Swaziland	FDMS
+MTT Mexico	MMMT
+MTY Mexico	MMMY
+MUB Botswana	FBMN
+MUC Germany	EDDM
+MUE Hawaii	PHMU
+MUN Venezuela	SVMT
+MUR Malaysia	WBGM
+MUX Pakistan	OPMT
+MVD Uruguay	SUMU
+MVN Unknown	NONE
+MVY Unknown	NONE
+MWA Unknown	NONE
+MWH Unknown	NONE
+MWZ Tanzania	HTMW
+MXL Mexico	MMML
+MXP Italy	LIMC
+MXS Samoa	NSMA
+MXV Mongolia	ZMMN
+MXW Mongolia	ZMMG
+MXZ Unknown	NONE
+MYA Australia	YMRY
+MYE Japan	RJTQ
+MYG Bahamas	MYMM
+MYJ Japan	RJOM
+MYR Unknown	NONE
+MYU Alaska	PAMY
+MYY Malaysia	WBGR
+MZG Taiwan	RCQC
+MZL Colombia	SKMZ
+MZT Mexico	MMMZ
+MZV Malaysia	WBMU
+NAA Australia	YNBR
+NAG India	VANP
+NAH Indonesia	WAMH
+NAK Thailand	VTUQ
+NAN Fiji	NFFN
+NAP Italy	LIRN
+NAS Bahamas	MYNN
+NAT Brazil	SBNT
+NAY People's Repub	ZBNY
+NBO Kenya	HKJK
+NCA Turks and Caic	MBNC
+NCE France	LFMN
+NCL United Kingdom	EGNT
+NCU Uzbekistan	UTNN
+NCY France	LFLP
+NDG People's Repub	ZYQQ
+NDJ Chad	FTTJ
+NDR Morocco	GMMW
+NEC Argentina	SAZO
+NER Unknown	NONE
+NEU Laos	VLSN
+NEV Saint Kitts an	TKPN
+NFO Tonga	NFTO
+NGB People's Repub	ZSNB
+NGO Japan	RJGG
+NGS Japan	RJFU
+NHA Vietnam	VVNT
+NIM Niger	DRRN
+NIX Mali	GANR
+NJC Russian Federa	USNN
+NKC Mauritania	GQNN
+NKG People's Repub	ZSNJ
+NLA Zambia	FLND
+NLD Mexico	MMNL
+NLG Alaska	PAOU
+NLK Australia	YSNF
+NLP South Africa	FANS
+NMA Uzbekistan	UTFN
+NME Alaska	PAGT
+NNG People's Repub	ZGNN
+NNM Russian Federa	ULAM
+NNY People's Repub	ZHNY
+NOC Ireland	EIKN
+NOH Unknown	NONE
+NOU New Caledonia	NWWW
+NPE New Zealand	NZNR
+NPL New Zealand	NZNP
+NQN Argentina	SAZN
+NQY United Kingdom	EGHQ
+NRA Australia	YNAR
+NRK Sweden	ESSP
+NRN Germany	EDLV
+NRT Japan	RJAA
+NSB Unknown	NONE
+NSI Cameroo	FKYS
+NSK Russian Federa	UOOO
+NSN New Zealand	NZNS
+NST Thailand	VTSF
+NTE France	LFRS
+NTG Unknown	NONE
+NTL Australia	YWLM
+NTQ Japan	RJNW
+NTT Tonga	NFTP
+NTY South Africa	FAPN
+NUE Germany	EDDN
+NUX Russian Federa	USMU
+NVT Brazil	SBNF
+NWA Comoros	FMCI
+NWI United Kingdom	EGSH
+NYU Myanmar (Burma	VYBG
+OAG Australia	YORG
+OAJ Unknown	NONE
+OAK Unknown	NONE
+OAX Mexico	MMOX
+OBO Japan	RJCB
+OCJ Jamaica	MKBS
+ODE Denmark	EKOD
+ODN Malaysia	WBGI
+ODS Ukraine	UKOO
+ODW Unknown	NONE
+ODY Laos	VLOS
+OER Sweden	ESNO
+OFK Unknown	NONE
+OGG Hawaii	PHOG
+OGS Unknown	NONE
+OHD FYROM	LWOH
+OIM Japan	RJTO
+OIT Japan	RJFO
+OKA Japan	ROAH
+OKC Unknown	NONE
+OKD Japan	RJCO
+OKJ Japan	RJOB
+OLB Italy	LIEO
+OLF Unknown	NONE
+OLM Unknown	NONE
+OLP Unknown	NONE
+OMA Unknown	NONE
+OME Alaska	PAOM
+OMR Romania	LROD
+OMS Russian Federa	UNOO
+ONG Unknown	NONE
+ONJ Japan	RJSR
+ONT Unknown	NONE
+OOK Alaska	PAOO
+OOL Australia	YBCG
+OOM Australia	YCOM
+OPF Unknown	NONE
+OPO Portugal	LPPR
+ORB Sweden	ESOE
+ORD Unknown	NONE
+ORF Unknown	NONE
+ORH Unknown	NONE
+ORK Ireland	EICK
+ORL Unknown	NONE
+ORN Algeria	DAOO
+ORY France	LFPO
+OSA Unknown	NONE
+OSD Sweden	ESNZ
+OSH Unknown	NONE
+OSL Norway	ENGM
+OSR Czech Republic	LKMT
+OSZ Unknown	NONE
+OTH Unknown	NONE
+OTM Unknown	NONE
+OTP Romania	LROP
+OTZ Alaska	PAOT
+OUA Burkina Faso	DFFD
+OUD Morocco	GMFO
+OUI Unknown	NONE
+OUL Finland	EFOU
+OVB Russian Federa	UNNT
+OVD Spain	LEAS
+OWB Unknown	NONE
+OWD Unknown	NONE
+OXB Guinea	GGOV
+OXR Unknown	NONE
+OZH Ukraine	UKDE
+OZZ Morocco	GMMZ
+PAC Panama	MPMG
+PAD Germany	EDLP
+PAH Unknown	NONE
+PAM Unknown	NONE
+PAO Unknown	NONE
+PAP Haiti	MTPP
+PAR Unknown	NONE
+PAS Greece	LGPA
+PAT India	VEPT
+PAZ Mexico	MMPA
+PBC Mexico	MMPB
+PBD India	VAPR
+PBI Unknown	NONE
+PBM Suriname	SMJP
+PBO Australia	YPBO
+PCA Alaska	PAOC
+PCL Peru	SPCL
+PCT Unknown	NONE
+PDG Indonesia	WIPT
+PDL Portugal	LPPD
+PDP Uruguay	SUPE
+PDS Mexico	MMPG
+PDT Unknown	NONE
+PDX Unknown	NONE
+PEE Russian Federa	USPP
+PEG Italy	LIRZ
+PEI Colombia	SKPE
+PEK People's Repub	ZBAA
+PEM Peru	SPTU
+PEN Malaysia	WMKP
+PER Australia	YPPH
+PES Russian Federa	ULPB
+PEW Pakistan	OPPS
+PFB Brazil	SBPF
+PFN Unknown	NONE
+PFO Cyprus	LCPH
+PGA Unknown	NONE
+PGF France	LFMP
+PGV Unknown	NONE
+PGX France	LFBX
+PHC Nigeria	DNPO
+PHE Australia	YPPD
+PHF Unknown	NONE
+PHL Unknown	NONE
+PHO Alaska	PAPO
+PHS Thailand	VTPP
+PHW South Africa	FAPH
+PHX Unknown	NONE
+PIA Unknown	NONE
+PIB Unknown	NONE
+PID Bahamas	MYPI
+PIE Unknown	NONE
+PIH Unknown	NONE
+PIK United Kingdom	EGPK
+PIP Alaska	PAPN
+PIR Unknown	NONE
+PIS France	LFBI
+PIT Unknown	NONE
+PIU Peru	SPUR
+PIW Canada	CZMN
+PJG Pakistan	OPPG
+PKB Unknown	NONE
+PKC Russian Federa	UHPP
+PKE Australia	YPKS
+PKR Nepal	VNPK
+PKU Indonesia	WIBB
+PKZ Laos	VLPS
+PLB Unknown	NONE
+PLH United Kingdom	EGHD
+PLM Indonesia	WIPP
+PLN Unknown	NONE
+PLO Australia	YPLC
+PLQ Lithuania	EYPA
+PLS Turks and Caic	MBPV
+PLU Brazil	SBBH
+PLW Indonesia	WAML
+PLZ South Africa	FAPE
+PMC Chile	SCTE
+PMD Unknown	NONE
+PMF Italy	LIMP
+PMI Spain	LEPA
+PML Alaska	PAAL
+PMO Italy	LICJ
+PMR New Zealand	NZPM
+PMV Venezuela	SVMG
+PMW Brazil	SBPJ
+PNA Spain	LEPP
+PNC Unknown	NONE
+PNH Cambodia	VDPP
+PNI Federated Stat	PTPN
+PNK Indonesia	WIOO
+PNL Italy	LICG
+PNQ India	VAPO
+PNR Republic of th	FCPP
+PNS Unknown	NONE
+PNZ Brazil	SBPL
+POA Brazil	SBPA
+POG Gabon	FOOG
+POM Papua New Guin	AYPY
+POP Dominican Repu	MDPP
+POR Finland	EFPO
+POS Trinidad and T	TTPP
+POU Unknown	NONE
+POZ Poland	EPPO
+PPG American Samoa	NSTU
+PPP Australia	YBPN
+PPS Philippines	RPVP
+PPT French Polynes	NTAA
+PQC Vietnam	VVPQ
+PQI Unknown	NONE
+PQQ Australia	YPMQ
+PRC Unknown	NONE
+PRG Czech Republic	LKPR
+PRI Seychelles	FSPP
+PRJ Unknown	NONE
+PRN Unknown	NONE
+PSA Italy	LIRP
+PSC Unknown	NONE
+PSE Puerto Rico	TJPS
+PSG Alaska	PAPG
+PSI Pakistan	OPPI
+PSM Unknown	NONE
+PSO Colombia	SKPS
+PSP Unknown	NONE
+PSR Italy	LIBP
+PSS Argentina	SARP
+PSZ Bolivia	SLPS
+PTF Fiji	NFFO
+PTG South Africa	FAPP
+PTH Alaska	PAPH
+PTJ Australia	YPOD
+PTP Guadeloupe	TFFR
+PTU Alaska	PAPM
+PTY Panama	MPTO
+PUB Unknown	NONE
+PUF France	LFBP
+PUJ Dominican Repu	MDPC
+PUQ Chile	SCCI
+PUS South Korea	RKPK
+PUW Unknown	NONE
+PUY Croatia	LDPL
+PUZ Nicaragua	MNPC
+PVC Unknown	NONE
+PVD Unknown	NONE
+PVG People's Repub	ZSPD
+PVH Brazil	SBPV
+PVK Greece	LGPZ
+PVR Mexico	MMPR
+PVU Unknown	NONE
+PWK Unknown	NONE
+PWM Unknown	NONE
+PWT Unknown	NONE
+PXM Mexico	MMPS
+PXO Portugal	LPPS
+PXU Vietnam	VVPK
+PZB South Africa	FAPM
+PZE United Kingdom	EGHK
+PZH Pakistan	OPZB
+PZO Unknown	NONE
+QBF Unknown	NONE
+QBL Unknown	NONE
+QDU Unknown	NONE
+QEC Unknown	NONE
+QEJ Unknown	NONE
+QGG Unknown	NONE
+QGH Unknown	NONE
+QIE France	LFMI
+QKB Unknown	NONE
+QKL Unknown	NONE
+QKO Unknown	NONE
+QMQ Unknown	NONE
+QRO Mexico	MMQT
+QSY Unknown	NONE
+QUB Unknown	NONE
+QXB France	LFMM
+QZL Unknown	NONE
+QZT Unknown	NONE
+RAB Papua New Guin	AYTK
+RAE Saudi Arabia	OERR
+RAH Saudi Arabia	OERF
+RAI Cape Verde	GVNP
+RAJ India	VARK
+RAK Morocco	GMMX
+RAO Brazil	SBRP
+RAP Unknown	NONE
+RAR Turks and Caic	NCRG
+RAS Iran	OIGG
+RBA Morocco	GMME
+RBR Brazil	SBRB
+RCB South Africa	FARB
+RCE Unknown	NONE
+RDD Unknown	NONE
+RDG Unknown	NONE
+RDM Unknown	NONE
+RDU Unknown	NONE
+RDZ France	LFCR
+REC Brazil	SBRF
+REG Italy	LICR
+REK Unknown	NONE
+REL Argentina	SAVT
+REP Cambodia	VDSR
+RES Argentina	SARE
+REU Spain	LERS
+REX Mexico	MMRX
+RFD Unknown	NONE
+RFP French Polynes	NTTR
+RGA Argentina	SAWE
+RGL Argentina	SAWG
+RGN Myanmar (Burma	VYYY
+RHI Unknown	NONE
+RHO Greece	LGRP
+RIC Unknown	NONE
+RIO Unknown	NONE
+RIS Japan	RJER
+RIW Unknown	NONE
+RIX Latvia	EVRA
+RJL Spain	LELO
+RKD Unknown	NONE
+RKS Unknown	NONE
+RKT United Arab Em	OMRK
+RKV Unknown	NONE
+RLG Germany	ETNL
+RMA Australia	YROM
+RMF Egypt	HEMA
+RMI Italy	LIPR
+RNB Sweden	ESDF
+RNN Denmark	EKRN
+RNO Unknown	NONE
+RNS France	LFRN
+ROA Unknown	NONE
+ROB Liberia	GLRB
+ROC Unknown	NONE
+ROK Australia	YBRK
+ROM Unknown	NONE
+ROP Northern Maria	PGRO
+ROR Palau	PTRO
+ROS Argentina	SAAR
+ROT New Zealand	NZRO
+ROV Russian Federa	URRR
+ROW Unknown	NONE
+RPN Israel	LLIB
+RPR India	VARP
+RRG Mauritius	FIMR
+RRO Unknown	NONE
+RSA Argentina	SAZR
+RSD Bahamas	MYER
+RST Unknown	NONE
+RSU South Korea	RKJY
+RSW Unknown	NONE
+RTB Honduras	MHRO
+RTM Netherlands	EHRD
+RUH Saudi Arabia	OERK
+RUI Unknown	NONE
+RUN Reunion	FMEE
+RUT Unknown	NONE
+RVN Finland	EFRO
+RWI Unknown	NONE
+RXS Philippines	RPVR
+RYK Pakistan	OPRK
+RZE Poland	EPRZ
+SAB Netherlands An	TNCS
+SAF Unknown	NONE
+SAH Yemen	OYSN
+SAL El Salvador	MSLP
+SAN Unknown	NONE
+SAP Honduras	MHLM
+SAQ Bahamas	MYAN
+SAT Unknown	NONE
+SAV Unknown	NONE
+SAY Italy	LIQS
+SBA Unknown	NONE
+SBH Saint Barthele	TFFJ
+SBN Unknown	NONE
+SBP Unknown	NONE
+SBW Malaysia	WBGS
+SBY Unknown	NONE
+SBZ Romania	LRSB
+SCC Alaska	PASC
+SCE Unknown	NONE
+SCK Unknown	NONE
+SCL Chile	SCEL
+SCM Alaska	PACM
+SCN Germany	EDDR
+SCQ Spain	LEST
+SCU Cuba	MUCU
+SCX Unknown	NONE
+SDE Argentina	SANE
+SDF Unknown	NONE
+SDJ Japan	RJSS
+SDK Malaysia	WBKS
+SDL Sweden	ESNN
+SDN Norway	ENSD
+SDP Alaska	PASD
+SDQ Dominican Repu	MDSD
+SDR Spain	LEXJ
+SDU Brazil	SBRJ
+SDV Israel	LLSD
+SDX Unknown	NONE
+SDY Unknown	NONE
+SEA Unknown	NONE
+SEB Libya	HLLS
+SEL Unknown	NONE
+SEZ Seychelles	FSIA
+SFA Tunisia	DTTX
+SFB Unknown	NONE
+SFG Saint Martin	TFFG
+SFJ Greenland	BGSF
+SFL Cape Verde	GVSF
+SFN Argentina	SAAV
+SFO Unknown	NONE
+SFQ Turkey	LTCH
+SFT Sweden	ESNS
+SGC Russian Federa	USRR
+SGD Denmark	EKSB
+SGF Unknown	NONE
+SGN Vietnam	VVTS
+SGO Australia	YSGE
+SGU Unknown	NONE
+SGY Alaska	PAGY
+SHA People's Repub	ZSSS
+SHB Japan	RJCN
+SHC Unknown	NONE
+SHD Unknown	NONE
+SHE People's Repub	ZYTX
+SHJ United Arab Em	OMSJ
+SHM Japan	RJBD
+SHO South Korea	RKND
+SHP People's Repub	ZBSH
+SHR Unknown	NONE
+SHV Unknown	NONE
+SHW Unknown	NONE
+SID Cape Verde	GVAC
+SIG Puerto Rico	TJIG
+SIN Singapore	WSSS
+SIP Ukraine	UKFF
+SIR Switzerland	LSGS
+SIT Alaska	PASI
+SJC Unknown	NONE
+SJD Mexico	MMSD
+SJI Philippines	RPUH
+SJJ Bosnia and Her	LQSA
+SJK Brazil	SBSJ
+SJO Costa Rica	MROC
+SJP Brazil	SBSR
+SJT Unknown	NONE
+SJU Puerto Rico	TJSJ
+SJW People's Repub	ZBSJ
+SKB Saint Kitts an	TKPK
+SKD Uzbekistan	UTSS
+SKE Norway	ENSN
+SKG Greece	LGTS
+SKN Norway	ENSK
+SKP FYROM	LWSK
+SKS Denmark	EKSP
+SKU Greece	LGSY
+SKZ Pakistan	OPSK
+SLA Argentina	SASA
+SLC Unknown	NONE
+SLD Slovakia	LZSL
+SLK Unknown	NONE
+SLL Oman	OOSA
+SLM Spain	LESA
+SLN Unknown	NONE
+SLP Mexico	MMSP
+SLU Saint Lucia	TLPC
+SLW Mexico	MMIO
+SLZ Brazil	SBSL
+SMF Unknown	NONE
+SMI Greece	LGSM
+SML Bahamas	MYLS
+SMM Malaysia	WBKA
+SMR Colombia	SKSM
+SMS Madagascar	FMMS
+SMX Unknown	NONE
+SNA Unknown	NONE
+SNB Australia	YSNB
+SNE Cape Verde	GVSN
+SNN Ireland	EINN
+SNO Thailand	VTUI
+SNP Alaska	PASN
+SNU Cuba	MUSC
+SOF Bulgaria	LBSF
+SOG Norway	ENSG
+SOM Venezuela	SVST
+SOP Unknown	NONE
+SOU United Kingdom	EGHI
+SOW Unknown	NONE
+SOY United Kingdom	EGER
+SPB Unknown	NONE
+SPC Canary Islands	GCLA
+SPD Unknown	NONE
+SPI Unknown	NONE
+SPN Northern Maria	PGSN
+SPR Unknown	NONE
+SPS Unknown	NONE
+SPU Croatia	LDSP
+SPW Unknown	NONE
+SQH Vietnam	VVNS
+SQL Unknown	NONE
+SQO Sweden	ESUD
+SRE Bolivia	SLSU
+SRG Indonesia	WIIS
+SRQ Unknown	NONE
+SRX Unknown	NONE
+SSA Brazil	SBSV
+SSB Netherlands	EHSB
+SSG Equatorial Gui	FGSL
+SSH Egypt	HESH
+SSJ Norway	ENST
+SSQ Unknown	NONE
+STC Unknown	NONE
+STD Venezuela	SVSO
+STI Dominican Repu	MDST
+STL Unknown	NONE
+STM Brazil	SBWX
+STN United Kingdom	EGSS
+STP Unknown	NONE
+STR Germany	EDDS
+STS Unknown	NONE
+STT U.S. Virgin Is	TIST
+STX U.S. Virgin Is	TISX
+SUB Indonesia	WARR
+SUE Unknown	NONE
+SUF Italy	LICA
+SUJ Romania	LRSM
+SUL Pakistan	OPSU
+SUN Unknown	NONE
+SUV Fiji	NFNA
+SUX Unknown	NONE
+SVC Unknown	NONE
+SVD Saint Vincent 	TVSV
+SVG Norway	ENZV
+SVJ Norway	ENSH
+SVL Finland	EFSA
+SVO Russian Federa	UUEE
+SVQ Spain	LEZL
+SVU Fiji	NFNS
+SVX Russian Federa	USSS
+SVZ Venezuela	SVSA
+SWA People's Repub	ZGOW
+SWF Unknown	NONE
+SWP Namibia	FYSM
+SWQ Indonesia	WRRS
+SXB France	LFST
+SXF Germany	EDDB
+SXL Ireland	EISG
+SXM Netherlands An	TNCM
+SXR India	VISR
+SYD Australia	YSSY
+SYM People's Repub	ZPSM
+SYO Japan	RJSY
+SYR Unknown	NONE
+SYX People's Repub	ZJSY
+SYY United Kingdom	EGPO
+SYZ Iran	OISS
+SZB Malaysia	WMSA
+SZF Turkey	LTFH
+SZG Austria	LOWS
+SZT Mexico	MMSC
+SZX People's Repub	ZGSZ
+SZZ Poland	EPSC
+TAB Trinidad and T	TTCP
+TAC Philippines	RPVA
+TAE South Korea	RKTN
+TAG Philippines	RPVT
+TAI Yemen	OYTZ
+TAK Japan	RJOT
+TAM Mexico	MMTM
+TAO People's Repub	ZSQD
+TAP Mexico	MMTP
+TAS Uzbekistan	UTTT
+TAT Slovakia	LZTT
+TAV Unknown	NONE
+TBB Vietnam	VVTH
+TBN Unknown	NONE
+TBP Peru	SPME
+TBS Georgia	UGTB
+TBT Brazil	SBTT
+TBU Tonga	NFTF
+TBZ Iran	OITT
+TCB Bahamas	MYAT
+TCG Peru	SPCH
+TCI Unknown	NONE
+TCL Unknown	NONE
+TCQ Peru	SPTN
+TDD Bolivia	SLTR
+TEB Unknown	NONE
+TED Denmark	EKTS
+TEN People's Repub	ZUTR
+TER Portugal	LPLA
+TEX Unknown	NONE
+TEZ India	VETZ
+TFF Brazil	SBTF
+TFN Canary Islands	GCXO
+TFS Canary Islands	GCTS
+TGD Montenegro	LYPG
+TGG Malaysia	WMKN
+TGM Romania	LRTM
+TGU Honduras	MHTG
+TGZ Mexico	MMTG
+THE Brazil	SBTE
+THF Germany	EDDI
+THK Laos	VLTK
+THN Sweden	ESGT
+THR Iran	OIII
+THU Greenland	BGTL
+TIA Albania	LATI
+TIE Ethiopia	HATP
+TIF Saudi Arabia	OETF
+TIJ Mexico	MMTJ
+TIM Indonesia	WABP
+TIP Libya	HLLT
+TIQ Northern Maria	PGWT
+TIS Unknown	NONE
+TIU New Zealand	NZTU
+TIV Montenegro	LYTV
+TIZ Papua New Guin	AYTA
+TJA Bolivia	SLTJ
+TJM Russian Federa	USTR
+TKE Unknown	NONE
+TKK Federated Stat	PTKK
+TKN Japan	RJKN
+TKQ Tanzania	HTKA
+TKS Japan	RJOS
+TKU Finland	EFTU
+TLC Mexico	MMTO
+TLH Unknown	NONE
+TLL Estonia	EETN
+TLN France	LFTH
+TLS France	LFBO
+TLV Israel	LLBG
+TMG Malaysia	WBKM
+TMJ Uzbekistan	UTST
+TMP Finland	EFTP
+TMS Sao Tome and P	FPST
+TMT Brazil	SBTB
+TMW Australia	YSTW
+TNA People's Repub	ZSJN
+TNG Morocco	GMTT
+TNK Unknown	NONE
+TNN Taiwan	RCNN
+TNR Madagascar	FMMI
+TOB Unknown	NONE
+TOG Alaska	PATG
+TOL Unknown	NONE
+TOS Norway	ENTC
+TOY Japan	RJNT
+TPA Unknown	NONE
+TPE Taiwan	RCTP
+TPL Unknown	NONE
+TPP Peru	SPST
+TPQ Mexico	MMEP
+TPR Unknown	NONE
+TPS Italy	LICT
+TRC Mexico	MMTC
+TRD Unknown	NONE
+TRE Serbia	LYTR
+TRF Norway	ENTO
+TRG New Zealand	NZTG
+TRI Unknown	NONE
+TRK Indonesia	WRLR
+TRN Italy	LIMF
+TRO Australia	YTRE
+TRS Italy	LIPQ
+TRU Peru	SPRU
+TRV India	VOTV
+TRZ India	VOTR
+TSA Taiwan	RCSS
+TSE Kazakhstan	UACC
+TSF Italy	LIPH
+TSJ Japan	RJDT
+TSM Unknown	NONE
+TSN People's Repub	ZBTJ
+TSR Romania	LRTR
+TSS Unknown	NONE
+TST Thailand	VTST
+TSV Australia	YBTL
+TSZ Mongolia	ZMTG
+TTB Italy	LIET
+TTE Indonesia	WAMT
+TTJ Japan	RJOR
+TTN Unknown	NONE
+TTT Taiwan	RCFN
+TUC Argentina	SANT
+TUF France	LFOT
+TUG Philippines	RPUT
+TUI Saudi Arabia	OETR
+TUK Pakistan	OPTU
+TUL Unknown	NONE
+TUN Tunisia	DTTA
+TUO New Zealand	NZAP
+TUP Unknown	NONE
+TUR Brazil	SBTU
+TUS Unknown	NONE
+TUU Saudi Arabia	OETB
+TVC Unknown	NONE
+TVF Unknown	NONE
+TVL Unknown	NONE
+TVU Fiji	NFNM
+TWA Unknown	NONE
+TWB Australia	YTWB
+TWF Unknown	NONE
+TXG Unknown	NONE
+TXK Unknown	NONE
+TXL Germany	EDDT
+TXN People's Repub	ZSTX
+TYN People's Repub	ZBYN
+TYR Unknown	NONE
+TYS Unknown	NONE
+TZA Unknown	NONE
+TZN Unknown	NONE
+TZX Turkey	LTCG
+UAK Greenland	BGBW
+UAQ Argentina	SANU
+UBA Brazil	SBUR
+UBJ Japan	RJDC
+UBP Thailand	VTUU
+UCA Unknown	NONE
+UDI Brazil	SBUL
+UDJ Ukraine	UKLU
+UDR India	VAUD
+UEL Mozambique	FQQL
+UEO Japan	ROKJ
+UET Pakistan	OPQT
+UFA Russian Federa	UWUU
+UGA Mongolia	ZMBN
+UGB Unknown	NONE
+UGC Uzbekistan	UTNU
+UIB Colombia	SKUI
+UIH Vietnam	VVPC
+UIN Unknown	NONE
+UIO Ecuador	SEQU
+UIP France	LFRQ
+ULD South Africa	FAUL
+ULG Mongolia	ZMUL
+ULN Mongolia	ZMUB
+ULO Mongolia	ZMUG
+ULY Russian Federa	UWLW
+ULZ Unknown	NONE
+UME Sweden	ESNU
+UMR Unknown	NONE
+UNA Unknown	NONE
+UNI Saint Vincent 	TVSU
+UNK Alaska	PAUN
+UNR Mongolia	ZMUH
+UNT Unknown	NONE
+UPG Indonesia	WAAA
+UPN Mexico	MMPN
+URC People's Repub	ZWWW
+URO France	LFOP
+URT Thailand	VTSB
+URY Saudi Arabia	OEGT
+USH Argentina	SAWH
+USM Thailand	VTSM
+USN South Korea	RKPU
+UTH Thailand	VTUD
+UTN South Africa	FAUP
+UTT South Africa	FAUT
+UUD Russian Federa	UIUU
+UUN Mongolia	ZMBU
+UUS Russian Federa	UHSS
+UVF Saint Lucia	TLPL
+VAA Finland	EFVA
+VAI Papua New Guin	AYVN
+VAK Alaska	PAVA
+VAN Turkey	LTCI
+VAR Bulgaria	LBWN
+VAS Turkey	LTAR
+VAV Tonga	NFTV
+VBS Italy	LIPO
+VBY Sweden	ESSV
+VCE Italy	LIPZ
+VCP Brazil	SBKP
+VCT Unknown	NONE
+VDA Israel	LLOV
+VDC Brazil	SBQV
+VDM Argentina	SAVV
+VDS Norway	ENVR
+VDZ Alaska	PAVD
+VER Mexico	MMVR
+VEY Unknown	NONE
+VFA Zimbabwe	FVFA
+VGO Spain	LEVX
+VGT Unknown	NONE
+VHM Sweden	ESNV
+VHY France	LFLV
+VIE Austria	LOWW
+VII Vietnam	VVVH
+VIJ British Virgin	TUPW
+VIL Western Sahara	GSVO
+VIS Unknown	NONE
+VIT Spain	LEVT
+VIX Brazil	SBVT
+VKG Vietnam	VVRG
+VKO Russian Federa	UUWW
+VLC Spain	LEVC
+VLD Unknown	NONE
+VLG Argentina	SAZV
+VLI Vanuatu	NVVV
+VLL Spain	LEVD
+VLN Venezuela	SVVA
+VNA Laos	VLSV
+VNO Lithuania	EYVI
+VNS India	VIBN
+VOG Russian Federa	URWW
+VPS Unknown	NONE
+VQS Puerto Rico	TJVQ
+VRA Cuba	MUVR
+VRB Unknown	NONE
+VRK Finland	EFVR
+VRN Italy	LIPX
+VSA Mexico	MMVA
+VSG Ukraine	UKCW
+VST Sweden	ESOW
+VTE Laos	VLVT
+VTZ India	VEVZ
+VUP Colombia	SKVP
+VVI Bolivia	SLVR
+VVO Russian Federa	UHWW
+VXO Sweden	ESMX
+WAE Unknown	NONE
+WAG New Zealand	NZWU
+WAT Ireland	EIWF
+WAW Poland	EPWA
+WBU Unknown	NONE
+WDG Unknown	NONE
+WDH Namibia	FYWH
+WEI Australia	YBWP
+WGA Australia	YSWG
+WGE Australia	YWLG
+WHK New Zealand	NZWK
+WIC United Kingdom	EGPC
+WIL Kenya	HKNW
+WIN Australia	YWTN
+WJU South Korea	RKNW
+WKA New Zealand	NZWF
+WKJ Japan	RJCW
+WKK Unknown	NONE
+WLG New Zealand	NZWN
+WMH United States	KBPK
+WNA Alaska	PANA
+WNP Philippines	RPUN
+WNZ People's Repub	ZSWZ
+WRE New Zealand	NZWR
+WRG Alaska	PAWG
+WRI Unknown	NONE
+WRL Unknown	NONE
+WRO Poland	EPWR
+WSN Alaska	PFWS
+WST Ireland	EIWT
+WSX Unknown	NONE
+WSZ New Zealand	NZWS
+WTL Unknown	NONE
+WUH People's Repub	ZHHH
+WUS People's Repub	ZSWY
+WVB Namibia	FYWB
+WWK Papua New Guin	AYWK
+WWT Alaska	PAEW
+WXN Unknown	NONE
+WYA Australia	YWHA
+WYS Unknown	NONE
+XAP Brazil	SBCH
+XAW Unknown	NONE
+XAZ Unknown	NONE
+XBR Unknown	NONE
+XCI Unknown	NONE
+XCM Unknown	NONE
+XDL Unknown	NONE
+XDM Unknown	NONE
+XDU Unknown	NONE
+XEE Unknown	NONE
+XEH Unknown	NONE
+XEJ Unknown	NONE
+XEK Unknown	NONE
+XEL Unknown	NONE
+XEM Unknown	NONE
+XEY Unknown	NONE
+XFD Unknown	NONE
+XFE Unknown	NONE
+XFG Unknown	NONE
+XFL Unknown	NONE
+XFM Unknown	NONE
+XFN People's Repub	ZHXF
+XFO Unknown	NONE
+XFQ Unknown	NONE
+XFS Unknown	NONE
+XFV Unknown	NONE
+XGJ Unknown	NONE
+XGK Unknown	NONE
+XGR Canada	CYLU
+XGY Unknown	NONE
+XHM Unknown	NONE
+XHS Unknown	NONE
+XIA Unknown	NONE
+XIB Unknown	NONE
+XID Unknown	NONE
+XIL Unknown	NONE
+XIM Unknown	NONE
+XIO Unknown	NONE
+XIP Unknown	NONE
+XIY People's Repub	ZLXY
+XJL Unknown	NONE
+XJQ Unknown	NONE
+XKH Laos	VLXK
+XLV Unknown	NONE
+XLZ Unknown	NONE
+XMN People's Repub	ZSAM
+XNA France	LFXN
+XNN People's Repub	ZLXN
+XOK Unknown	NONE
+XPB Unknown	NONE
+XPN Unknown	NONE
+XPX Unknown	NONE
+XQP Costa Rica	MRQP
+XQU Unknown	NONE
+XRP Unknown	NONE
+XRY Spain	LEJR
+XSC Turks and Caic	MBSC
+XTY Unknown	NONE
+XUZ People's Repub	ZSXZ
+XVV Unknown	NONE
+XWY Unknown	NONE
+XZB Unknown	NONE
+XZC Unknown	NONE
+YAI Chile	SCCH
+YAK Alaska	PAYA
+YAM Canada	CYAM
+YAP Federated Stat	PTYA
+YAT Canada	CYAT
+YAY Canada	CYAY
+YAZ Canada	CYAZ
+YBA Unknown	NONE
+YBB Canada	CYBB
+YBC Canada	CYBC
+YBG Canada	CYBG
+YBL Canada	CYBL
+YBP People's Repub	ZUYB
+YBR Canada	CYBR
+YBW Canada	CYBW
+YBX Canada	CYBX
+YCA Unknown	NONE
+YCB Canada	CYCB
+YCC Canada	CYCC
+YCD Canada	CYCD
+YCG Canada	CYCG
+YCM Unknown	NONE
+YCO Canada	CYCO
+YCY Canada	CYCY
+YDF Canada	CYDF
+YDI Unknown	NONE
+YDN Canada	CYDN
+YDQ Canada	CYDQ
+YDS Unknown	NONE
+YEC Unknown	NONE
+YEG Canada	CYEG
+YEK Canada	CYEK
+YEL Canada	CYEL
+YEV Canada	CYEV
+YEY Canada	CYEY
+YFA Canada	CYFA
+YFB Canada	CYFB
+YFC Canada	CYFC
+YFO Canada	CYFO
+YFS Canada	CYFS
+YGB Canada	CYGB
+YGG Unknown	NONE
+YGJ Japan	RJOH
+YGK Canada	CYGK
+YGL Canada	CYGL
+YGN Unknown	NONE
+YGO Canada	CYGO
+YGP Canada	CYGP
+YGR Canada	CYGR
+YGT Canada	CYGT
+YGW Canada	CYGW
+YHB Canada	CYHB
+YHD Canada	CYHD
+YHH Unknown	NONE
+YHI Canada	CYHI
+YHK Canada	CYHK
+YHM Canada	CYHM
+YHN Canada	CYHN
+YHR Canada	CYHR
+YHU Canada	CYHU
+YHY Canada	CYHY
+YHZ Canada	CYHZ
+YIB Canada	CYIB
+YIF Canada	CYIF
+YIH People's Repub	ZHYC
+YIK Canada	CYIK
+YIN People's Repub	ZWYN
+YIO Canada	CYIO
+YIP United States	KYIP
+YIW People's Repub	ZSYW
+YJA Unknown	NONE
+YJT Canada	CYJT
+YKA Canada	CYKA
+YKF Canada	CYKF
+YKG Canada	CYAS
+YKL Canada	CYKL
+YKM United States	KYKM
+YKQ Canada	CYKQ
+YKS Russian Federa	UEEE
+YKU Unknown	NONE
+YKZ Canada	CYKZ
+YLC Canada	CYLC
+YLD Canada	CYLD
+YLQ Canada	CYLQ
+YLW Canada	CYLW
+YMM Canada	CYMM
+YMO Canada	CYMO
+YMP Unknown	NONE
+YMQ Unknown	NONE
+YMS Peru	SPMS
+YMT Canada	CYMT
+YMX Canada	CYMX
+YNA Canada	CYNA
+YNB Saudi Arabia	OEYN
+YND Canada	CYND
+YNG United States	KYNG
+YNJ People's Repub	ZYYJ
+YNT People's Repub	ZSYT
+YNY South Korea	RKNY
+YNZ Unknown	NONE
+YOJ Canada	CYOJ
+YOO Canada	CYOO
+YOP Unknown	NONE
+YOW Canada	CYOW
+YPA Canada	CYPA
+YPE Canada	CYPE
+YPF Unknown	NONE
+YPH Canada	CYPH
+YPJ Canada	CYLA
+YPR Canada	CYPR
+YPT Unknown	NONE
+YPW Canada	CYPW
+YPX Unknown	NONE
+YPZ Canada	CYPZ
+YQB Canada	CYQB
+YQC Canada	CYHA
+YQD Canada	CYQD
+YQG Canada	CYQG
+YQH Canada	CYQH
+YQI Canada	CYQI
+YQK Canada	CYQK
+YQL Canada	CYQL
+YQM Canada	CYQM
+YQQ Canada	CYQQ
+YQR Canada	CYQR
+YQT Canada	CYQT
+YQU Canada	CYQU
+YQX Canada	CYQX
+YQY Canada	CYQY
+YQZ Canada	CYQZ
+YRB Canada	CYRB
+YRI Canada	CYRI
+YRJ Canada	CYRJ
+YRL Canada	CYRL
+YRR Unknown	NONE
+YRT Canada	CYRT
+YSB Canada	CYSB
+YSF Canada	CYSF
+YSH Canada	CYSH
+YSJ Canada	CYSJ
+YSK Canada	CYSK
+YSL Canada	CYSL
+YSM Canada	CYSM
+YSN Canada	CZAM
+YSP Canada	CYSP
+YSR Canada	CYSR
+YTA Canada	CYTA
+YTD Canada	CZLQ
+YTE Canada	CYTE
+YTG Unknown	NONE
+YTH Canada	CYTH
+YTQ Canada	CYTQ
+YTS Canada	CYTS
+YTZ Canada	CYTZ
+YUD Canada	CYMU
+YUL Canada	CYUL
+YUM Unknown	NONE
+YUX Canada	CYUX
+YUY Canada	CYUY
+YVA Comoros	FMCN
+YVB Canada	CYVB
+YVC Canada	CYVC
+YVM Canada	CYVM
+YVO Canada	CYVO
+YVP Canada	CYVP
+YVR Canada	CYVR
+YVZ Canada	CYVZ
+YWB Unknown	NONE
+YWG Canada	CYWG
+YWH Canada	CYWH
+YWK Canada	CYWK
+YWL Canada	CYWL
+YWR Unknown	NONE
+YWS Unknown	NONE
+YXC Canada	CYXC
+YXD Canada	CYXD
+YXE Canada	CYXE
+YXH Canada	CYXH
+YXJ Canada	CYXJ
+YXL Canada	CYXL
+YXP Canada	CYXP
+YXS Canada	CYXS
+YXT Canada	CYXT
+YXU Canada	CYXU
+YXX Canada	CYXX
+YXY Canada	CYXY
+YXZ Canada	CYXZ
+YYB Canada	CYYB
+YYC Canada	CYYC
+YYD Canada	CYYD
+YYE Canada	CYYE
+YYF Canada	CYYF
+YYG Canada	CYYG
+YYH Canada	CYYH
+YYJ Canada	CYYJ
+YYQ Canada	CYYQ
+YYR Canada	CYYR
+YYT Canada	CYYT
+YYU Canada	CYYU
+YYY Canada	CYYY
+YYZ Canada	CYYZ
+YZF Canada	CYZF
+YZG Canada	CYZG
+YZP Canada	CYZP
+YZR Canada	CYZR
+YZT Canada	CYZT
+YZV Canada	CYZV
+ZAD Croatia	LDZD
+ZAG Croatia	LDZA
+ZAH Iran	OIZH
+ZAL Chile	SCVD
+ZAM Philippines	RPMZ
+ZAT People's Repub	ZPZT
+ZAZ Spain	LEZG
+ZBF Canada	CZBF
+ZBV Unknown	NONE
+ZCL Mexico	MMZC
+ZCO Chile	SCTC
+ZDJ Unknown	NONE
+ZGC People's Repub	ZLLL
+ZGI Canada	CZGI
+ZHA People's Repub	ZGZJ
+ZHO Unknown	NONE
+ZIH Mexico	MMZH
+ZJJ Unknown	NONE
+ZKE Canada	CZKE
+ZLO Mexico	MMZO
+ZNA Unknown	NONE
+ZNE Australia	YNWN
+ZNZ Tanzania	HTZA
+ZOS Chile	SCJO
+ZQN New Zealand	NZQN
+ZQW Germany	EDRZ
+ZRF Unknown	NONE
+ZRH Switzerland	LSZH
+ZSA Bahamas	MYSM
+ZTH Greece	LGZA
+ZUH People's Repub	ZGSD
+ZVK Laos	VLSK
+ZYL Bangladesh	VGSY
+512 inputs: 0.036799 seconds
+1024 inputs: 0.050735 seconds
+2048 inputs: 0.077943 seconds
+All inputs (2871): 0.101240 seconds
+512 changes: 0.025728 seconds
+1024 changes: 0.045586 seconds
+2048 changes: 0.082279 seconds
+4096 changes: 0.174959 seconds
+All changes (5427): 0.222718 seconds

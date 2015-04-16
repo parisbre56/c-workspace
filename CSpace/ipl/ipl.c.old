@@ -1,0 +1,579 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+THERE IS A PROBLEM EITHER IN FREEING IN FUN RESIZE OR IN ASSINGING TEMPVARINT
+//**ERROR-CODES
+#define FUN_SUCCESS 0
+#define VSTACKRESERR_MEM -1
+#define VSTACKRESERR_SIZE -2
+#define VSTACKCREATEERR_MEM -3
+#define VARNAMEERR_INT 1
+#define VARNAMEERR_ARR 2
+#define VARNAMEERR_MEM 3
+#define ARRAYRESERR_MEM 4
+#define ARRAYRESERR_SIZE 5
+#define ARRAYRESERR_NF 6
+#define ARRAYCREATEERR_MEM 7
+
+#define printvar(S,N) if (getvarint(S,N)!=NULL) {printf("%s: %d\n",(*getvarint(S,N)).name,(*getvarint(S,N)).value);} else {printf("VAR < %s > NOT FOUND",N);}
+
+struct vstack * newvstack(unsigned int intsize, unsigned int arraysize);
+/* Creates a virtual stack and initialises it so that it can contain 
+ * <intcount> integer variables and <arraycount> integer arrays.
+ * This function returns a pointer to the created vstack if it is
+ * succesful and a NULL pointer if it wasn't. 
+ * ALWAYS remember to NULL-check the returned pointer and to free
+ * it after using it.
+ */
+void freevstack(struct vstack * vstack);
+/* Frees all memmory allocated to <vstack> and its compoments. (i.e. all 
+ * integer variables, integer arrays, variable names etc.). This also frees
+ * the pointer <vstack> itself, so DO NOT pass it a referenced vstack, only 
+ * vstack pointers
+ */
+struct vstack * cpvstack(struct vstack * vstack);
+/* Returns a pointer to a copy of <vstack> or a NULL pointer if it was unsuccessful.
+ * 
+ * USE !THIS! FUNCTION TO COPY A VSTACK.
+ * 
+ * Do not assing vstack pointers to vstack variables, assing vstack pointers to
+ * other vstack pointers or do anything without use of these functions if you don't 
+ * understand what you are doing!
+ */
+signed char resizevstack(struct vstack * vstack, unsigned int intsize, unsigned int arraysize);
+/* Resizes the virtual stack <vstack> so that it can contain 
+ * <intcount> integer variables and <arraycount> integer arrays.
+ * No data should be lost during the resizing. This function returns FUN_SUCCESS if 
+ * it is succesful, VSTACKRESERR_MEM if <vstack> couldn't be resized due to
+ * memmory problems, VSTACKRESERR_SIZE if <vstack> was not resized because 
+ * the size given was smaller than the members of <vstack>.
+ */
+signed char newvarint(struct vstack * vstack, char * name);
+/* Creates an integer variable with name <name> in the vstack <vstack>.
+ * The string <name> should terminate with the char '\0'.
+ * Integer variables are stored alphabetically on the top of the stack. 
+ * <vstack> is resized automatically.
+ * This function returns FUN_SUCCESS if it is succesful, VARNAMEERR_INT if an 
+ * integer with name <name> already exists, VARNAMEERR_ARR if an integer array 
+ * with name <name> already exists, VSTACKRESERR_MEM if <vstack> couldn't be resized,
+ * VARNAMEERR_MEM if 
+ */
+signed char newarrayint(struct vstack * vstack, char * name, unsigned int size);
+/* Creates an integer array with name <name> and size <size> in 
+ * the vstack <vstack>. The string <name> should terminate with the char '\0'.
+ * Integer arrays are stored alphabetically on the bottom of the vstack. 
+ * <vstack> is resized automatically.
+ * This function returns FUN_SUCCESS if it is succesful, VARNAMEERR_INT if an integer 
+ * with name <name> already exists, VARNAMEERR_ARR if an integer array with name <name> 
+ * already exists, VSTACKRESERR_MEM if <vstack> couldn't be resized.
+ */
+signed char resizearrayint(struct vstack * vstack, char * name, unsigned int size);
+/* Resizes the integer array with name <name> to size <size>. No data
+ * should be lost during the resizing. The string <name> should 
+ * terminate with the char '\0'. This function returns FUN_SUCCESS if 
+ * it is succesful, ARRAYRESERR_MEM if <name> couldn't be resized due to memmory problems,
+ * ARRAYRESERR_SIZE if <name> was not resized because the size given was smaller than 
+ * the previous size, ARRAYRESERR_NF if <name> does not exist in <vstack>.
+ */
+struct varint * getvarint(struct vstack * vstack, char * name);
+/* Returns a pointer to the integer variable <name> or a NULL pointer 
+ * if it doesn't exist in <vstack>. The string <name> should terminate with the char '\0'.
+ */
+struct arrayint * getarrayint(struct vstack * vstack, char * name);
+/* Returns a pointer to the integer array <name> or a NULL pointer 
+ * if it doesn't exist in <vstack>. The string <name> should terminate with the char '\0'.
+ */
+signed char putvarint (struct vstack * vstack, char * name, int value);
+/* Gives integer variable <name> a value of <value>. If the variable does 
+ * not exist it is created. If necesseary <vstack> is resized. The string <name> should 
+ * terminate with the char '\0'. This function returns FUN_SUCCESS if it is 
+ * succesful, VSTACKRESERR_MEM if <vstack> couldn't be resized, VARNAMEERR_ARR if 
+ * an integer array with name <name> already exists.
+ */
+signed char putarrayint (struct vstack * vstack, char * name, unsigned int position, int value);
+/* Gives integer array <name> a value of <value> in position <position>. The string <name> should 
+ * terminate with the char '\0'. If the array does not exist it is created. If necesseary <vstack> 
+ * or <name> are resized. This function returns FUN_SUCCESS if it is succesful, VSTACKRESERR_MEM if
+ * <vstack> couldn't be resized, ARRAYRESERR_MEM if <name> couldn't be resized, VARNAMEERR_INT if 
+ * an integer array with name <name> already exists.
+ */
+
+void errorpr(signed char errornum, char name[]);
+/* Prints error info in the standard error output, and optionally a name.
+ */
+
+//**STRUCT
+struct varint
+{
+	int value;
+	char * name;
+};
+
+struct arrayint
+{
+	int * value;
+	char * name;
+	int size;
+};
+
+struct vstack
+{
+	void * memmory;
+	int intcount;
+	int arraycount;
+	int intsize;
+	int arraysize;
+};
+
+
+//**BEGIN
+int main (int argc, char * argv[])
+{
+	struct vstack * mystack;
+	struct varint * tempvar;
+	struct arrayint * temparr;
+	struct vstack astack;
+	signed char testval;
+	mystack=newvstack(1,1);
+	if (mystack==NULL)
+	{
+		//fprintf(stderr,"ERROR: Unable to create the virtual stack\n");
+		errorpr(VSTACKCREATEERR_MEM,"mystack");
+		return EXIT_FAILURE;
+	}
+	testval=newvarint(mystack,"TEST");
+	errorpr(testval,"1");
+	testval=newvarint(mystack,"A");
+	errorpr(testval,"2");
+	testval=newvarint(mystack,"Z99");
+	errorpr(testval,"3");
+	printvar(mystack,"TEST")
+	printvar(mystack,"A")
+	printvar(mystack,"Z99")
+	printvar(mystack,"NONE")
+	
+	freevstack(mystack);
+	return EXIT_SUCCESS;
+}
+
+//**VSTACKFUN
+struct vstack * newvstack(unsigned int intsize, unsigned int arraysize)
+{
+	struct vstack * temp;
+	temp=malloc(sizeof(struct vstack));
+	if (temp==NULL)
+	{
+		return NULL;
+	}
+	(*temp).arraysize=arraysize;
+	(*temp).arraycount=0;
+	(*temp).intsize=intsize;
+	(*temp).intcount=0;
+	(*temp).memmory=malloc(intsize*sizeof(struct varint)+arraysize*sizeof(struct arrayint));
+	if ((*temp).memmory==NULL)
+	{
+		free(temp);
+		return NULL;
+	}
+	return temp;
+}
+////////////////////////////////////////
+void freevstack(struct vstack * vstack)
+{
+	unsigned int i;
+	//Free integers
+	for (i=0;i<(*vstack).intcount;i++)//For all integer variables
+	{
+		free((*((struct varint *)((*vstack).memmory+i*sizeof(struct varint)))).name);
+		/* First, we move the pointer from the beggining of the vstack.memmory to the 
+		 * position of the i-th varint. Since vstack.memmory is a void pointer we cast
+		 * it to a varint pointer and then dereference it in to get the actual i-th varint.
+		 * Finally we free the char array varint.name.
+		 */
+	}
+	//Free arrays
+	for (i=0;i<(*vstack).arraycount;i++)//For all integer arrays
+	{
+		free((*((struct arrayint *)(((*vstack).memmory)+(*vstack).intsize*sizeof(struct varint)+i*sizeof(struct arrayint)))).value);
+		free((*(((struct arrayint *)((*vstack).memmory)+(*vstack).intsize*sizeof(struct varint)+i*sizeof(struct arrayint)))).name);
+	}
+	//Free the memmory
+	free((*vstack).memmory);
+	//Free the vstack object itself
+	free(vstack);
+}
+////////////////////////////////////////
+signed char resizevstack(struct vstack * vstack, unsigned int intsize, unsigned int arraysize)
+{
+	unsigned int i;
+	struct vstack * tempstack;
+	struct vstack * tempp;
+	//Check for proper size values
+	if ((*vstack).intcount>intsize||(*vstack).arraycount>arraysize)
+	{
+		return VSTACKRESERR_SIZE;
+	}
+	//Create a temp stack
+	tempp=newvstack((*vstack).intsize,(*vstack).arraysize);
+	if (tempp==NULL)
+	{
+		return VSTACKRESERR_MEM;
+	}
+	tempstack=tempp;
+	//Copy vstack to tempstack
+	for(i=0;i<(*vstack).intcount;i++)//For all integer variables
+	{
+		*((struct varint *)((*tempstack).memmory+i*sizeof(struct varint)))=*((struct varint *)((*vstack).memmory+i*sizeof(struct varint)));//Copy them from vstack to tempstack
+	}
+	(*tempstack).intcount=(*vstack).intcount;
+	for(i=0;i<(*vstack).arraycount;i++)//For all integer arrays
+	{
+		*((struct arrayint *)((*tempstack).memmory+i*sizeof(struct arrayint)))=*((struct arrayint *)((*vstack).memmory+i*sizeof(struct varint)));//Copy them from vstack to tempstack
+	}
+	(*tempstack).arraycount=(*vstack).arraycount;
+	//Resize vstack
+	tempp=newvstack(intsize,arraysize);
+	if (tempp==NULL)
+	{
+		freevstack(tempstack);
+		return VSTACKRESERR_MEM;
+	}
+	freevstack(vstack);
+	*vstack=*tempp;
+	free(tempp);
+	//Copy tempstack to vstack
+	for(i=0;i<(*tempstack).intcount;i++)//For all integer variables
+	{
+		*((struct varint *)((*vstack).memmory+i*sizeof(struct varint)))=*((struct varint *)((*tempstack).memmory+i*sizeof(struct varint)));//Copy them from tempstack to vstack
+	}
+	(*vstack).intcount=(*tempstack).intcount;
+	for(i=0;i<(*tempstack).arraycount;i++)//For all integer arrays
+	{
+		*((struct arrayint *)((*vstack).memmory+i*sizeof(struct arrayint)))=*((struct arrayint *)((*tempstack).memmory+i*sizeof(struct varint)));//Copy them from tempstack to vstack
+	}
+	(*vstack).arraycount=(*tempstack).arraycount;
+	
+	freevstack(tempstack);
+	return FUN_SUCCESS;
+}
+////////////////////////////////////////
+signed char newvarint(struct vstack * vstack, char * name)
+{
+	int i;
+	unsigned int j;
+	unsigned int namesize;
+	struct varint * tempvarint;
+	void * tempp;
+	tempp=getvarint(vstack,name);
+	if (tempp!=NULL)
+	{
+		return VARNAMEERR_INT;
+	}
+	tempp=getarrayint(vstack,name);
+	if (tempp!=NULL)
+	{
+		return VARNAMEERR_ARR;
+	}
+	if ((*vstack).intsize==(*vstack).intcount)
+	{
+		i=resizevstack(vstack,(*vstack).intsize+5,(*vstack).arraysize);	
+		// Adding five integer variables instead of one reduces the calls made to the rather costly resize function.
+		if (i!=FUN_SUCCESS)
+		{
+			return i;
+		}
+	}
+	namesize=strlen(name)+1;//Size of string name (+1 for '\0')
+	for(i=(*vstack).intcount;i>0;i--)
+	{
+		//tempvarint=(*vstack).memmory+(i-1)*sizeof(struct varint);
+		tempvarint=&((((struct varint *)(*vstack).memmory))[i-1]);
+		//tempvarint first points to the last variable, then to the second to last and so on until the first
+		if ((strcmp(name,(*tempvarint).name))>0)//name='z'>(*tempvarint).name='a'|strcmp>0|put the new var right after tempvarint
+		{
+			(*(tempvarint+1)).name=malloc(namesize*sizeof(char));
+			if ((*(tempvarint+1)).name==NULL)
+			{
+				return VARNAMEERR_MEM;
+			}
+			for (j=0;j<namesize;j++)
+			{
+				(*(tempvarint+1)).name[j]=name[j];
+			}
+			break;
+		}
+		else//Move tempvarint to the right
+		{
+			(*(tempvarint+1)).name=malloc((strlen((*tempvarint).name)+1)*sizeof(char));
+			if ((*(tempvarint+1)).name==NULL)
+			{
+				return VARNAMEERR_MEM;
+			}
+			for (j=0;j<strlen((*tempvarint).name)+1;j++)
+			{
+				(*(tempvarint+1)).name[j]=(*tempvarint).name[j];
+			}
+			free((*(tempvarint)).name);
+			(*(tempvarint+1)).value=(*tempvarint).value;
+		}
+	}
+	if (i==0)//If we have reached the first place without creating the variable, create it on the first place
+	{
+		tempvarint=(*vstack).memmory;
+		(*tempvarint).name=malloc(namesize*sizeof(char));
+		if ((*tempvarint).name==NULL)
+		{
+			return VARNAMEERR_MEM;
+		}
+		for (j=0;j<namesize;j++)
+		{
+			(*tempvarint).name[j]=name[j];
+		}
+	}
+	((*vstack).intcount)++;
+	return FUN_SUCCESS;
+}
+////////////////////////////////////////
+struct varint * getvarint(struct vstack * vstack, char * name)
+{
+	unsigned int i;
+	for (i=0;i<(*vstack).intcount;i++)
+	{
+		if (!strcmp(name,((struct varint *)(*vstack).memmory)[i].name))//If <name> is equal to varint.name
+		{
+			return &((struct varint *)(*vstack).memmory)[i];//Return a pointer to varint with varint.name=<name>
+		}
+	}
+	return NULL;
+}
+////////////////////////////////////////
+struct arrayint * getarrayint(struct vstack * vstack, char * name)
+{
+	unsigned int i;
+	for (i=0;i<(*vstack).arraycount;i++)
+	{
+		if(!strcmp(name,((struct arrayint *)((*vstack).memmory+(*vstack).intsize*sizeof(struct varint)))[i].name))
+		{
+			return &((struct arrayint *)((*vstack).memmory+(*vstack).intsize*sizeof(struct varint)))[i];
+		}
+	}
+	return NULL;
+}
+////////////////////////////////////////
+signed char newarrayint(struct vstack * vstack, char * name, unsigned int size)
+/* Creates an integer array with name <name> and size <size> in 
+ * the vstack <vstack>. The string <name> should terminate with the char '\0'.
+ * Integer arrays are stored alphabetically on the bottom of the vstack. 
+ * <vstack> is resized automatically.
+ * This function returns FUN_SUCCESS if it is succesful, VARNAMEERR_INT if an integer 
+ * with name <name> already exists, VARNAMEERR_ARR if an integer array with name <name> 
+ * already exists, VSTACKRESERR_MEM if <vstack> couldn't be resized.
+ */
+{
+	unsigned int i;
+	unsigned int j;
+	unsigned int namesize;
+	struct arrayint * temparrayint;
+	void * tempp;
+	tempp=getvarint(vstack,name);
+	if (tempp!=NULL)
+	{
+		return VARNAMEERR_INT;
+	}
+	tempp=getarrayint(vstack,name);
+	if (tempp!=NULL)
+	{
+		return VARNAMEERR_ARR;
+	}
+	if ((*vstack).arraysize==(*vstack).arraycount)
+	{
+		i=resizevstack(vstack,(*vstack).intsize,(*vstack).arraysize+3);	
+		// Adding three integer arrays instead of one reduces the calls made to the rather costly resize function.
+		if (i!=FUN_SUCCESS)
+		{
+			return i;
+		}
+	}
+	namesize=strlen(name)+1;//Size of string name (+1 for '\0')
+	for(i=(*vstack).arraycount;i>0;i--)
+	{
+		//temparrayint=(*vstack).memmory+(i-1)*sizeof(struct varint);
+		temparrayint=&((struct arrayint *)((*vstack).memmory+(*vstack).intsize*sizeof(struct varint)))[i-1];
+		//temparrayint first points to the last variable, then to the second to last and so on until the first
+		if ((strcmp(name,(*temparrayint).name))>0)//name='z'>(*temparrayint).name='a'|strcmp>0|put the new var right after temparrayint
+		{
+			(*(temparrayint+1)).name=malloc(namesize*sizeof(char));
+			if ((*(temparrayint+1)).name==NULL)
+			{
+				return VARNAMEERR_MEM;
+			}
+			for (j=0;j<namesize;j++)
+			{
+				(*(temparrayint+1)).name[j]=name[j];
+			}
+			(*temparrayint).size=size;
+			(*temparrayint).value=malloc(size*sizeof(int));
+			if ((*temparrayint).value==NULL)
+			{
+				return ARRAYCREATEERR_MEM;
+			}
+			break;
+		}
+		else//Move temparrayint to the right
+		{
+			(*(temparrayint+1)).name=malloc((strlen((*temparrayint).name)+1)*sizeof(char));
+			if ((*(temparrayint+1)).name==NULL)
+			{
+				return VARNAMEERR_MEM;
+			}
+			for (j=0;j<strlen((*temparrayint).name)+1;j++)
+			{
+				(*(temparrayint+1)).name[j]=(*temparrayint).name[j];
+			}
+			free((*(temparrayint)).name);
+			
+			(*(temparrayint+1)).value=malloc((*temparrayint).size*sizeof(int));
+			if ((*(temparrayint+1)).value==NULL)
+			{
+				return ARRAYCREATEERR_MEM;				
+			}
+			for (j=0;j<(*temparrayint).size;j++)
+			{
+				(*(temparrayint+1)).value[j]=(*temparrayint).value[j];
+			}
+			free((*temparrayint).value);
+			
+			(*(temparrayint+1)).size=(*temparrayint).size;
+			(*temparrayint).size=0;
+		}
+	}
+	if (i==0)//If we have reached the first place without creating the variable, create it on the first place
+	{
+		temparrayint=(*vstack).memmory+(*vstack).intsize*sizeof(struct varint);
+		(*temparrayint).name=malloc(namesize*sizeof(char));
+		if ((*temparrayint).name==NULL)
+		{
+			return VARNAMEERR_MEM;
+		}
+		for (j=0;j<namesize;j++)
+		{
+			(*temparrayint).name[j]=name[j];
+		}
+		(*temparrayint).size=size;
+	}
+	((*vstack).arraycount)++;
+	return FUN_SUCCESS;
+}
+//////////////////////////
+struct vstack * cpvstack(struct vstack * vstack)
+{
+	struct vstack * tempstack;
+	struct varint srcvar;
+	struct arrayint srcarr;
+	struct varint tarvar;
+	struct arrayint tararr;
+	unsigned int i;
+	unsigned int j;
+	//Create the new stack
+	tempstack=newvstack((*vstack).intsize,(*vstack).arraysize);
+	if (tempstack==NULL)
+	{
+		return NULL;
+	}
+	//Copy the integer variables
+	for (i=0;i<(*vstack).intcount;i++)
+	{
+		srcvar=((struct varint *)(*vstack).memmory)[i];
+		tarvar=((struct varint *)(*tempstack).memmory)[i];
+		tarvar.name=malloc(strlen(srcvar.name)+1);
+		if (tarvar.name==NULL)
+		{
+			freevstack(tempstack);			
+			return NULL;
+		}
+		for (j=0;j<strlen(srcvar.name)+1;j++)
+		{
+			tarvar.name[j]=srcvar.name[j];
+		}
+		tarvar.value=srcvar.value;
+		(*tempstack).intcount++;
+	}
+	//Copy the integer arrays
+	for (i=0;i<(*vstack).arraycount;i++)
+	{
+		srcarr=((struct arrayint *)(*vstack).memmory+(*vstack).intsize*sizeof(struct varint))[i];
+		tararr=((struct arrayint *)(*tempstack).memmory+(*tempstack).intsize*sizeof(struct varint))[i];
+		tararr.name=malloc(strlen(srcarr.name)+1);
+		if (tararr.name==NULL)
+		{
+			freevstack(tempstack);			
+			return NULL;
+		}
+		for (j=0;j<strlen(srcarr.name)+1;j++)
+		{
+			tararr.name[j]=srcarr.name[j];
+		}
+		tararr.value=malloc(srcarr.size*sizeof(int));
+		if (tararr.value==NULL)
+		{
+			free(tararr.name);
+			freevstack(tempstack);
+			return NULL;
+		}
+		for (j=0;j<srcarr.size;j++)
+		{
+			tararr.value[j]=srcarr.value[j];
+		}
+		tararr.size=srcarr.size;
+		(*tempstack).arraycount++;
+	}
+	return tempstack;
+}
+
+//**INTERPRETERFUN
+
+
+//**MISCFUN
+void errorpr (signed char errornum,char*name)
+{
+	fprintf(stderr,"ERROR:");
+	switch (errornum)
+	{
+		case FUN_SUCCESS:
+		fprintf(stderr,"No error\n");
+		break;
+		case VSTACKRESERR_MEM:
+		fprintf(stderr,"Unable to resize the virtual stack %s: Memmory allocation failure\n",name);
+		break;
+		case VSTACKRESERR_SIZE:
+		fprintf(stderr,"Unable to resize the virtual stack %s: Size too small\n",name);
+		break;
+		case VSTACKCREATEERR_MEM:
+		fprintf(stderr,"Unable to create the virtual stack %s: Memmory allocation failure\n",name);		
+		break;
+		case VARNAMEERR_INT:
+		fprintf(stderr,"Unable to create variable %s: An int with that name already exists\n",name);	
+		break;
+		case VARNAMEERR_ARR:
+		fprintf(stderr,"Unable to create variable %s: An array with that name already exists\n",name);
+		break;
+		case ARRAYRESERR_MEM:
+		fprintf(stderr,"Unable to resize array %s: Memmory allocation failure\n",name);	
+		break;
+		case ARRAYRESERR_SIZE:
+		fprintf(stderr,"Unable to resize array %s: Size too small\n",name);	
+		break;
+		case ARRAYRESERR_NF:
+		fprintf(stderr,"Unable to resize array %s: Array not found\n",name);	
+		break;
+		case VARNAMEERR_MEM:
+		fprintf(stderr,"Unable to create variable name %s: Memmory allocation failure\n",name);	
+		break;
+		case ARRAYCREATEERR_MEM:
+		fprintf(stderr,"Unable to create array %s: Memmory allocation failure\n",name);			
+		break;
+		default:
+		fprintf(stderr,"Unknown error: %s\n",name);
+		break;
+	}
+}

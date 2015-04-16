@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="CSpace" Database="./CSpace.tags">
+  <Project Name="Sequencecompute1" Path="Sequencecompute1/Sequencecompute1.project" Active="No"/>
+  <Project Name="Sequencecompute0" Path="Sequencecompute0/Sequencecompute0.project"/>
+  <Project Name="Sequencecompute2" Path="Sequencecompute2/Sequencecompute2.project" Active="No"/>
+  <Project Name="Sequencecompute3" Path="Sequencecompute3/Sequencecompute3.project" Active="No"/>
+  <Project Name="Sequencecompute4" Path="Sequencecompute4/Sequencecompute4.project" Active="No"/>
+  <Project Name="Sequencecompute5" Path="Sequencecompute5/Sequencecompute5.project" Active="No"/>
+  <Project Name="Sequencecompute6" Path="Sequencecompute6/Sequencecompute6.project" Active="No"/>
+  <Project Name="Sequencecompute7" Path="Sequencecompute7/Sequencecompute7.project" Active="No"/>
+  <Project Name="happypr" Path="happypr/happypr.project" Active="No"/>
+  <Project Name="Test" Path="Test/Test.project" Active="No"/>
+  <Project Name="Calcproto" Path="Calcproto/Calcproto.project" Active="No"/>
+  <Project Name="stablemar" Path="stablemar/stablemar.project" Active="No"/>
+  <Project Name="ipl" Path="ipl/ipl.project" Active="No"/>
+  <Project Name="Hanoi" Path="Hanoi/Hanoi.project" Active="No"/>
+  <Project Name="Phonedata" Path="Phonedata/Phonedata.project" Active="No"/>
+  <Project Name="AirportManagement" Path="AirportManagement/AirportManagement.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="Sequencecompute1" ConfigName="Debug"/>
+      <Project Name="Sequencecompute0" ConfigName="Debug"/>
+      <Project Name="Sequencecompute2" ConfigName="Debug"/>
+      <Project Name="Sequencecompute3" ConfigName="Debug"/>
+      <Project Name="Sequencecompute4" ConfigName="Debug"/>
+      <Project Name="Sequencecompute5" ConfigName="Debug"/>
+      <Project Name="Sequencecompute6" ConfigName="Debug"/>
+      <Project Name="Sequencecompute7" ConfigName="Debug"/>
+      <Project Name="happypr" ConfigName="Debug"/>
+      <Project Name="Test" ConfigName="Debug"/>
+      <Project Name="Calcproto" ConfigName="Debug"/>
+      <Project Name="stablemar" ConfigName="Debug"/>
+      <Project Name="ipl" ConfigName="Debug"/>
+      <Project Name="Hanoi" ConfigName="Debug"/>
+      <Project Name="Phonedata" ConfigName="Debug"/>
+      <Project Name="AirportManagement" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="Sequencecompute1" ConfigName="Release"/>
+      <Project Name="Sequencecompute0" ConfigName="Release"/>
+      <Project Name="Sequencecompute2" ConfigName="Release"/>
+      <Project Name="Sequencecompute3" ConfigName="Release"/>
+      <Project Name="Sequencecompute4" ConfigName="Release"/>
+      <Project Name="Sequencecompute5" ConfigName="Release"/>
+      <Project Name="Sequencecompute6" ConfigName="Release"/>
+      <Project Name="Sequencecompute7" ConfigName="Release"/>
+      <Project Name="happypr" ConfigName="Release"/>
+      <Project Name="Test" ConfigName="Release"/>
+      <Project Name="Calcproto" ConfigName="Release"/>
+      <Project Name="stablemar" ConfigName="Release"/>
+      <Project Name="ipl" ConfigName="Release"/>
+      <Project Name="Hanoi" ConfigName="Release"/>
+      <Project Name="Phonedata" ConfigName="Release"/>
+      <Project Name="AirportManagement" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>

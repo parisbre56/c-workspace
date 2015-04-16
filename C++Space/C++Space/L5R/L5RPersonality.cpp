@@ -1,0 +1,195 @@
+#include "L5RPersonality.hpp"
+
+#include "L5RTypeConverter.hpp"
+
+#include <iostream>
+
+using namespace std;
+
+namespace L5RPersonalityNamespace
+{
+	int data[5][5] = {
+	/* Cost 	*/	{5,	5,	15,	15,	30},
+	/* Attack 	*/	{3,	2,	10,	5,	20},
+	/* Defence 	*/	{2,	3,	5,	10,	20},
+	/* Honor	*/	{2,	2,	8,	8,	12},
+	/* Max.Att.	*/	{2,	4,	8,	10,	15}};
+}
+
+using namespace L5RPersonalityNamespace;
+
+Personality::Personality(std::string name, int SubType):
+	BlackCard(name,data[0][SubType-1]),attack(data[1][SubType-1]),
+	defence(data[2][SubType-1]),honour(data[3][SubType-1]),
+	isDead(false),maxAttachments(data[4][SubType-1]),
+	subType((PersonalityType)SubType)
+	//Assumes SubType is always given correctly by DeckBuilder
+{
+	#ifdef __L5R_DEBUG_CERR__
+	cerr<<"Creating Personality with Name: "<<getName()<<endl;
+	#endif
+}
+void Personality::print(void) const
+{
+	if(!getIsRevealed())
+	{
+		cout<<"Hidden BlackCard"<<endl;
+		return;
+	}
+	cout<<"Great Personality"<<endl;
+	cout<<"Name: "<<getName()<<endl;
+	cout<<"Cost: "<<getCost()<<endl;
+	cout<<"Tapped: "<<((getIsTapped())?("YES"):("NO"))<<endl;
+	cout<<"Dead: "<<((getIsDead())?("YES"):("NO"))<<endl;
+	cout<<"Honour: "<<getHonour()<<endl;
+	cout<<"Attack: "<<getAttack()<<endl;
+	cout<<"Att. + Bonuses: "<<getActualAttack()<<endl;
+	cout<<"Defence: "<<getDefence()<<endl;
+	cout<<"Def. + Bonuses: "<<getActualDefence()<<endl;
+	cout<<"Attachments: "<<attachments.size()<<" / "<<getMaxAttachments()<<endl;
+}
+int Personality::getAttack(void) const
+{
+	return attack;
+}
+int Personality::getDefence(void) const
+{
+	return defence;
+}
+int Personality::getHonour(void) const
+{
+	return honour;
+}
+int Personality::reduceHonour(void)
+{
+	#ifdef __L5R_DEBUG_CERR__
+	cerr<<"Reducing the honour of Personality with Name: "<<getName()<<endl;
+	if(honour<=0)
+	{
+		cerr<<"Personality with Name: "<<getName()<<" has negative honour."<<endl;
+	}
+	if(--honour == 0)
+	{
+		performSeppuku();
+	}
+	return honour;
+	#endif
+}
+void Personality::performSeppuku(void)
+{
+	cout<<"Personality with Name: "<<getName()<<
+		" shouts \"I cannot live with this dishonour!\""<<
+		"before plunging their wakizashi into their guts,"<<
+		"thus restoring their honour in death."<<endl;
+	isDead=true;
+}
+bool Personality::getIsDead(void) const
+{
+	return isDead;
+}
+std::list<GreenCard*>& Personality::getAttachments(void)
+{
+	return attachments;
+}
+enum PersonalityType Personality::getSubType(void) const
+{
+	return subType;
+}
+enum CardType Personality::getType(void) const
+{
+	return PERSONALITY;
+}
+int Personality::getMaxAttachments(void) const
+{
+	return maxAttachments;
+}
+int Personality::getAttachmentNum(void) const
+{
+	return attachments.size();
+}
+void Personality::attach(GreenCard* source)
+{
+	if(getAttachmentNum()>=getMaxAttachments())
+	{
+		cout<<"Unable to attach GreenCard with Name: "<<source->getName()<<
+			" to Personality with Name: "<<getName()<<". Reason: Not enough attachment slots."<<endl;
+		return;
+	}
+	attachments.push_back(source);
+	source->attach(this);
+}
+int Personality::getActualAttack(void) const
+{
+	int att=getAttack();
+	if(getAttachmentNum()==0)
+	{
+		return att;
+	}
+	list<GreenCard*>::const_iterator it = attachments.begin();
+	while (it != attachments.end())
+	{
+		att+=(*it)->getAttackBonus()+((*it)->getEffectActive())*((*it)->getEffectBonus());
+		++it;
+	}
+	return att;
+}
+int Personality::getActualDefence(void) const
+{
+	int def=getDefence();
+	if(getAttachmentNum()==0)
+	{
+		return def;
+	}
+	list<GreenCard*>::const_iterator it = attachments.begin();
+	while (it != attachments.end())
+	{
+		def+=(*it)->getDefenceBonus()+((*it)->getEffectActive())*((*it)->getEffectBonus());
+		++it;
+	}
+	return def;
+}
+void Personality::battleFought(void)
+{
+	if(getAttachmentNum()==0)
+	{
+		return;
+	}
+	list<GreenCard*>::iterator it = attachments.begin();
+	while (it != attachments.end())
+	{
+		if((*it)->getType()==ITEM)
+		{
+			if(TypeConverter().getItem((*it))->reduceDurability()==0)
+			{
+				(*it)->detach();
+				delete (*it);
+				it=attachments.erase(it);
+				//it now points to the element right after the erased one.
+			}
+			else
+			{
+				++it;
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+Personality::~Personality(void)
+{
+	#ifdef __L5R_DEBUG_CERR__
+	cerr<<"Deleting Personality with Name: "<<getName()<<endl;
+	#endif
+	if(getAttachmentNum()==0)
+	{
+		return;
+	}
+	list<GreenCard*>::const_iterator it = attachments.begin();
+	while (it != attachments.end())
+	{
+		delete (*it);
+		++it;
+	}
+}

@@ -1,0 +1,1002 @@
+load data50000
+sumstats
+sumstats
+del
+del
+print
+sumstats
+top
+print
+top 0.83
+del
+stats Mac
+top 0.19
+del
+del
+top
+sumstats
+stats Att
+lookup 0000044703
+top 0.17
+stats Att
+sumstats
+lookup 0000064813
+lookup 0000020724
+top
+stats Mac
+print
+top
+sumstats
+sumstats
+top 0.90
+stats Mac
+del
+del
+del
+lookup 0000089859
+del
+sumstats
+lookup 0000015595
+del
+sumstats
+top
+sumstats
+top
+top 0.56
+del
+sumstats
+print
+top
+sumstats
+del
+sumstats
+top 0.20
+del
+del
+top 0.15
+stats Att
+print
+sumstats
+del
+top
+top 0.18
+sumstats
+sumstats
+sumstats
+print
+del
+sumstats
+top 0.94
+print
+top
+top
+stats Pel
+sumstats
+del
+stats Mac
+stats Att
+lookup 0000005948
+sumstats
+del
+lookup 0000058482
+sumstats
+sumstats
+stats Pel
+print
+sumstats
+lookup 0000020132
+top 0.57
+del
+print
+lookup 0000069977
+print
+top
+print
+del
+sumstats
+sumstats
+lookup 0000023877
+stats Att
+stats Aeg
+top 0.03
+stats Att
+print
+lookup 0000000604
+top 0.17
+print
+del
+print
+lookup 0000025942
+sumstats
+top 0.12
+print
+lookup 0000012641
+print
+lookup 0000006556
+lookup 0000009476
+print
+lookup 0000093463
+top 0.58
+sumstats
+stats Att
+lookup 0000003989
+print
+top 0.01
+top
+top
+top 0.17
+print
+top 0.42
+lookup 0000052087
+top
+del
+top
+stats Cre
+top
+del
+del
+top 0.94
+stats Att
+print
+top 0.76
+lookup 0000037589
+del
+del
+sumstats
+stats Att
+print
+stats Mac
+print
+del
+top 0.39
+del
+del
+sumstats
+top 0.52
+top
+top
+sumstats
+del
+del
+del
+stats Mac
+sumstats
+lookup 0000070067
+stats Att
+print
+sumstats
+top 0.35
+lookup 0000017093
+lookup 0000098963
+sumstats
+del
+top 0.64
+sumstats
+stats Mac
+top 0.51
+sumstats
+stats Pel
+top 0.12
+sumstats
+stats Epi
+top 0.67
+del
+del
+sumstats
+top 0.54
+top 0.26
+stats Pel
+top 0.55
+sumstats
+print
+sumstats
+print
+del
+top 0.75
+print
+sumstats
+top
+stats Att
+sumstats
+top
+top 0.69
+top 0.06
+sumstats
+lookup 0000008306
+stats Att
+lookup 0000094558
+del
+print
+top
+lookup 0000038025
+stats Att
+top
+lookup 0000066812
+print
+stats Mac
+sumstats
+lookup 0000006367
+del
+lookup 0000018978
+print
+sumstats
+sumstats
+top
+print
+top 0.31
+top
+del
+top
+del
+stats Att
+top
+top 0.24
+print
+sumstats
+print
+print
+print
+del
+top 0.36
+lookup 0000008874
+top 0.01
+top
+top 0.33
+sumstats
+del
+del
+sumstats
+sumstats
+stats Mac
+print
+top 0.33
+top
+print
+print
+sumstats
+top
+sumstats
+stats Att
+top 0.31
+lookup 0000064706
+lookup 0000081516
+stats Mac
+print
+top 0.12
+lookup 0000074550
+sumstats
+lookup 0000025228
+stats Mac
+lookup 0000093277
+stats Thr
+lookup 0000006456
+lookup 0000039860
+del
+top
+sumstats
+top 0.15
+del
+top 0.95
+sumstats
+sumstats
+top 0.39
+sumstats
+top
+print
+print
+del
+stats Mac
+top 0.33
+print
+del
+lookup 0000066034
+print
+sumstats
+top 0.94
+print
+lookup 0000003610
+stats Att
+stats Att
+del
+top
+print
+sumstats
+top 0.58
+del
+lookup 0000087117
+sumstats
+del
+del
+top
+top 0.58
+lookup 0000087809
+print
+lookup 0000086387
+sumstats
+del
+print
+stats Att
+top
+top
+lookup 0000056946
+lookup 0000091051
+top
+lookup 0000086213
+sumstats
+sumstats
+top 0.40
+sumstats
+top 0.66
+stats Mac
+lookup 0000086619
+top
+top 0.96
+stats Mac
+sumstats
+top
+stats CGr
+sumstats
+lookup 0000089957
+sumstats
+top 0.43
+top
+sumstats
+print
+top
+print
+stats Att
+top
+del
+lookup 0000099828
+del
+stats Att
+stats Pel
+top 0.47
+top
+top
+top 0.95
+del
+del
+top
+print
+top 0.04
+lookup 0000053776
+top
+top
+lookup 0000008077
+top
+print
+lookup 0000052344
+print
+lookup 0000010907
+print
+top 0.66
+del
+top
+stats Att
+sumstats
+top 1.00
+lookup 0000063534
+stats Mac
+sumstats
+top 0.67
+stats Att
+lookup 0000090761
+top 0.19
+top
+del
+lookup 0000076781
+lookup 0000065181
+top 0.98
+sumstats
+print
+del
+sumstats
+top
+top 0.65
+top 0.54
+sumstats
+sumstats
+stats Mac
+print
+top
+sumstats
+stats Att
+del
+print
+sumstats
+lookup 0000038283
+top 0.54
+del
+print
+stats Mac
+lookup 0000007986
+stats Thr
+top
+lookup 0000038884
+top 0.76
+del
+del
+del
+sumstats
+top 0.49
+stats Att
+top
+del
+stats Mac
+sumstats
+top
+stats Att
+stats Pel
+stats Mac
+top 0.20
+lookup 0000033766
+del
+lookup 0000079788
+del
+top
+top 0.51
+del
+lookup 0000077532
+print
+print
+top 0.85
+del
+top 0.25
+sumstats
+top 0.87
+print
+print
+sumstats
+top 0.56
+lookup 0000004198
+del
+print
+print
+del
+top
+del
+del
+del
+print
+stats Att
+print
+sumstats
+top 0.40
+stats Cre
+sumstats
+sumstats
+top
+lookup 0000053751
+stats Mac
+top
+del
+sumstats
+del
+print
+top
+stats Att
+print
+top 0.64
+stats Att
+sumstats
+stats Att
+top
+top 0.45
+sumstats
+stats Att
+top
+top 0.12
+top 0.26
+del
+sumstats
+top 0.02
+top 0.04
+print
+sumstats
+del
+top
+lookup 0000079632
+stats Aeg
+top 0.51
+stats Att
+stats Pel
+top
+sumstats
+lookup 0000084622
+lookup 0000075585
+stats Att
+top 0.76
+stats Cre
+top 0.94
+stats Mac
+top 0.45
+top 0.10
+del
+top 0.66
+stats Att
+stats Mac
+lookup 0000050349
+del
+sumstats
+top 0.96
+top
+sumstats
+del
+stats Pel
+lookup 0000021480
+lookup 0000013832
+lookup 0000074224
+sumstats
+print
+stats Epi
+del
+top
+top
+top
+del
+top
+stats Mac
+stats Aeg
+top
+del
+top
+sumstats
+lookup 0000074476
+stats 4
+top 1.00
+top
+sumstats
+print
+top 0.65
+del
+top
+del
+print
+lookup 0000007271
+sumstats
+top
+del
+top 0.21
+lookup 0000080485
+print
+print
+sumstats
+top
+sumstats
+stats Pel
+print
+del
+top
+stats Att
+print
+sumstats
+del
+sumstats
+print
+stats Cre
+stats Att
+lookup 0000030277
+sumstats
+sumstats
+print
+top
+del
+top
+top
+top
+stats Att
+print
+stats Att
+del
+del
+top
+lookup 0000065588
+lookup 0000051359
+print
+top
+sumstats
+stats Cre
+top
+top
+del
+lookup 0000031693
+top
+del
+top
+stats 4
+lookup 0000058069
+print
+top
+top
+del
+stats Thr
+lookup 0000055679
+top 0.21
+print
+del
+sumstats
+lookup 0000089200
+top 0.51
+lookup 0000063728
+stats Att
+lookup 0000094382
+sumstats
+del
+top
+stats Att
+stats Att
+del
+top 0.31
+print
+sumstats
+lookup 0000093588
+sumstats
+top
+top 0.59
+print
+stats The
+top
+stats Att
+sumstats
+stats Att
+top
+top
+lookup 0000086355
+stats Aeg
+sumstats
+del
+print
+top 0.02
+sumstats
+stats Cre
+stats CGr
+stats Att
+print
+top 0.44
+sumstats
+top
+print
+top
+top
+del
+sumstats
+stats Att
+sumstats
+stats Pel
+sumstats
+lookup 0000024185
+print
+del
+top
+sumstats
+lookup 0000017889
+stats Thr
+sumstats
+print
+top 0.07
+sumstats
+lookup 0000070905
+sumstats
+sumstats
+lookup 0000092550
+sumstats
+top 0.19
+del
+sumstats
+sumstats
+stats Att
+top
+lookup 0000044938
+print
+del
+lookup 0000091659
+top
+lookup 0000042218
+lookup 0000055441
+del
+del
+lookup 0000056657
+sumstats
+lookup 0000027358
+top 0.31
+sumstats
+print
+del
+del
+sumstats
+top 0.96
+top 0.03
+stats Mac
+del
+top
+top
+lookup 0000036623
+lookup 0000094720
+stats CGr
+top
+lookup 0000024293
+lookup 0000061509
+lookup 0000091045
+sumstats
+sumstats
+del
+del
+top 0.66
+top 0.51
+lookup 0000073521
+stats CGr
+stats Mac
+top
+sumstats
+lookup 0000095532
+print
+lookup 0000094196
+stats Att
+print
+sumstats
+top
+print
+sumstats
+top
+top
+top 0.12
+top 0.79
+sumstats
+stats Att
+del
+print
+del
+sumstats
+del
+stats Cre
+lookup 0000066387
+stats Att
+del
+top 0.31
+top
+top
+del
+stats Att
+print
+lookup 0000010661
+print
+lookup 0000057214
+top 0.72
+top 0.63
+top
+lookup 0000046165
+print
+del
+top 0.41
+sumstats
+top 0.68
+print
+top
+top 0.06
+del
+print
+sumstats
+top
+sumstats
+top
+top 0.29
+lookup 0000011835
+del
+lookup 0000069079
+lookup 0000077135
+del
+del
+sumstats
+del
+del
+lookup 0000071829
+stats Att
+print
+del
+del
+sumstats
+print
+lookup 0000065192
+del
+print
+print
+del
+lookup 0000020119
+lookup 0000010830
+lookup 0000083237
+sumstats
+stats Att
+del
+top 0.32
+lookup 0000030605
+del
+lookup 0000040658
+del
+print
+stats Mac
+sumstats
+top 0.75
+top 0.44
+stats Pel
+lookup 0000092169
+top 0.27
+del
+top 0.90
+top 0.75
+sumstats
+sumstats
+lookup 0000011131
+print
+top 0.79
+del
+lookup 0000038397
+top 0.90
+print
+sumstats
+lookup 0000084085
+lookup 0000093881
+sumstats
+top 0.70
+top
+print
+del
+del
+del
+lookup 0000020629
+del
+top 0.59
+print
+del
+top
+top 0.39
+del
+lookup 0000063985
+stats CGr
+del
+del
+print
+print
+del
+del
+print
+sumstats
+top
+top 0.64
+sumstats
+top
+stats Aeg
+print
+print
+top 0.87
+top
+del
+stats Att
+del
+top
+sumstats
+top
+del
+top 0.36
+top 0.13
+top 0.70
+lookup 0000025716
+del
+del
+del
+print
+lookup 0000043506
+sumstats
+top
+print
+top 0.58
+top 0.62
+top
+top 0.44
+sumstats
+top 0.43
+top 0.53
+stats Mac
+sumstats
+top
+sumstats
+top
+del
+sumstats
+lookup 0000059121
+top
+lookup 0000007897
+print
+lookup 0000051342
+lookup 0000059428
+print
+sumstats
+top 0.09
+lookup 0000004978
+stats Pel
+stats Att
+print
+del
+print
+lookup 0000078870
+lookup 0000019899
+lookup 0000009633
+top 0.55
+top 0.96
+sumstats
+sumstats
+sumstats
+top 0.11
+lookup 0000022600
+lookup 0000089584
+stats Att
+lookup 0000082681
+stats CGr
+top
+top
+stats Mac
+del
+top 0.85
+lookup 0000059700
+print
+stats The
+del
+top 0.05
+top
+print
+sumstats
+sumstats
+lookup 0000013237
+sumstats
+print
+print
+top
+top 0.29
+top
+top
+lookup 0000007060
+sumstats
+lookup 0000076971
+del
+del
+stats Att
+stats Mac
+top 0.68
+print
+stats Mac
+print
+stats Att
+stats Att
+top
+del
+sumstats
+print
+sumstats
+top 0.55
+sumstats
+top 0.04
+top
+lookup 0000006094
+top 0.68
+top 0.26
+print
+lookup 0000067305
+sumstats
+sumstats
+del
+top 0.98
+del
+lookup 0000041650
+del
+stats Att
+lookup 0000062450
+top
+print
+top 0.38
+top
+del
+top
+print
+print
+del
+exit dumpfile

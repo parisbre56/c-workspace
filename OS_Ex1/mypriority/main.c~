@@ -1,0 +1,538 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include "myheap.h"
+#include "databases.h"
+
+#define INPUT_BUFFER_SIZE 500
+
+void displayHelp(void);
+/* Display some simple help
+ */
+ 
+int checkArguements(int argc, char **argv);
+/* Checks that all arguements are OK.
+ */
+ 
+int findArg(char* arg, int argc, char** argv);
+/* Returns the index of the first occurance of string <arg> in the arguements or -1 if not found;
+ */
+
+int main(int argc, char **argv)
+{
+	//Declarations
+	int i=0;
+	int j=0;
+	
+	char* invoiceFileName=NULL;
+	char* inputFileName=NULL;
+	char* configFileName=NULL;
+	char batchFileName[100];
+	FILE * invoiceFile=NULL;
+	FILE * inputFile=NULL;
+	FILE * batchFile=NULL;
+	char inputString[INPUT_BUFFER_SIZE];
+	inputString[0]='\0';
+	double topPrecent=0;
+	char tempString[100];
+	
+	long long afm;
+	char lastname[25];
+	char firstname[15];
+	char town[20];
+	char nomos[3];
+	double debt;
+	
+	double totalDebt=0;
+	double debtCounter=0;
+	precentileNode* prPointer=NULL;
+	
+	Heap* debtHeap=NULL;
+	precentileNode* precentileList=NULL;
+	nomosNode* nomosList=NULL;
+	otherNode* otherList=NULL;
+	
+	nomosNode* nmPointer=NULL;
+	
+	otherNode* otPointer=NULL;
+	
+	if(checkArguements(argc,argv)<0)
+	{
+		fprintf(stderr,"ERROR: Check the arguements you provided.\n");
+		displayHelp();
+		return EXIT_FAILURE;
+	}
+	//Pointers to file names if they are provided.
+	invoiceFileName=argv[findArg("-o",argc,argv)+1];
+	inputFileName=(findArg("-i",argc,argv)>0)?(argv[findArg("-i",argc,argv)+1]):(NULL);
+	configFileName=(findArg("-c",argc,argv)>0)?(argv[findArg("-c",argc,argv)+1]):(NULL);
+	//Create heap
+	debtHeap = HEAP_newHeap(true, sizeof(afm));
+	if (debtHeap==NULL)
+	{
+		fprintf(stderr,"ERROR: Memory allocation error when creating heap.\n");
+		return EXIT_FAILURE;
+	}
+	//Open invoice file
+	invoiceFile = fopen(invoiceFileName,"a");
+	if(invoiceFile==NULL)
+	{
+		fprintf(stderr, "ERROR: Error opening invoice file \"%s\"\n",invoiceFileName);
+		perror("mypriority");
+		return EXIT_FAILURE;
+	}
+	fprintf(invoiceFile,"\n|-|-|-|New access|-|-|-|\n");
+	//Check for input file
+	if(inputFileName!=NULL)
+	{
+		//Open input file
+		inputFile = fopen(inputFileName,"r");
+		if(inputFile==NULL)
+		{
+			fprintf(stderr, "ERROR: Error opening input file \"%s\"\n",inputFileName);
+			perror("mypriority");
+		}
+		else
+		{
+			//Read from input file
+			do
+			{
+				//Get a line
+				fgets(inputString,INPUT_BUFFER_SIZE,inputFile);
+				sscanf(inputString,"%s",tempString);
+				if(!strcmp(tempString,"load"))
+				{
+					i=sscanf(inputString,"%*s %s",batchFileName);
+					if(i<1)
+					{
+						fprintf(stderr,"ERROR: Expected batch file after \"load\" command\n");
+						continue;
+					}
+					batchFile=fopen(batchFileName,"r");
+					if(batchFile==NULL)
+					{
+						fprintf(stderr,"ERROR: Error opening input file \"%s\"\n",batchFileName);
+						perror("mypriority");
+						continue;
+					}
+					while(!feof(batchFile))
+					{
+						fgets(inputString,INPUT_BUFFER_SIZE,batchFile);
+						if(sscanf(inputString,"%10lld %15s %25s %20s %3s %lf",&afm,firstname,lastname,town,nomos,&debt)!=6)
+						{
+							continue;
+						}
+						if(HEAP_insertData(debtHeap,&afm,debt)<0||
+							PRE_Insert(&precentileList,debt,afm)<0||
+							NOM_Insert(&nomosList,nomos,debt)<0||
+							OTH_Insert(&otherList,afm,lastname,firstname,town,nomos,debt)<0)
+						{
+							fprintf(stderr,"ERROR: Unable to insert data from batch file.\nMemory allocation error.\n");
+							return EXIT_FAILURE;
+						}
+						totalDebt+=debt;
+					}
+					fclose(batchFile);
+				}
+				else if(!strcmp(tempString,"ins"))
+				//If this is an insert command
+				{
+					sscanf(inputString,"%*s %10lld %15s %25s %20s %3s %lf",&afm,firstname,lastname,town,nomos,&debt);
+					if(HEAP_insertData(debtHeap,&afm,debt)<0||
+						PRE_Insert(&precentileList,debt,afm)<0||
+						NOM_Insert(&nomosList,nomos,debt)<0||
+						OTH_Insert(&otherList,afm,lastname,firstname,town,nomos,debt)<0)
+					{
+						fprintf(stderr,"ERROR: Unable to insert data.\nMemory allocation error.\n");
+						return EXIT_FAILURE;
+					}
+					totalDebt+=debt;
+				}
+				else if(!strcmp(tempString,"top"))
+				//If this is a top command
+				{
+					if(HEAP_getHeapSize(debtHeap)<=0)
+					{
+						printf("Heap empty, nothing to print.");
+						continue;
+					}
+					i=sscanf(inputString,"%*s %s",tempString);
+					//CHECK for number if number after top:
+					if(i==1&&(topPrecent=atof(tempString))>0&&topPrecent<1)
+					{
+						debtCounter=0;
+						prPointer=precentileList;
+						//Use database to print all people in debt responsible for number(number is double like 0.17 for 17%) precent of debt.
+						while(debtCounter/totalDebt<topPrecent)
+						{
+							OTH_PrintData(&otherList,stdout,prPointer->afm);
+							debtCounter+=prPointer->debt;
+							prPointer=prPointer->next;
+						}
+						continue;
+					}
+					//Else just print the data of the first
+					afm=*((long long *)(HEAP_getHead(debtHeap)->data));
+					OTH_PrintData(&otherList,stdout,afm);
+				}
+				else if(!strcmp(tempString,"del"))
+				{
+					if(HEAP_getHeapSize(debtHeap)<=0)
+					{
+						printf("Heap empty, nothing to delete.\n");
+						continue;
+					}
+					afm=*((long long *)(HEAP_getHead(debtHeap)->data));
+					fprintf(invoiceFile,"===New===\n");
+					OTH_PrintData(&otherList,invoiceFile,afm);
+					fprintf(invoiceFile,"===New===\n");
+					HEAP_deleteHead(debtHeap);
+				}
+				else if(!strcmp(tempString,"lookup"))
+				{
+					if(HEAP_getHeapSize(debtHeap)<=0)
+					{
+						printf("Heap empty, nothing to do.\n");
+						continue;
+					}
+					sscanf(inputString,"%*s %lld",&afm);
+					//Search for afm
+					for(i=0;i<HEAP_getHeapSize(debtHeap);++i)
+					{
+						if(*((long long *)HEAP_getVector(debtHeap)[i]->data)==afm)
+						{
+							break;
+						}
+					}
+					//If afm not found
+					if(i==HEAP_getHeapSize(debtHeap))
+					{
+						printf("AFM %.10lld not found.",afm);
+						continue;
+					}
+					//Find distance from root
+					++i;
+					j=-1;
+					while(i!=0)
+					{
+						i=i>>1;
+						++j;
+					}
+					printf("Distance from Root: %d\n",j);
+					OTH_PrintData(&otherList,stdout,afm);
+				}
+				else if(!strcmp(tempString,"stats"))
+				{
+					sscanf(inputString,"%*s %3s",nomos);
+					if(NOM_Get(&nomosList,nomos)==NULL)
+					{
+						printf("Prefecture not in database.\n");
+						continue;
+					}
+					printf("Number of Debitors: %ld\nAverage Debt: %.2lf\n",NOM_Get(&nomosList,nomos)->people,totalDebt/((double)NOM_Get(&nomosList,nomos)->people));
+				}
+				else if(!strcmp(tempString,"sumstats"))
+				{
+					//τύπωσε το συνολικό αριθμό οφειλετών στην δομή καθώς επίσης και για κάθε νομό πόσοι
+					//οφειλέτες υπάρχουν και το συνολικό τους χρέος.
+					printf("Total debitors: %d\n",HEAP_getHeapSize(debtHeap));
+					nmPointer=nomosList;
+					while(nmPointer!=NULL)
+					{
+						printf("Prefecture: %.3s Debitors: %ld Debt: %.2lf\n", nmPointer->nomos, nmPointer->people, nmPointer->totalDebt);
+						nmPointer=nmPointer->next;
+					}
+				}
+				else if(!strcmp(tempString,"print"))
+				{
+					for(i=0;i<HEAP_getHeapSize(debtHeap);++i)
+					{
+						printf("Node: %d Debt: %.2lf AFM: %.10lld\n",i,HEAP_getVector(debtHeap)[i]->value,*((long long *)HEAP_getVector(debtHeap)[i]->data));
+					}
+				}
+				else if(!strcmp(tempString,"exit"))
+				{
+					//Check for dumpfile
+					i=sscanf(inputString,"%*s %s",batchFileName);
+					if(i==1)
+					{
+						batchFile=fopen(batchFileName,"w");
+						if(batchFile==NULL)
+						{
+							fprintf(stderr,"ERROR: Error opening output file \"%s\"\n",batchFileName);
+							perror("mypriority");
+							continue;
+						}
+						otPointer=otherList;
+						while(otPointer!=NULL)
+						{
+							fprintf(batchFile,"%.10lld %.15s %.25s %.20s %.3s %.2lf\n",otPointer->afm,otPointer->firstname,otPointer->lastname,otPointer->town,otPointer->nomos,otPointer->debt);
+							otPointer=otPointer->next;
+						}
+						fclose(batchFile);
+					}
+					HEAP_deleteHeap(debtHeap);
+					OTH_Free(&otherList);
+					PRE_Free(&precentileList);
+					NOM_Free(&nomosList);
+					fclose(inputFile);
+					fclose(invoiceFile);
+					return EXIT_SUCCESS;
+				}
+				else
+				{
+					fprintf(stderr,"ERROR: Unknown command \"%s\"\n",tempString);
+				}
+			}while (!feof(inputFile));
+			fclose(inputFile);
+		}
+	}
+	while(true)
+	{
+		//Get a line
+		fgets(inputString,INPUT_BUFFER_SIZE,stdin);
+		sscanf(inputString,"%s",tempString);
+		if(!strcmp(tempString,"load"))
+		{
+			i=sscanf(inputString,"%*s %s",batchFileName);
+			if(i<1)
+			{
+				fprintf(stderr,"ERROR: Expected batch file after \"load\" command\n");
+				continue;
+			}
+			batchFile=fopen(batchFileName,"r");
+			if(batchFile==NULL)
+			{
+				fprintf(stderr,"ERROR: Error opening input file \"%s\"\n",batchFileName);
+				perror("mypriority");
+				continue;
+			}
+			while(!feof(batchFile))
+			{
+				fgets(inputString,INPUT_BUFFER_SIZE,batchFile);
+				if(sscanf(inputString,"%10lld %15s %25s %20s %3s %lf",&afm,firstname,lastname,town,nomos,&debt)!=6)
+				{
+					continue;
+				}
+				if(HEAP_insertData(debtHeap,&afm,debt)<0||
+					PRE_Insert(&precentileList,debt,afm)<0||
+					NOM_Insert(&nomosList,nomos,debt)<0||
+					OTH_Insert(&otherList,afm,lastname,firstname,town,nomos,debt)<0)
+				{
+					fprintf(stderr,"ERROR: Unable to insert data from batch file.\nMemory allocation error.\n");
+					return EXIT_FAILURE;
+				}
+				totalDebt+=debt;
+			}
+			fclose(batchFile);
+		}
+		else if(!strcmp(tempString,"ins"))
+		//If this is an insert command
+		{
+			sscanf(inputString,"%*s %10lld %15s %25s %20s %3s %lf",&afm,firstname,lastname,town,nomos,&debt);
+			if(HEAP_insertData(debtHeap,&afm,debt)<0||
+				PRE_Insert(&precentileList,debt,afm)<0||
+				NOM_Insert(&nomosList,nomos,debt)<0||
+				OTH_Insert(&otherList,afm,lastname,firstname,town,nomos,debt)<0)
+			{
+				fprintf(stderr,"ERROR: Unable to insert data.\nMemory allocation error.\n");
+				return EXIT_FAILURE;
+			}
+			totalDebt+=debt;
+		}
+		else if(!strcmp(tempString,"top"))
+		//If this is a top command
+		{
+			if(HEAP_getHeapSize(debtHeap)<=0)
+			{
+				printf("Heap empty, nothing to print.");
+				continue;
+			}
+			i=sscanf(inputString,"%*s %s",tempString);
+			//CHECK for number if number after top:
+			if(i==1&&(topPrecent=atof(tempString))>0&&topPrecent<1)
+			{
+				debtCounter=0;
+				prPointer=precentileList;
+				//Use database to print all people in debt responsible for number(number is double like 0.17 for 17%) precent of debt.
+				while(debtCounter/totalDebt<topPrecent)
+				{
+					OTH_PrintData(&otherList,stdout,prPointer->afm);
+					debtCounter+=prPointer->debt;
+					prPointer=prPointer->next;
+				}
+				continue;
+			}
+			//Else just print the data of the first
+			afm=*((long long *)(HEAP_getHead(debtHeap)->data));
+			OTH_PrintData(&otherList,stdout,afm);
+		}
+		else if(!strcmp(tempString,"del"))
+		{
+			if(HEAP_getHeapSize(debtHeap)<=0)
+			{
+				printf("Heap empty, nothing to delete.\n");
+				continue;
+			}
+			afm=*((long long *)(HEAP_getHead(debtHeap)->data));
+			fprintf(invoiceFile,"===New===\n");
+			OTH_PrintData(&otherList,invoiceFile,afm);
+			fprintf(invoiceFile,"===New===\n");
+			HEAP_deleteHead(debtHeap);
+		}
+		else if(!strcmp(tempString,"lookup"))
+		{
+			if(HEAP_getHeapSize(debtHeap)<=0)
+			{
+				printf("Heap empty, nothing to do.\n");
+				continue;
+			}
+			sscanf(inputString,"%*s %lld",&afm);
+			//Search for afm
+			for(i=0;i<HEAP_getHeapSize(debtHeap);++i)
+			{
+				if(*((long long *)HEAP_getVector(debtHeap)[i]->data)==afm)
+				{
+					break;
+				}
+			}
+			//If afm not found
+			if(i==HEAP_getHeapSize(debtHeap))
+			{
+				printf("AFM %.10lld not found.\n",afm);
+				continue;
+			}
+			//Find distance from root
+			++i;
+			j=-1;
+			while(i!=0)
+			{
+				i=i>>1;
+				++j;
+			}
+			printf("Distance from Root: %d\n",j);
+			OTH_PrintData(&otherList,stdout,afm);
+		}
+		else if(!strcmp(tempString,"stats"))
+		{
+			sscanf(inputString,"%*s %3s",nomos);
+			if(NOM_Get(&nomosList,nomos)==NULL)
+			{
+				printf("Prefecture not in database.\n");
+				continue;
+			}
+			printf("Number of Debitors: %ld\nAverage Debt: %.2lf\n",NOM_Get(&nomosList,nomos)->people,totalDebt/((double)NOM_Get(&nomosList,nomos)->people));
+		}
+		else if(!strcmp(tempString,"sumstats"))
+		{
+			//τύπωσε το συνολικό αριθμό οφειλετών στην δομή καθώς επίσης και για κάθε νομό πόσοι
+			//οφειλέτες υπάρχουν και το συνολικό τους χρέος.
+			printf("Total debitors: %d\n",HEAP_getHeapSize(debtHeap));
+			nmPointer=nomosList;
+			while(nmPointer!=NULL)
+			{
+				printf("Prefecture: %.3s Debitors: %ld Debt: %.2lf\n", nmPointer->nomos, nmPointer->people, nmPointer->totalDebt);
+				nmPointer=nmPointer->next;
+			}
+		}
+		else if(!strcmp(tempString,"print"))
+		{
+			for(i=0;i<HEAP_getHeapSize(debtHeap);++i)
+			{
+				printf("Node: %d Debt: %.2lf AFM: %.10lld\n",i,HEAP_getVector(debtHeap)[i]->value,*((long long *)(HEAP_getVector(debtHeap)[i]->data)));
+			}
+		}
+		else if(!strcmp(tempString,"exit"))
+		{
+			//Check for dumpfile
+			i=sscanf(inputString,"%*s %s",batchFileName);
+			if(i==1)
+			{
+				batchFile=fopen(batchFileName,"w");
+				if(batchFile==NULL)
+				{
+					fprintf(stderr,"ERROR: Error opening output file \"%s\"\n",batchFileName);
+					perror("mypriority");
+					continue;
+				}
+				otPointer=otherList;
+				while(otPointer!=NULL)
+				{
+					fprintf(batchFile,"%.10lld %.15s %.25s %.20s %.3s %.2lf\n",otPointer->afm,otPointer->firstname,otPointer->lastname,otPointer->town,otPointer->nomos,otPointer->debt);
+					otPointer=otPointer->next;
+				}
+				fclose(batchFile);
+			}
+			HEAP_deleteHeap(debtHeap);
+			OTH_Free(&otherList);
+			PRE_Free(&precentileList);
+			NOM_Free(&nomosList);
+			fclose(invoiceFile);
+			return EXIT_SUCCESS;
+		}
+		else
+		{
+			fprintf(stderr,"ERROR: Unknown command \"%s\"\n",tempString);
+		}
+	}
+}
+
+int checkArguements(int argc, char **argv)
+{
+	//If there are less than two arguements, then obviously there is no invoice file provided
+	if (argc<3)
+	{
+		return -1;
+	}
+	int i;
+	bool found = false;
+	//Check all arguements
+	for(i = 1 ; i < argc ; ++i)
+	{
+		//Check all arguements for invoice file flag "-o"
+		if(strcmp("-o",argv[i])==0)
+		{
+			//There is an invoice file flag
+			found=true;
+		}
+		//All of those flags must have an arguement following them
+		//That means they can't be the final arguement
+		if(((strcmp("-i", argv[i])==0)||(strcmp("-c", argv[i])==0)||(strcmp("-o",argv[i])==0))
+			&& i==argc-1)
+		{
+			return -4;
+		}
+		//All of those flags mist have an arguement following them
+		//That means they can't have another flag following them
+		if(((strcmp("-i", argv[i])==0)||(strcmp("-c", argv[i])==0)||(strcmp("-o",argv[i])==0))
+			&& ((strcmp("-i", argv[i+1])==0)||(strcmp("-c", argv[i+1])==0)||(strcmp("-o",argv[i+1])==0)))
+		{
+				return -5;
+		}
+	}
+	//If no invoice flag was found, then no invoice file has been
+	if(found==false)
+	{
+		return -3;
+	}
+	return 0;
+}
+
+void displayHelp(void)
+{
+	printf("Usage: mypriority -o <InvoiceFile> [-i <InputFile>] [-c <ConfigFile>]\n");
+}
+
+int findArg(char* arg, int argc, char** argv)
+{
+	int i;
+	for(i=1 ; i<argc ; ++i)
+	{
+		if(strcmp(arg,argv[i])==0)
+		{
+			return i;
+		}
+	}
+	return -1;
+}

@@ -1,0 +1,1 @@
+./Debug/MobileCallManagement.o ./Debug/OuraPlus.o ./Debug/TStoixeiouOuraPlus.o

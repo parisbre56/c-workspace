@@ -1,0 +1,1 @@
+./Debug/L5RCard.o ./Debug/L5RGameBoard.o ./Debug/L5RPlayer.o ./Debug/main.o ./Debug/L5RStronghold.o ./Debug/L5RGreenCard.o ./Debug/L5RBlackCard.o ./Debug/L5RItem.o ./Debug/L5RFollower.o ./Debug/L5RPersonality.o ./Debug/L5RHolding.o ./Debug/L5RTypeConverter.o ./Debug/L5RDeckBuilder.o ./Debug/L5RProvince.o

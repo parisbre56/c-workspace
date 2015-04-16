@@ -1,0 +1,1 @@
+./Debug/AirportManagement.o ./Debug/Evretirio.o ./Debug/TSDDA.o ./Debug/TSEvr.o ./Debug/AVL_ch8_AVLpointer.o ./Debug/BST_ch8_BSTpointer.o

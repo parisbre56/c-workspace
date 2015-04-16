@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CodeLite_Workspace Name="C++Space" Database="./C++Space.tags">
+  <Project Name="Scene1" Path="Scene1/Scene1.project" Active="No"/>
+  <Project Name="Scene2" Path="Scene2/Scene2.project" Active="No"/>
+  <Project Name="Scene3" Path="Scene3/Scene3.project" Active="No"/>
+  <Project Name="L5R" Path="L5R/L5R.project" Active="No"/>
+  <Project Name="Databases1" Path="Databases1/Databases1.project" Active="No"/>
+  <Project Name="Dtabases2" Path="Dtabases2/Dtabases2.project" Active="Yes"/>
+  <BuildMatrix>
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
+      <Project Name="Scene1" ConfigName="Debug"/>
+      <Project Name="Scene2" ConfigName="Debug"/>
+      <Project Name="Scene3" ConfigName="Debug"/>
+      <Project Name="L5R" ConfigName="Debug"/>
+      <Project Name="Databases1" ConfigName="Debug"/>
+      <Project Name="Dtabases2" ConfigName="Debug"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Release" Selected="yes">
+      <Project Name="Scene1" ConfigName="Release"/>
+      <Project Name="Scene2" ConfigName="Release"/>
+      <Project Name="Scene3" ConfigName="Release"/>
+      <Project Name="L5R" ConfigName="Release"/>
+      <Project Name="Databases1" ConfigName="Release"/>
+      <Project Name="Dtabases2" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+  </BuildMatrix>
+</CodeLite_Workspace>
