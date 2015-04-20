@@ -3,19 +3,29 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstring>
+#include <cmath>
 
 #include <iostream>
+#include <iomanip>
 
+//Prints debug messages
 //#define __DEBUG__MODE_EX1__
 
+//Use this to disable inter-thread communication to run it in single processor mode
 //#define __SingleProc__
+
+//Use this for the simple partition of collumns
 //#define __Question1__
+//Use this for the shuffle partition of collumns
 #define __Question2__
 
-//#define __QuestionExtra__
+//Makes the program compute the inverse instead
+#define __QuestionExtra__
 
-#define kappa 4
-//#define kappa 16
+//The number of collumns per thread (*2 for the inverse)
+//#define kappa 2
+//#define kappa 4
+#define kappa 16
 //#define kappa 32
 //#define kappa 64
 //#define kappa 128
@@ -26,6 +36,9 @@
 //Various tags for communication
 #define COL_NUM_TAG 1
 #define COL_TAG 2
+
+//How many digits will be printed
+#define OUTPUT_PRECISION 2
 
 using namespace std;
 
@@ -258,53 +271,106 @@ int main(int argc, char **argv)
 	
 	k=n-1;
 	
-	while(k>0) {
-		//Used for optimisation
-		bool isValid=colValidForThread(tid,nthreads,n,n);
-		int endCol;
-		if(isValid) {
-			endCol=globColToPartCol(tid,nthreads,n,n);
-		}
-		kapOwner=threadForCollumn(nthreads,n,k);
-		//If this is the owner of kappa
-		if(tid==kapOwner) {
-			//Get the collumn you need
-			int curCol=globColToPartCol(tid,nthreads,n,k);
-			for(int i=k-1;i>=0;--i) {
-				#ifndef __SingleProc__
-				MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-				#endif
-				if(isValid) {
-					matrPart[endCol][i]=matrPart[endCol][i]-matrPart[endCol][k]*matrPart[curCol][i];
-				}
-				matrPart[curCol][i]=0; //No need to do real subtraction.
-			}
-		}
-		//Else, if this is not the owner of kappa
-		else {
-			//for all rows below k row, receive what we need to multiply the subtraction with
-			//and do that if necessary
-			double recD;
-			for(int i=k-1;i>=0;--i) {
-				MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
-				if(destinationN!=kapOwner) {
-					MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-				}
-				if(isValid) {
-					matrPart[endCol][i]=matrPart[endCol][i]-recD*matrPart[endCol][k];
+	#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+		while(k>0) {
+			kapOwner=threadForCollumn(nthreads,n,k);
+			
+			//If this is the owner of kappa
+			if(tid==kapOwner) {
+				//Get the collumn you need
+				int curCol=globColToPartCol(tid,nthreads,n,k);
+				for(int i=k-1;i>=0;--i) {
+					#ifndef __SingleProc__
+					MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					#endif
+					for(int j=curCol+1;j<partSize;++j) {
+						//If this is in the inverse matrix
+						if(partColToGlobCol(tid,nthreads,n,j)>=n) { 
+							matrPart[j][i]=matrPart[j][i]-matrPart[j][k]*matrPart[curCol][i];
+						}
+					}
+					matrPart[curCol][i]=0; //No need to do real subtraction.
 				}
 			}
-		}
-		//Finally, decrement kappa
-		--k;
-		
-		#ifdef __DEBUG__MODE_EX1__
-			printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
-			if(tid==0) {
-				cout<<"------------------------------------------"<<endl;
+			//Else, if this is not the owner of kappa
+			else {
+				//for all rows above k row, receive what we need to multiply the subtraction with
+				//and do that if necessary
+				double recD;
+				for(int i=k-1;i>=0;--i) {
+					MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+					if(destinationN!=kapOwner) { //Pass it along to the next thread
+						MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					}
+					//For all collumns
+					for(int j=0;j<partSize;++j) {
+						//If this is in the inverse matrix
+						if(partColToGlobCol(tid,nthreads,n,j)>=n) {
+							matrPart[j][i]=matrPart[j][i]-recD*matrPart[j][k];
+						}
+					}
+				}
 			}
-		#endif
-	}
+			//Finally, decrement kappa
+			--k;
+			
+			#ifdef __DEBUG__MODE_EX1__
+				printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
+				if(tid==0) {
+					cout<<"------------------------------------------"<<endl;
+				}
+			#endif
+		}
+	#else
+		while(k>0) {
+			//Used for optimisation
+			bool isValid=colValidForThread(tid,nthreads,n,n);
+			int endCol;
+			if(isValid) {
+				endCol=globColToPartCol(tid,nthreads,n,n);
+			}
+			
+			kapOwner=threadForCollumn(nthreads,n,k);
+			//If this is the owner of kappa
+			if(tid==kapOwner) {
+				//Get the collumn you need
+				int curCol=globColToPartCol(tid,nthreads,n,k);
+				for(int i=k-1;i>=0;--i) {
+					#ifndef __SingleProc__
+					MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					#endif
+					if(isValid) {
+						matrPart[endCol][i]=matrPart[endCol][i]-matrPart[endCol][k]*matrPart[curCol][i];
+					}
+					matrPart[curCol][i]=0; //No need to do real subtraction.
+				}
+			}
+			//Else, if this is not the owner of kappa
+			else {
+				//for all rows above k row, receive what we need to multiply the subtraction with
+				//and do that if necessary
+				double recD;
+				for(int i=k-1;i>=0;--i) {
+					MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+					if(destinationN!=kapOwner) {
+						MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					}
+					if(isValid) {
+						matrPart[endCol][i]=matrPart[endCol][i]-recD*matrPart[endCol][k];
+					}
+				}
+			}
+			//Finally, decrement kappa
+			--k;
+			
+			#ifdef __DEBUG__MODE_EX1__
+				printMatrix(cartComm,tid,nthreads,n,&matrPart,partSize);
+				if(tid==0) {
+					cout<<"------------------------------------------"<<endl;
+				}
+			#endif
+		}
+	#endif
 	
 	if(tid==0) {
 		//Get the end time
@@ -327,7 +393,12 @@ int main(int argc, char **argv)
 			cout<<"2:\"shuffle\""<<endl;
 			#endif
 		#else
-			cout<<(time_end-time_initial)<<endl;
+			if(isnan(matrPart[0][0])) {
+				cout<<"INVALID MATRIX: NAN"<<endl;
+			}
+			else {
+				cout<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
+			}
 		#endif
 	}
 	
@@ -349,12 +420,16 @@ int main(int argc, char **argv)
 void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** matrPart, int& partSize) {
 	//Create empty matrix
 	partSize=0;
-	//If this is thread will hold the extra collumn
-	if(colValidForThread(tid,nthreads,n,n)) {
-		(*matrPart)=new double*[kappa+1];
-	} else {
-		(*matrPart)=new double*[kappa];
-	}
+	#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+		(*matrPart)=new double*[kappa*2];
+	#else
+		//If this is thread will hold the extra collumn
+		if(colValidForThread(tid,nthreads,n,n)) {
+			(*matrPart)=new double*[kappa+1];
+		} else {
+			(*matrPart)=new double*[kappa];
+		}
+	#endif
 	
 	int destinationN;
 	int destinationP;
@@ -362,42 +437,92 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** ma
 	
 	//For process 0
 	if(tid==0) {
-		//Create an array to hold the matrix (right now we just hope the determinant is non-zero)
-		//!!!CHECK DETERMINANT
-		//Create the matrix (dynamic creation prevents stack overflow)
-		double ** matr = new double*[n+1];
-		for(int j=0;j<n+1;++j) {
-			matr[j]=new double[n];
-		}
-		
-		//For all matrix collumns
-		for(int j=0;j<n+1;++j) {
-			//Generate the matrix rows
-			for(int i=0;i<n;++i) {
-				matr[j][i]= (rand()%((MAX_DEVIATION*2)+1)) - MAX_DEVIATION;
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			double ** matr = new double*[n*2];
+			//Create an array to hold the matrix (right now we just hope determinant is non-zero)
+			//Create the matrix (dynamic creation prevents stack overflow)
+			for(int j=0;j<n*2;++j) {
+				matr[j]=new double[n];
 			}
-		}
-		
-		//CHECK FOR DETERMINANT HERE!!!
-		
-		//Send each thread its collumns
-		for(int j=0;j<n+1;++j) { 
-			//If this collumn is for this thread
-			if(colValidForThread(tid,nthreads,n,j)) {
-				(*matrPart)[partSize]=new double[n];
-				memcpy(&((*matrPart)[partSize][0]),&(matr[j][0]),sizeof(double)*n);
-				++partSize;
+		#else
+			double ** matr = new double*[n+1];
+			//Create an array to hold the matrix (right now we just hope determinant is non-zero)
+			//Create the matrix (dynamic creation prevents stack overflow)
+			for(int j=0;j<n+1;++j) {
+				matr[j]=new double[n];
 			}
-			//If this collumn is for another thread
-			else {
-				#ifndef __SingleProc__
-				//Send the global collumn number
-				MPI_Send(&j,1,MPI_INT,destinationN,COL_NUM_TAG,cartComm);
-				//Send the collumn
-				MPI_Send(&(matr[j][0]),n,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-				#endif
+		#endif
+		
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			//For all matrix collumns
+			for(int j=0;j<n;++j) {
+				//Generate the matrix rows
+				for(int i=0;i<n;++i) {
+					matr[j][i]= (rand()%((MAX_DEVIATION*2)+1)) - MAX_DEVIATION;
+				}
 			}
-		}
+			//For all matrix collumns
+			for(int j=n;j<n*2;++j) {
+				//Generate the matrix rows (diagonal is 1, rest is 0)
+				for(int i=0;i<n;++i) {
+					if(i!=j-n) {
+						matr[j][i]=0.0;
+					} else {
+						matr[j][i]=1.0;
+					}
+				}
+			}
+		#else
+			//For all matrix collumns
+			for(int j=0;j<n+1;++j) {
+				//Generate the matrix rows
+				for(int i=0;i<n;++i) {
+					matr[j][i]= (rand()%((MAX_DEVIATION*2)+1)) - MAX_DEVIATION;
+				}
+			}
+		#endif
+		
+		//TODO: MAKE LOOP TO CHECK DETERMINANT
+		
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			//Send each thread its collumns
+			for(int j=0;j<n*2;++j) { 
+				//If this collumn is for this thread
+				if(colValidForThread(tid,nthreads,n,j)) {
+					(*matrPart)[partSize]=new double[n];
+					memcpy(&((*matrPart)[partSize][0]),&(matr[j][0]),sizeof(double)*n);
+					++partSize;
+				}
+				//If this collumn is for another thread
+				else {
+					#ifndef __SingleProc__
+					//Send the global collumn number
+					MPI_Send(&j,1,MPI_INT,destinationN,COL_NUM_TAG,cartComm);
+					//Send the collumn
+					MPI_Send(&(matr[j][0]),n,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					#endif
+				}
+			}
+		#else //IF THIS IS GAUSSIAN ELIMINATION
+			//Send each thread its collumns
+			for(int j=0;j<n+1;++j) { 
+				//If this collumn is for this thread
+				if(colValidForThread(tid,nthreads,n,j)) {
+					(*matrPart)[partSize]=new double[n];
+					memcpy(&((*matrPart)[partSize][0]),&(matr[j][0]),sizeof(double)*n);
+					++partSize;
+				}
+				//If this collumn is for another thread
+				else {
+					#ifndef __SingleProc__
+					//Send the global collumn number
+					MPI_Send(&j,1,MPI_INT,destinationN,COL_NUM_TAG,cartComm);
+					//Send the collumn
+					MPI_Send(&(matr[j][0]),n,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					#endif
+				}
+			}
+		#endif
 		
 		#ifndef __SingleProc__
 		//Send the end of data signal and wait for it to come back from behind
@@ -407,10 +532,17 @@ void createMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** ma
 		#endif
 		
 		//Free the memory
-		for(int j=0;j<n+1;++j) {
-			delete[] matr[j];
-		}
-		delete[] matr;
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			for(int j=0;j<n*2;++j) {
+				delete[] matr[j];
+			}
+			delete[] matr;
+		#else
+			for(int j=0;j<n+1;++j) {
+				delete[] matr[j];
+			}
+			delete[] matr;
+		#endif
 	}
 	//For all processes except zero
 	else {
@@ -446,10 +578,17 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** mat
 	//For process 0,
 	if(tid==0) {
 		//Create the matrix (dynamic creation prevents stack overflow)
-		double ** matr = new double*[n+1];
-		for(int j=0;j<n+1;++j) {
-			matr[j]=new double[n];
-		}
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			double ** matr = new double*[n*2];
+			for(int j=0;j<n*2;++j) {
+				matr[j]=new double[n];
+			}
+		#else
+			double ** matr = new double*[n+1];
+			for(int j=0;j<n+1;++j) {
+				matr[j]=new double[n];
+			}
+		#endif
 		
 		int colnum;
 		//Put your data in it
@@ -473,18 +612,34 @@ void printMatrix(MPI_Comm cartComm, int tid, int nthreads, int n, double *** mat
 		#endif
 		
 		//Print once we have everything
-		for(int i=0;i<n;++i) {
-			for(int j=0;j<n+1;++j) {
-				cout<<matr[j][i]<<"\t";
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			for(int i=0;i<n;++i) {
+				for(int j=0;j<n*2;++j) {
+					cout<<setprecision(OUTPUT_PRECISION)<<matr[j][i]<<"\t";
+				}
+				cout<<endl;
 			}
-			cout<<endl;
-		}
+		#else
+			for(int i=0;i<n;++i) {
+				for(int j=0;j<n+1;++j) {
+					cout<<setprecision(OUTPUT_PRECISION)<<matr[j][i]<<"\t";
+				}
+				cout<<endl;
+			}
+		#endif
 		
 		//Free memory
-		for(int j=0;j<n+1;++j) {
-			delete[] matr[j];
-		}
-		delete[] matr;
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			for(int j=0;j<n*2;++j) {
+				delete[] matr[j];
+			}
+			delete[] matr;
+		#else
+			for(int j=0;j<n+1;++j) {
+				delete[] matr[j];
+			}
+			delete[] matr;
+		#endif
 	}
 	//Else, for all other processes
 	else {
@@ -506,11 +661,19 @@ bool colValidForThread(int tid, int nthreads, int n, int col) {
 
 int threadForCollumn(int nthreads, int n, int col) {
 	#ifdef __Question1__
-		int temp=col/kappa;
-		if(temp>=nthreads) {
-			temp=nthreads-1;
-		}
-		return temp;
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			int temp=col/(kappa*2);
+			if(temp>=nthreads) {
+				temp=nthreads-1;
+			}
+			return temp;
+		#else
+			int temp=col/kappa;
+			if(temp>=nthreads) {
+				temp=nthreads-1;
+			}
+			return temp;
+		#endif
 	#endif
 	#ifdef __Question2__
 		int temp=col%nthreads;
@@ -520,8 +683,13 @@ int threadForCollumn(int nthreads, int n, int col) {
 
 int partColToGlobCol(int tid, int nthreads, int n, int col) {
 	#ifdef __Question1__
-		int temp= tid*kappa + col;
-		return temp;
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			int temp= tid*(kappa*2) + col;
+			return temp;
+		#else
+			int temp= tid*kappa + col;
+			return temp;
+		#endif
 	#endif
 	#ifdef __Question2__
 		int temp= col*nthreads + tid;
@@ -531,11 +699,15 @@ int partColToGlobCol(int tid, int nthreads, int n, int col) {
 
 int globColToPartCol(int tid, int nthreads, int n, int col) {
 	#ifdef __Question1__
-		int temp=col/kappa;
-		if(temp>=nthreads) {
-			return kappa;
-		}
-		return col%kappa;
+		#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
+			return col%(kappa*2);
+		#else
+			int temp=col/kappa;
+			if(temp>=nthreads) {
+				return kappa;
+			}
+			return col%kappa;
+		#endif
 	#endif
 	#ifdef __Question2__
 		int temp=col/nthreads;
