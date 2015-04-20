@@ -17,15 +17,15 @@
 //Use this for the simple partition of collumns
 //#define __Question1__
 //Use this for the shuffle partition of collumns
-#define __Question2__
+//#define __Question2__
 
 //Makes the program compute the inverse instead
-#define __QuestionExtra__
+//#define __QuestionExtra__
 
 //The number of collumns per thread (*2 for the inverse)
 //#define kappa 2
 //#define kappa 4
-#define kappa 16
+//#define kappa 16
 //#define kappa 32
 //#define kappa 64
 //#define kappa 128
@@ -393,12 +393,12 @@ int main(int argc, char **argv)
 			cout<<"2:\"shuffle\""<<endl;
 			#endif
 		#else
-			if(isnan(matrPart[0][0])) {
+			/*if(isnan(matrPart[0][0])) {
 				cout<<"INVALID MATRIX: NAN"<<endl;
 			}
-			else {
+			else {*/
 				cout<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
-			}
+			//}
 		#endif
 	}
 	
