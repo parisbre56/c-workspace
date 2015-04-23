@@ -2,10 +2,10 @@
 <CodeLite_Workspace Name="MPI" Database="MPI.tags">
   <Project Name="Ex1" Path="Ex1/Ex1.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="Ex1" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Project Name="Ex1" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>

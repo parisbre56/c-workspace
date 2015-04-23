@@ -40,6 +40,10 @@
 //How many digits will be printed
 #define OUTPUT_PRECISION 2
 
+//Uses broadcast instead of sending the data from one thread to the next
+//#define USE_BROADCAST
+//#define USE_BROADCAST_ASYNC
+
 using namespace std;
 
 /**
@@ -119,6 +123,10 @@ int main(int argc, char **argv)
 	//Wrap around
 	int wrapAround=1;
 	
+	#if defined(USE_BROADCAST_ASYNC) //If asynchronus broadcast is enabled, keep a request for testing if the data can be safely modified after being sent
+		MPI_Request bcastRequest;
+	#endif
+	
 	//Initialize the MPI environment
 	if(MPI_Init(NULL,NULL)!=MPI_SUCCESS) {
 		cerr<<"ERROR"<<endl;
@@ -190,25 +198,45 @@ int main(int argc, char **argv)
 			//First send what we need to do to it to the other threads (which is [k,k])
 			//(Data sent is number to divide with (the other threads should have the correct k and sender))
 			#ifndef __SingleProc__
-			MPI_Send(&(matrPart[curCol][k]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				#ifdef USE_BROADCAST
+					MPI_Bcast(&(matrPart[curCol][k]),1,MPI_DOUBLE,kapOwner,cartComm);
+				#elif defined(USE_BROADCAST_ASYNC)
+					MPI_Ibcast(&(matrPart[curCol][k]),1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+				#else //if not defined USE_BROADCAST
+					MPI_Send(&(matrPart[curCol][k]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				#endif
 			#endif
 			//Then divide with that number
 			for(int jj=curCol+1;jj<partSize;++jj) {
 				matrPart[jj][k]=matrPart[jj][k]/matrPart[curCol][k];
 			}
+			#if !defined(__SingleProc__) && defined(USE_BROADCAST_ASYNC)
+				//Wait for the buffer to be read if sending asynchronously, to avoid race conditions
+				MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+			#endif
 			matrPart[curCol][k]=1; //No need to do a real division for the first element
 			
 			//Then for all rows, subtract and send what we are multiplying to subtract to the other threads
 			for(int i=k+1;i<n;++i) {
 				//First send
 				#ifndef __SingleProc__
-				MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					#ifdef USE_BROADCAST
+						MPI_Bcast(&(matrPart[curCol][i]),1,MPI_DOUBLE,kapOwner,cartComm);
+					#elif defined(USE_BROADCAST_ASYNC)
+						MPI_Ibcast(&(matrPart[curCol][i]),1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+					#else //if not defined USE_BROADCAST
+						MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					#endif
 				#endif
 				//For all partcollumns, check to see if we can subtract anything
 				//(their global col must be greater than k and current collumn)
 				for(int jj=curCol+1;jj<partSize;++jj) {
 					matrPart[jj][i]=matrPart[jj][i]-matrPart[jj][k]*matrPart[curCol][i];
 				}
+				#if !defined(__SingleProc__) && defined(USE_BROADCAST_ASYNC)
+					//Wait for the buffer to be read if sending asynchronously, to avoid race conditions
+					MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+				#endif
 				//Then subtract
 				matrPart[curCol][i]=0; //NO need to do real subtraction for the first element
 			}
@@ -230,10 +258,17 @@ int main(int argc, char **argv)
 			//First receive the number you need to divide k row with and send it to the next one 
 			//(unless next one is sender)
 			double recD;
-			MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
-			if(destinationN!=kapOwner) {
-				MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-			}
+			#ifdef USE_BROADCAST
+				MPI_Bcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm);
+			#elif defined(USE_BROADCAST_ASYNC)
+				MPI_Ibcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+				MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+			#else //if not defined USE_BROADCAST
+				MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+				if(destinationN!=kapOwner) {
+					MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+				}
+			#endif
 			//Then divide k row if necessary
 			if(isValid) {
 				for(int j=0;j<partSize;++j) {
@@ -245,10 +280,17 @@ int main(int argc, char **argv)
 			//Then for all rows below k row, receive what we need to multiply the subtraction with
 			//and do that if necessary
 			for(int i=k+1;i<n;++i) {
-				MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
-				if(destinationN!=kapOwner) {
-					MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-				}
+				#ifdef USE_BROADCAST
+					MPI_Bcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm);
+				#elif defined(USE_BROADCAST_ASYNC)
+					MPI_Ibcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+					MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+				#else //if not defined USE_BROADCAST
+					MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+					if(destinationN!=kapOwner) {
+						MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+					}
+				#endif
 				if(isValid) {
 					for(int j=0;j<partSize;++j) {
 						if(isValidArr[j]) {
@@ -281,7 +323,13 @@ int main(int argc, char **argv)
 				int curCol=globColToPartCol(tid,nthreads,n,k);
 				for(int i=k-1;i>=0;--i) {
 					#ifndef __SingleProc__
-					MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+						#ifdef USE_BROADCAST
+							MPI_Bcast(&(matrPart[curCol][i]),1,MPI_DOUBLE,kapOwner,cartComm);
+						#elif defined(USE_BROADCAST_ASYNC)
+							MPI_Ibcast(&(matrPart[curCol][i]),1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+						#else //if not defined USE_BROADCAST
+							MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+						#endif
 					#endif
 					for(int j=curCol+1;j<partSize;++j) {
 						//If this is in the inverse matrix
@@ -289,6 +337,10 @@ int main(int argc, char **argv)
 							matrPart[j][i]=matrPart[j][i]-matrPart[j][k]*matrPart[curCol][i];
 						}
 					}
+					#if !defined(__SingleProc__) && defined(USE_BROADCAST_ASYNC)
+						//Wait for the buffer to be read if sending asynchronously, to avoid race conditions
+						MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+					#endif
 					matrPart[curCol][i]=0; //No need to do real subtraction.
 				}
 			}
@@ -298,10 +350,17 @@ int main(int argc, char **argv)
 				//and do that if necessary
 				double recD;
 				for(int i=k-1;i>=0;--i) {
-					MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
-					if(destinationN!=kapOwner) { //Pass it along to the next thread
-						MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-					}
+					#ifdef USE_BROADCAST
+						MPI_Bcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm);
+					#elif defined(USE_BROADCAST_ASYNC)
+						MPI_Ibcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+						MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+					#else //if not defined USE_BROADCAST
+						MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+						if(destinationN!=kapOwner) { //Pass it along to the next thread
+							MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+						}
+					#endif
 					//For all collumns
 					for(int j=0;j<partSize;++j) {
 						//If this is in the inverse matrix
@@ -337,11 +396,21 @@ int main(int argc, char **argv)
 				int curCol=globColToPartCol(tid,nthreads,n,k);
 				for(int i=k-1;i>=0;--i) {
 					#ifndef __SingleProc__
-					MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+						#ifdef USE_BROADCAST
+							MPI_Bcast(&(matrPart[curCol][i]),1,MPI_DOUBLE,kapOwner,cartComm);
+						#elif defined(USE_BROADCAST_ASYNC)
+							MPI_Ibcast(&(matrPart[curCol][i]),1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+						#else //if not defined USE_BROADCAST
+							MPI_Send(&(matrPart[curCol][i]),1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+						#endif
 					#endif
 					if(isValid) {
 						matrPart[endCol][i]=matrPart[endCol][i]-matrPart[endCol][k]*matrPart[curCol][i];
 					}
+					#if !defined(__SingleProc__) && defined(USE_BROADCAST_ASYNC)
+						//Wait for the buffer to be read if sending asynchronously, to avoid race conditions
+						MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+					#endif
 					matrPart[curCol][i]=0; //No need to do real subtraction.
 				}
 			}
@@ -351,10 +420,17 @@ int main(int argc, char **argv)
 				//and do that if necessary
 				double recD;
 				for(int i=k-1;i>=0;--i) {
-					MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
-					if(destinationN!=kapOwner) {
-						MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
-					}
+					#ifdef USE_BROADCAST
+						MPI_Bcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm);
+					#elif defined(USE_BROADCAST_ASYNC)
+						MPI_Ibcast(&recD,1,MPI_DOUBLE,kapOwner,cartComm, &bcastRequest);
+						MPI_Wait(&bcastRequest, MPI_STATUS_IGNORE);
+					#else //if not defined USE_BROADCAST
+						MPI_Recv(&recD,1,MPI_DOUBLE,destinationP,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+						if(destinationN!=kapOwner) {
+							MPI_Send(&recD,1,MPI_DOUBLE,destinationN,COL_TAG,cartComm);
+						}
+					#endif
 					if(isValid) {
 						matrPart[endCol][i]=matrPart[endCol][i]-recD*matrPart[endCol][k];
 					}

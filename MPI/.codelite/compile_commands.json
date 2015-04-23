@@ -1,9 +1,5 @@
 [{
   "directory": "/home/paris/.codelite/MPI/Ex1",
-  "command": "/usr/bin/mpic++ -O2 -Wall -DNDEBUG -I. -I. -MG -MP -MT./Release/main.cpp.o -MF./Release/main.cpp.o.d -MM main.cpp",
-  "file": "/home/paris/.codelite/MPI/Ex1/main.cpp"
- }, {
-  "directory": "/home/paris/.codelite/MPI/Ex1",
   "command": "/usr/bin/mpic++ -c /home/paris/.codelite/MPI/Ex1/main.cpp -O2 -Wall -DNDEBUG -o ./Release/main.cpp.o -I. -I.",
   "file": "/home/paris/.codelite/MPI/Ex1/main.cpp"
  }]
