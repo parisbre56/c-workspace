@@ -178,6 +178,46 @@ int main(int argc, char **argv)
 	}
 	#endif
 	
+	//Create a cache for optimization
+	//This ensures that there is no difference due to how expensive the functions used to find the right collumn or processor are
+	#ifdef __QuestionExtra__
+		int colnum = n*2;
+	#else
+		int colnum = n+1;
+	#endif
+	int thrForCol[colnum]; //Tells us which thread each collumn belongs to
+	for (int i=0;i<colnum;++i) {
+		thrForCol[i]=threadForCollumn(nthreads,n,i);
+	}
+	
+	bool colValidForThr[colnum]; //Tells us if the coolumn selected is valid for the current thread
+	for (int i=0;i<colnum;++i) {
+		colValidForThr[i]=(thrForCol[i]==tid);
+	}
+	
+	int glColToPartCol[colnum]; //Holds the part collumn for the global collumn given (-1 if invalid)
+	for (int i=0;i<colnum;++i) {
+		if(colValidForThr[i]) {
+			glColToPartCol[i]=globColToPartCol(tid,nthreads,n,i);
+		}
+		else {
+			glColToPartCol[i]=-1;
+		}
+	}
+	
+	int ptColToGlobCol[partSize]; //Holds the global collumn for the part column given
+	for (int i=0;i<partSize;++i) {
+		ptColToGlobCol[i]=partColToGlobCol(tid,nthreads,n,i);
+	}
+	
+	//If this is computing the inverse matrix
+	#ifdef __QuestionExtra__ 
+		bool inInverseMatrix[partSize]; //True if in the inverse matrix
+		for (int i=0;i<partSize;++i) {
+			inInverseMatrix[i]=(ptColToGlobCol[i]>=n);
+		}
+	#endif
+	
 	//Set the active diagonal to 0
 	int k=0;
 	int kapOwner;
@@ -189,11 +229,11 @@ int main(int argc, char **argv)
 	
 	//Start solving
 	while(k<n) {
-		kapOwner=threadForCollumn(nthreads,n,k);
+		kapOwner=thrForCol[k];
 		//If this is the owner of kappa
 		if(tid==kapOwner) {
 			//Get the collumn you need
-			int curCol=globColToPartCol(tid,nthreads,n,k);
+			int curCol=glColToPartCol[k];
 			//For row k, divide it so that it becomes 1 and send what you divided it with to the other rows
 			//First send what we need to do to it to the other threads (which is [k,k])
 			//(Data sent is number to divide with (the other threads should have the correct k and sender))
@@ -247,7 +287,7 @@ int main(int argc, char **argv)
 			bool isValid=false;
 			bool isValidArr[partSize];
 			for(int j=0;j<partSize;++j) {
-				if(partColToGlobCol(tid,nthreads,n,j)>k) {
+				if(ptColToGlobCol[j]>k) {
 					isValid=true;
 					isValidArr[j]=true;
 				}
@@ -315,12 +355,12 @@ int main(int argc, char **argv)
 	
 	#ifdef __QuestionExtra__ //IF THIS IS COMPUTING THE INVERSE MATRIX
 		while(k>0) {
-			kapOwner=threadForCollumn(nthreads,n,k);
+			kapOwner=thrForCol[k];
 			
 			//If this is the owner of kappa
 			if(tid==kapOwner) {
 				//Get the collumn you need
-				int curCol=globColToPartCol(tid,nthreads,n,k);
+				int curCol=glColToPartCol[k];
 				for(int i=k-1;i>=0;--i) {
 					#ifndef __SingleProc__
 						#ifdef USE_BROADCAST
@@ -333,7 +373,7 @@ int main(int argc, char **argv)
 					#endif
 					for(int j=curCol+1;j<partSize;++j) {
 						//If this is in the inverse matrix
-						if(partColToGlobCol(tid,nthreads,n,j)>=n) { 
+						if(inInverseMatrix[j]) { 
 							matrPart[j][i]=matrPart[j][i]-matrPart[j][k]*matrPart[curCol][i];
 						}
 					}
@@ -364,7 +404,7 @@ int main(int argc, char **argv)
 					//For all collumns
 					for(int j=0;j<partSize;++j) {
 						//If this is in the inverse matrix
-						if(partColToGlobCol(tid,nthreads,n,j)>=n) {
+						if(inInverseMatrix[j]) {
 							matrPart[j][i]=matrPart[j][i]-recD*matrPart[j][k];
 						}
 					}
@@ -380,20 +420,20 @@ int main(int argc, char **argv)
 				}
 			#endif
 		}
-	#else
+	#else //If this is not computing the inverse matrix but doing elimination
 		while(k>0) {
 			//Used for optimisation
-			bool isValid=colValidForThread(tid,nthreads,n,n);
 			int endCol;
+			bool isValid=colValidForThr[n];
 			if(isValid) {
-				endCol=globColToPartCol(tid,nthreads,n,n);
+				endCol=glColToPartCol[n];
 			}
 			
-			kapOwner=threadForCollumn(nthreads,n,k);
+			kapOwner=thrForCol[k];
 			//If this is the owner of kappa
 			if(tid==kapOwner) {
 				//Get the collumn you need
-				int curCol=globColToPartCol(tid,nthreads,n,k);
+				int curCol=glColToPartCol[k];
 				for(int i=k-1;i>=0;--i) {
 					#ifndef __SingleProc__
 						#ifdef USE_BROADCAST
