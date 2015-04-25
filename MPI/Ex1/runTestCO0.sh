@@ -33,20 +33,20 @@ function conduct_test() {
 	for k in $3; do #for all kappa (number of collumns per thread, *2 for extra question)
 		#>&2 echo $k
 		if [ -z "$4" ]; then
-			#>&2 echo "mpicc -std=c11 -O3 -D NDEBUG -D \"kappa=$k\" -o ./Ex1 ./main.c"
-			mpicc -std=c11 -O3 -D NDEBUG -D "kappa=$k" -o ./Ex1 ./main.c
+			#>&2 echo "mpicc -std=c11 -O0 -D NDEBUG -D \"kappa=$k\" -o ./Ex1 ./main.c"
+			mpicc -std=c11 -O0 -D NDEBUG -D "kappa=$k" -o ./Ex1 ./main.c
 		elif [ -z "$5" ]; then
-			#>&2 echo "mpicc -std=c11 -O3 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -o ./Ex1 ./main.c"
-			mpicc -std=c11 -O3 -D NDEBUG -D "kappa=$k" -D "$4" -o ./Ex1 ./main.c
+			#>&2 echo "mpicc -std=c11 -O0 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -o ./Ex1 ./main.c"
+			mpicc -std=c11 -O0 -D NDEBUG -D "kappa=$k" -D "$4" -o ./Ex1 ./main.c
 		elif [ -z "$6" ]; then
-			#>&2 echo "mpicc -std=c11 -O3 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -D \"$5\" -o ./Ex1 ./main.c"
-			mpicc -std=c11 -O3 -D NDEBUG -D "kappa=$k" -D "$4" -D "$5" -o ./Ex1 ./main.c
+			#>&2 echo "mpicc -std=c11 -O0 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -D \"$5\" -o ./Ex1 ./main.c"
+			mpicc -std=c11 -O0 -D NDEBUG -D "kappa=$k" -D "$4" -D "$5" -o ./Ex1 ./main.c
 		elif [ -z "$7" ]; then
-			#>&2 echo "mpicc -std=c11 -O3 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -D \"$5\" -D \"$6\" -o ./Ex1 ./main.c"
-			mpicc -std=c11 -O3 -D NDEBUG -D "kappa=$k" -D "$4" -D "$5" -D "$6" -o ./Ex1 ./main.c
+			#>&2 echo "mpicc -std=c11 -O0 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -D \"$5\" -D \"$6\" -o ./Ex1 ./main.c"
+			mpicc -std=c11 -O0 -D NDEBUG -D "kappa=$k" -D "$4" -D "$5" -D "$6" -o ./Ex1 ./main.c
 		else
-			#>&2 echo "mpicc -std=c11 -O3 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -D \"$5\" -D \"$6\" -D \"$7\" -o ./Ex1 ./main.c"
-			mpicc -std=c11 -O3 -D NDEBUG -D "kappa=$k" -D "$4" -D "$5" -D "$6" -D "$7" -o ./Ex1 ./main.c
+			#>&2 echo "mpicc -std=c11 -O0 -D NDEBUG -D \"kappa=$k\" -D \"$4\" -D \"$5\" -D \"$6\" -D \"$7\" -o ./Ex1 ./main.c"
+			mpicc -std=c11 -O0 -D NDEBUG -D "kappa=$k" -D "$4" -D "$5" -D "$6" -D "$7" -o ./Ex1 ./main.c
 		fi
 		echo -n "["
 		for p in $2; do #for all numbers of processors
