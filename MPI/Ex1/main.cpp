@@ -37,8 +37,8 @@
 #define COL_NUM_TAG 1
 #define COL_TAG 2
 
-//How many digits will be printed
-#define OUTPUT_PRECISION 2
+//How many digits will be printed (used for debug, not for normal printing)
+#define OUTPUT_PRECISION 20
 
 //Uses broadcast instead of sending the data from one thread to the next
 //#define USE_BROADCAST
@@ -185,17 +185,17 @@ int main(int argc, char **argv)
 	#else
 		int colnum = n+1;
 	#endif
-	int thrForCol[colnum]; //Tells us which thread each collumn belongs to
+	int thrForCol = new int[colnum]; //Tells us which thread each collumn belongs to
 	for (int i=0;i<colnum;++i) {
 		thrForCol[i]=threadForCollumn(nthreads,n,i);
 	}
 	
-	bool colValidForThr[colnum]; //Tells us if the coolumn selected is valid for the current thread
+	bool colValidForThr = new bool[colnum]; //Tells us if the coolumn selected is valid for the current thread
 	for (int i=0;i<colnum;++i) {
 		colValidForThr[i]=(thrForCol[i]==tid);
 	}
 	
-	int glColToPartCol[colnum]; //Holds the part collumn for the global collumn given (-1 if invalid)
+	int glColToPartCol = new int[colnum]; //Holds the part collumn for the global collumn given (-1 if invalid)
 	for (int i=0;i<colnum;++i) {
 		if(colValidForThr[i]) {
 			glColToPartCol[i]=globColToPartCol(tid,nthreads,n,i);
@@ -205,14 +205,14 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	int ptColToGlobCol[partSize]; //Holds the global collumn for the part column given
+	int ptColToGlobCol = new int[partSize]; //Holds the global collumn for the part column given
 	for (int i=0;i<partSize;++i) {
 		ptColToGlobCol[i]=partColToGlobCol(tid,nthreads,n,i);
 	}
 	
 	//If this is computing the inverse matrix
 	#ifdef __QuestionExtra__ 
-		bool inInverseMatrix[partSize]; //True if in the inverse matrix
+		bool inInverseMatrix = new bool[partSize]; //True if in the inverse matrix
 		for (int i=0;i<partSize;++i) {
 			inInverseMatrix[i]=(ptColToGlobCol[i]>=n);
 		}
@@ -523,6 +523,15 @@ int main(int argc, char **argv)
 		delete[] matrPart[j];
 	}
 	delete[] matrPart;
+	
+	//Delete cache
+	delete[] thrForCol;
+	delete[] colValidForThr;
+	delete[] glColToPartCol;
+	delete[] ptColToGlobCol;
+	#ifdef __QuestionExtra__ 
+		delete[] inInverseMatrix;
+	#endif
 	
 	//Finalize the MPI environment
 	if(MPI_Finalize()!=MPI_SUCCESS) {
