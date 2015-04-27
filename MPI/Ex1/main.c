@@ -189,12 +189,12 @@ int main(int argc, char **argv)
 		thrForCol[i]=threadForCollumn(nthreads,n,i);
 	}
 	
-	bool colValidForThr=malloc(sizeof(bool)*colnum); //Tells us if the coolumn selected is valid for the current thread
+	bool* colValidForThr=malloc(sizeof(bool)*colnum); //Tells us if the coolumn selected is valid for the current thread
 	for (int i=0;i<colnum;++i) {
 		colValidForThr[i]=(thrForCol[i]==tid);
 	}
 	
-	int glColToPartCol=malloc(sizeof(int)*colnum);//Holds the part collumn for the global collumn given (-1 if invalid)
+	int* glColToPartCol=malloc(sizeof(int)*colnum);//Holds the part collumn for the global collumn given (-1 if invalid)
 	for (int i=0;i<colnum;++i) {
 		if(colValidForThr[i]) {
 			glColToPartCol[i]=globColToPartCol(tid,nthreads,n,i);
@@ -204,14 +204,14 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	int ptColToGlobCol=malloc(sizeof(int)*partSize);//Holds the global collumn for the part column given
+	int* ptColToGlobCol=malloc(sizeof(int)*partSize);//Holds the global collumn for the part column given
 	for (int i=0;i<partSize;++i) {
 		ptColToGlobCol[i]=partColToGlobCol(tid,nthreads,n,i);
 	}
 	
 	//If this is computing the inverse matrix
 	#ifdef __QuestionExtra__ 
-		bool inInverseMatrix=malloc(sizeof(bool)*partSize); //True if in the inverse matrix
+		bool* inInverseMatrix=malloc(sizeof(bool)*partSize); //True if in the inverse matrix
 		for (int i=0;i<partSize;++i) {
 			inInverseMatrix[i]=(ptColToGlobCol[i]>=n);
 		}

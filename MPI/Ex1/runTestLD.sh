@@ -81,7 +81,7 @@ tests=20;
 #procs='2 4 8 16'
 #kappas='4 16 32 64'
 procs='2 3 4 5 6 7'
-kappas='100 200 300 400'
+kappas='50 100 150 200'
 echo "procs=[$procs];"
 echo -n "kappas=["
 for k in $kappas; do

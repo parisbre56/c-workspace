@@ -185,17 +185,17 @@ int main(int argc, char **argv)
 	#else
 		int colnum = n+1;
 	#endif
-	int thrForCol = new int[colnum]; //Tells us which thread each collumn belongs to
+	int* thrForCol = new int[colnum]; //Tells us which thread each collumn belongs to
 	for (int i=0;i<colnum;++i) {
 		thrForCol[i]=threadForCollumn(nthreads,n,i);
 	}
 	
-	bool colValidForThr = new bool[colnum]; //Tells us if the coolumn selected is valid for the current thread
+	bool* colValidForThr = new bool[colnum]; //Tells us if the coolumn selected is valid for the current thread
 	for (int i=0;i<colnum;++i) {
 		colValidForThr[i]=(thrForCol[i]==tid);
 	}
 	
-	int glColToPartCol = new int[colnum]; //Holds the part collumn for the global collumn given (-1 if invalid)
+	int* glColToPartCol = new int[colnum]; //Holds the part collumn for the global collumn given (-1 if invalid)
 	for (int i=0;i<colnum;++i) {
 		if(colValidForThr[i]) {
 			glColToPartCol[i]=globColToPartCol(tid,nthreads,n,i);
@@ -205,14 +205,14 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	int ptColToGlobCol = new int[partSize]; //Holds the global collumn for the part column given
+	int* ptColToGlobCol = new int[partSize]; //Holds the global collumn for the part column given
 	for (int i=0;i<partSize;++i) {
 		ptColToGlobCol[i]=partColToGlobCol(tid,nthreads,n,i);
 	}
 	
 	//If this is computing the inverse matrix
 	#ifdef __QuestionExtra__ 
-		bool inInverseMatrix = new bool[partSize]; //True if in the inverse matrix
+		bool* inInverseMatrix = new bool[partSize]; //True if in the inverse matrix
 		for (int i=0;i<partSize;++i) {
 			inInverseMatrix[i]=(ptColToGlobCol[i]>=n);
 		}
