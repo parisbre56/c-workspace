@@ -5,18 +5,18 @@
 ## Debug
 ProjectName            :=Ex2
 ConfigurationName      :=Debug
-WorkspacePath          := "/home/parisbre56/.codelite/MPI"
-ProjectPath            := "/home/parisbre56/.codelite/MPI/Ex2"
+WorkspacePath          := "/home/paris/.codelite/MPI"
+ProjectPath            := "/home/paris/.codelite/MPI/Ex2"
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
-User                   :=parisbre56
-Date                   :=05/05/15
-CodeLitePath           :="/home/parisbre56/.codelite"
-LinkerName             :=/usr/bin/mpic++ 
-SharedObjectLinkerName :=/usr/bin/mpic++ -shared -fPIC
+User                   :=Paris
+Date                   :=05/06/15
+CodeLitePath           :="/home/paris/.codelite"
+LinkerName             :=/home/paris/.openmpi/bin/mpic++ 
+SharedObjectLinkerName :=/home/paris/.openmpi/bin/mpic++ -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -48,8 +48,8 @@ LibPath                := $(LibraryPathSwitch).
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
 AR       := /usr/bin/ar rcu
-CXX      := /usr/bin/mpic++ 
-CC       := /usr/bin/mpicc 
+CXX      := /home/paris/.openmpi/bin/mpic++ 
+CC       := /home/paris/.openmpi/bin/mpicc 
 CXXFLAGS :=  -g -O0 -Wall $(Preprocessors)
 CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
@@ -88,7 +88,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/parisbre56/.codelite/MPI/Ex2/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/paris/.codelite/MPI/Ex2/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM "main.cpp"
 

@@ -1,0 +1,13 @@
+[{
+  "file": "/home/paris/.codelite/MPI/Ex1/main.cpp",
+  "directory": "/home/paris/.codelite/MPI/Ex1",
+  "command": "/home/paris/.openmpi/bin/mpic++  -c /home/paris/.codelite/MPI/Ex1/main.cpp -o /home/paris/.codelite/MPI/Ex1/main.cpp.o  -g  -O0  -Wall  -D __DEBUG__MODE_EX1__ -I. -I."
+ }, {
+  "file": "/home/paris/.codelite/MPI/Ex1/main.c",
+  "directory": "/home/paris/.codelite/MPI/Ex1",
+  "command": "/home/paris/.openmpi/bin/mpicc  -c /home/paris/.codelite/MPI/Ex1/main.c -o /home/paris/.codelite/MPI/Ex1/main.c.o  -g  -O0  -Wall -I. -I."
+ }, {
+  "file": "/home/paris/.codelite/MPI/Ex2/main.cpp",
+  "directory": "/home/paris/.codelite/MPI/Ex2",
+  "command": "/home/paris/.openmpi/bin/mpic++  -c /home/paris/.codelite/MPI/Ex2/main.cpp -o /home/paris/.codelite/MPI/Ex2/main.cpp.o  -g  -O0  -Wall -I. -I."
+ }]

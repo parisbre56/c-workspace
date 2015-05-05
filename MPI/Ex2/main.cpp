@@ -10,11 +10,10 @@ using namespace std;
 
 #define ITER_CHECK 50 //The program will check if we have converged every ITER_CHECK iterations 
 
-#define sqrtN 2000 //The squre root of the number of elements in the grid
+#define sqrtN 250 //The squre root of the number of elements in the grid
 
 //When the total change occuring in the entire array is less than epsilon, the program stops solving
-//Because we compare without the square root, the desired epsilon should be squared and written below
-#define epsilonSq 1e-10 //Means (10^-5)^2
+#define epsilon 1e-5
 
 #define qDef sqrt(nthreads)/4
 //#define qDef sqrt(nthreads)/2
@@ -28,13 +27,16 @@ using namespace std;
 //#define omegaRed 1.8
 //#define omegaRed 1.9
 
-//#define MPI_BOOL MPI_CHAR
+//#define MPI::BOOL MPI_CHAR
 
 #define omegaBlack 0.1
 //#define omegaBlack 0.2
 //...
 //#define omegaBlack 1.8
 //#define omegaBlack 1.9
+
+#define INIT_TAG 1 //Used to send initialisation data
+#define BUFF_TAG 2 //Used to send data from block to block
 
 /**
  * @brief Computes the value of elem[i][j] in the next iteration
@@ -48,7 +50,7 @@ inline double equation(double omega, double** elems, int i, int j);
 
 int main(int argc, char **argv)
 {
-	MPI_Comm cartComm; //Cartesian communicator
+	MPI::Cartcomm cartComm; //Cartesian communicator
 	
 	int tid; //ID of the current thread
 	
@@ -70,10 +72,10 @@ int main(int argc, char **argv)
 	bool isFirstElemRed; //True if the first (upper left) element (NOT edge) of this block is red, false otherwise
 	
 	int threads[2]; //Threads per dimension
-	int wrapAround[2]; //Does the cartesian grid wrap around?
+	bool wrapAround[2]; //Does the cartesian grid wrap around?
 	//No, it doesn't
-	wrapAround[0]=0;
-	wrapAround[1]=0;
+	wrapAround[0]=false;
+	wrapAround[1]=false;
 	
 	int destL; //Left neighbour
 	int destR; //Right neighbour
@@ -92,24 +94,23 @@ int main(int argc, char **argv)
 	
 	//Send and receive requests for asynchronous communication. Initializing as null lets us wait on them
 	//even when no request has been made (useful for the first iteration).
-	MPI_Request reqSL=MPI_REQUEST_NULL;
-	MPI_Request reqRL=MPI_REQUEST_NULL;
-	MPI_Request reqSU=MPI_REQUEST_NULL;
-	MPI_Request reqRU=MPI_REQUEST_NULL;
-	MPI_Request reqSD=MPI_REQUEST_NULL;
-	MPI_Request reqRD=MPI_REQUEST_NULL;
-	MPI_Request reqSR=MPI_REQUEST_NULL;
-	MPI_Request reqRR=MPI_REQUEST_NULL;
+	MPI::Request reqSL=MPI::REQUEST_NULL;
+	MPI::Request reqRL=MPI::REQUEST_NULL;
+	MPI::Request reqSU=MPI::REQUEST_NULL;
+	MPI::Request reqRU=MPI::REQUEST_NULL;
+	MPI::Request reqSD=MPI::REQUEST_NULL;
+	MPI::Request reqRD=MPI::REQUEST_NULL;
+	MPI::Request reqSR=MPI::REQUEST_NULL;
+	MPI::Request reqRR=MPI::REQUEST_NULL;
+	
+	//Used for the asynchrous sum allreduce
+	MPI_Request reqSum;
 	
 	//Initialize the MPI environment
-	if(MPI_Init(NULL,NULL)!=MPI_SUCCESS) {
-		cerr<<"ERROR"<<endl;
-	}
+	MPI::Init();
 	
 	//Get number of threads
-	if(MPI_Comm_size(MPI_COMM_WORLD, &nthreads)!=MPI_SUCCESS) {
-		cerr<<"ERROR"<<endl;
-	}
+	nthreads=MPI::COMM_WORLD.Get_size();
 	
 	//Number of collumns
 	verZones = qDef;
@@ -122,20 +123,17 @@ int main(int argc, char **argv)
 	threads[1]=verZones;
 	
 	//Create two dimensional cartesian grouping that doesn't wrap around
-	if(MPI_Cart_create(MPI_COMM_WORLD,2,threads,wrapAround,1,&cartComm)!=MPI_SUCCESS) {
-		cerr<<"ERROR"<<endl;
-	}
+	cartComm=MPI::COMM_WORLD.Create_cart(2,threads,wrapAround,true);
+
 	//Get new number of threads
-	if(MPI_Comm_size(cartComm, &nthreads)!=MPI_SUCCESS) {
-		cerr<<"ERROR"<<endl;
-	}
+	nthreads=cartComm.Get_size();
+	
 	//Get new id of thread
-	if(MPI_Comm_rank(cartComm, &tid)!=MPI_SUCCESS) {
-		cerr<<"ERROR"<<endl;
-	}
+	tid=cartComm.Get_rank();
+	
 	//Get neighbours
-	MPI_Cart_shift(cartComm,0,1,&destL,&destR);
-	MPI_Cart_shift(cartComm,1,1,&destU,&destD);
+	cartComm.Shift(0,1,destL,destR);
+	cartComm.Shift(1,1,destU,destD);
 	
 	//Find out how many elements this zone should have
 	horElements = sqrtN/horZones;
@@ -143,11 +141,11 @@ int main(int argc, char **argv)
 	
 	//If this is in the right/bottom edge (which we can tell since we have no right/bottom neighbour)
 	//Find how many more elements we need and add them to the number of elements of this zone
-	if(destR==MPI_PROC_NULL) {
+	if(destR==MPI::PROC_NULL) {
 		horDeficit=sqrtN%horZones;
 		horElements+=horDeficit;
 	}
-	if(destD==MPI_PROC_NULL) {
+	if(destD==MPI::PROC_NULL) {
 		verDeficit=sqrtN%verZones;
 		verElements+=verDeficit;
 	}
@@ -158,65 +156,70 @@ int main(int argc, char **argv)
 	//Allocate the local grid plus the necessary border buffers
 	//and initialize everything to zero
 	double ** elems = new double*[horTotal];
-	for(int i=1;i<horTotal;++i) {
+	for(int i=0;i<horTotal;++i) {
 		elems[i]=new double[verTotal](); //() means initialize to 0
 	}
 	
 	//If this is on the right edge initialise the right edge to 1
-	if(destR==MPI_PROC_NULL) {
+	if(destR==MPI::PROC_NULL) {
 		for(int i=0;i<verTotal;++i) {
 			elems[horTotal-1][i]=1.0;
 		}
 	}
 	
 	//Allocate communication buffers if necessary
-	if(destR!=MPI_PROC_NULL) {
-		bufSR=new double[verTotal](); //() means initialize to 0
-		bufRR=new double[verTotal](); //() means initialize to 0
+	if(destR!=MPI::PROC_NULL) {
+		bufSR=new double[verElements](); //() means initialize to 0
+		bufRR=new double[verElements](); //() means initialize to 0
 	}
-	if(destL!=MPI_PROC_NULL) {
-		bufSL=new double[verTotal](); //() means initialize to 0
-		bufRL=new double[verTotal](); //() means initialize to 0
+	if(destL!=MPI::PROC_NULL) {
+		bufSL=new double[verElements](); //() means initialize to 0
+		bufRL=new double[verElements](); //() means initialize to 0
 	}
-	if(destU!=MPI_PROC_NULL) {
-		bufSU=new double[horTotal](); //() means initialize to 0
-		bufRU=new double[horTotal](); //() means initialize to 0
+	if(destU!=MPI::PROC_NULL) {
+		bufSU=new double[horElements](); //() means initialize to 0
+		bufRU=new double[horElements](); //() means initialize to 0
 	}
-	if(destD!=MPI_PROC_NULL) {
-		bufSD=new double[horTotal](); //() means initialize to 0
-		bufRD=new double[horTotal](); //() means initialize to 0
+	if(destD!=MPI::PROC_NULL) {
+		bufSD=new double[horElements](); //() means initialize to 0
+		bufRD=new double[horElements](); //() means initialize to 0
 	}
 	
 	//Compute if the upper left element (element, NOT edge) of this block is red or black
 	//then use that to tell the next block
 	//First we receive data from the previous block, if it exists
-	if(destU!=MPI_PROC_NULL) {
-		MPI_Recv(&isFirstElemRed,1,MPI_BOOL,destU,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+	if(destU!=MPI::PROC_NULL) {
+		cartComm.Recv(&isFirstElemRed,1,MPI::BOOL,destU,INIT_TAG);
 	}
-	if(destL!=MPI_PROC_NULL) {
-		MPI_Recv(&isFirstElemRed,1,MPI_BOOL,destL,MPI_ANY_TAG,cartComm,MPI_STATUS_IGNORE);
+	if(destL!=MPI::PROC_NULL) {
+		cartComm.Recv(&isFirstElemRed,1,MPI::BOOL,destL,INIT_TAG);
 	}
 	//If the previous block doesn't exist, then we are at the upper left block and we
 	//know the upper left block starts red
-	if(destU==MPI_PROC_NULL && destL==MPI_PROC_NULL) {
+	if(destU==MPI::PROC_NULL && destL==MPI::PROC_NULL) {
 		isFirstElemRed=true;
 	}
 	//Send data to the next block if it exists
-	if(destD!=MPI_PROC_NULL) {
+	if(destD!=MPI::PROC_NULL) {
 		//verElements%2==0 when the first element is red and the next block's first element is also red
 		//So if isFirstElemRed==true and (verElements%2==0)==true then isNextFirstElemRed==true
 		//if isFirstElemRed==true and (verElements%2==0)==false then isNextFirstElemRed==false
 		//and so on
 		bool isNextFirstElemRed=(((verElements%2)==0)==isFirstElemRed);
-		MPI_Send(&isNextFirstElemRed,1,MPI_BOOL,destD,MPI_ANY_TAG,cartComm);
+		cartComm.Send(&isNextFirstElemRed,1,MPI::BOOL,destD,INIT_TAG);
 	}
-	if(destR!=MPI_PROC_NULL) {
+	if(destR!=MPI::PROC_NULL) {
 		bool isNextFirstElemRed=(((horElements%2)==0)==isFirstElemRed);
-		MPI_Send(&isNextFirstElemRed,1,MPI_BOOL,destR,MPI_ANY_TAG,cartComm);
+		cartComm.Send(&isNextFirstElemRed,1,MPI::BOOL,destR,INIT_TAG);
 	}
 	
+	//Wait for all processes to get here
+	cartComm.Barrier();
+	
 	//Get start time
-	time_initial = MPI_Wtime();
+	if(tid==0) {
+		time_initial = MPI::Wtime();
+	}
 	
 	//Start solving, keep looping until the difference becomes small enough
 	//Start from the left collumn (position 1) and start going down by two. 
@@ -238,33 +241,33 @@ int main(int argc, char **argv)
 		//wait for the data from the appropriate receive buffer each time the looop starts 
 		//and copy them to the edge. Then send a request for the next batch of edges 
 		//(that will complete on the next loop)
-		if(destR!=MPI_PROC_NULL) {
-			MPI_Wait(&reqRR,MPI_STATUS_IGNORE);
+		if(destR!=MPI::PROC_NULL) {
+			reqRR.Wait();
 			for(int j=1;j<verTotal-2;++j) {
-				elems[horTotal-1][j]=bufRR[j];
+				elems[horTotal-1][j]=bufRR[j-1];
 			}
-			MPI_Irecv(bufRR,verElements,MPI_DOUBLE,destR,MPI_ANY_TAG,cartComm,&reqRR);
+			reqRR=cartComm.Irecv(bufRR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
 		}
-		if(destL!=MPI_PROC_NULL) {
-			MPI_Wait(&reqRL,MPI_STATUS_IGNORE);
+		if(destL!=MPI::PROC_NULL) {
+			reqRL.Wait();
 			for(int j=1;j<verTotal-2;++j) {
-				elems[0][j]=bufRL[j];
+				elems[0][j]=bufRL[j-1];
 			}
-			MPI_Irecv(bufRL,verElements,MPI_DOUBLE,destL,MPI_ANY_TAG,cartComm,&reqRL);
+			reqRL=cartComm.Irecv(bufRL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
 		}
-		if(destU!=MPI_PROC_NULL) {
-			MPI_Wait(&reqRU,MPI_STATUS_IGNORE);
+		if(destU!=MPI::PROC_NULL) {
+			reqRU.Wait();
 			for(int i=1;i<horTotal-2;++i) {
-				elems[i][0]=bufRU[i];
+				elems[i][0]=bufRU[i-1];
 			}
-			MPI_Irecv(bufRU,horElements,MPI_DOUBLE,destU,MPI_ANY_TAG,cartComm,&reqRU);
+			reqRU=cartComm.Irecv(bufRU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
 		}
-		if(destD!=MPI_PROC_NULL) {
-			MPI_Wait(&reqRD,MPI_STATUS_IGNORE);
+		if(destD!=MPI::PROC_NULL) {
+			reqRD.Wait();
 			for(int i=1;i<horTotal-2;++i) {
-				elems[i][verTotal-1]=bufRD[i];
+				elems[i][verTotal-1]=bufRD[i-1];
 			}
-			MPI_Irecv(bufRD,horElements,MPI_DOUBLE,destD,MPI_ANY_TAG,cartComm,&reqRD);
+			reqRD=cartComm.Irecv(bufRD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
 		}
 		
 		//Compute all red
@@ -288,56 +291,86 @@ int main(int argc, char **argv)
 			}
 		}
 		
+		//Make a reduce request, now that we have all the data
+		double allSum;
+		if(checkIter) {
+			MPI_Iallreduce(&diffSum,&allSum,1,MPI::DOUBLE,MPI::SUM,cartComm,&reqSum);
+		}
+		
 		//Finally, wait on the send buffers, copy new data there and 
 		//make the buffers availiable to the other processes 
-		if(destR!=MPI_PROC_NULL) {
-			MPI_Wait(&reqSR,MPI_STATUS_IGNORE);
+		if(destR!=MPI::PROC_NULL) {
+			reqSR.Wait();
 			for(int j=1;j<verTotal-2;++j) {
-				bufSR[j]=elems[horTotal-1][j];
+				bufSR[j-1]=elems[horTotal-1][j];
 			}
-			MPI_Isend(bufSR,verElements,MPI_DOUBLE,destR,MPI_ANY_TAG,cartComm,&reqSR);
+			reqSR=cartComm.Isend(bufSR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
 		}
-		if(destL!=MPI_PROC_NULL) {
-			MPI_Wait(&reqSL,MPI_STATUS_IGNORE);
+		if(destL!=MPI::PROC_NULL) {
+			reqSL.Wait();
 			for(int j=1;j<verTotal-2;++j) {
-				bufSL[j]=elems[0][j];
+				bufSL[j-1]=elems[0][j];
 			}
-			MPI_Isend(bufSL,verElements,MPI_DOUBLE,destL,MPI_ANY_TAG,cartComm,&reqSL);
+			reqSL=cartComm.Isend(bufSL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
 		}
-		if(destU!=MPI_PROC_NULL) {
-			MPI_Wait(&reqSU,MPI_STATUS_IGNORE);
+		if(destU!=MPI::PROC_NULL) {
+			reqSU.Wait();
 			for(int i=1;i<horTotal-2;++i) {
-				bufSU[i]=elems[i][0];
+				bufSU[i-1]=elems[i][0];
 			}
-			MPI_Irecv(bufSU,horElements,MPI_DOUBLE,destU,MPI_ANY_TAG,cartComm,&reqSU);
+			reqSU=cartComm.Isend(bufSU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
 		}
-		if(destD!=MPI_PROC_NULL) {
-			MPI_Wait(&reqSD,MPI_STATUS_IGNORE);
+		if(destD!=MPI::PROC_NULL) {
+			reqSD.Wait();
 			for(int i=1;i<horTotal-2;++i) {
-				bufSD[i]=elems[i][verTotal-1];
+				bufSD[i-1]=elems[i][verTotal-1];
 			}
-			MPI_Isend(bufSD,horElements,MPI_DOUBLE,destD,MPI_ANY_TAG,cartComm,&reqSD);
+			reqSD=cartComm.Isend(bufSD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
 		}
 		
 		//Each ITER_CHECK times, check for the sum and exit if we have reached the required level of convergence
 		if(checkIter) {
-			if(diffSum<epsilonSq) {
+			MPI_Wait(&reqSum,MPI_STATUS_IGNORE);
+			if(sqrt(allSum)<epsilon) {
 				break;
 			}
 		}
 	} while(true);
 	
-	time_end = MPI_Wtime();
-	
 	if(tid==0) {
+		//Get end time
+		time_end = MPI::Wtime();
+		//Output time taken to complete
 		cout<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
 		//cerr<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
 	}
 	
-	//Finalize the MPI environment
-	if(MPI_Finalize()!=MPI_SUCCESS) {
-		cerr<<tid<<" ERROR"<<endl;
+	//free memory
+	for(int i=0;i<horTotal;++i) {
+		delete[] elems[i];
 	}
+	delete[] elems;
+	
+	//Allocate communication buffers if necessary
+	if(destR!=MPI::PROC_NULL) {
+		delete[] bufSR;
+		delete[] bufRR;
+	}
+	if(destL!=MPI::PROC_NULL) {
+		delete[] bufSL;
+		delete[] bufRL;
+	}
+	if(destU!=MPI::PROC_NULL) {
+		delete[] bufSU;
+		delete[] bufRU;
+	}
+	if(destD!=MPI::PROC_NULL) {
+		delete[] bufSD;
+		delete[] bufRD;
+	}
+	
+	//Finalize the MPI environment
+	MPI::Finalize();
 	
 	//Exit
 	return EXIT_SUCCESS;

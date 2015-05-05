@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="MPI" Database="MPI.tags">
-  <Project Name="Ex1" Path="Ex1/Ex1.project" Active="Yes"/>
+  <Project Name="Ex1" Path="Ex1/Ex1.project" Active="No"/>
+  <Project Name="Ex2" Path="Ex2/Ex2.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Project Name="Ex1" ConfigName="Debug"/>
+      <Project Name="Ex2" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Project Name="Ex1" ConfigName="Release"/>
+      <Project Name="Ex2" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
