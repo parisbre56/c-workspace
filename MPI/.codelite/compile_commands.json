@@ -1,9 +1,9 @@
 [{
   "directory": "/home/paris/.codelite/MPI/Ex2",
-  "command": "/home/paris/.openmpi/bin/mpic++ -g -O0 -Wall -I. -I. -MG -MP -MT./Debug/main.cpp.o -MF./Debug/main.cpp.o.d -MM main.cpp",
+  "command": "/home/paris/.openmpi/bin/mpic++ -g -O0 -Wall -std=c++11 -I. -I. -MG -MP -MT./Debug/main.cpp.o -MF./Debug/main.cpp.o.d -MM main.cpp",
   "file": "/home/paris/.codelite/MPI/Ex2/main.cpp"
  }, {
   "directory": "/home/paris/.codelite/MPI/Ex2",
-  "command": "/home/paris/.openmpi/bin/mpic++ -c /home/paris/.codelite/MPI/Ex2/main.cpp -g -O0 -Wall -o ./Debug/main.cpp.o -I. -I.",
+  "command": "/home/paris/.openmpi/bin/mpic++ -c /home/paris/.codelite/MPI/Ex2/main.cpp -g -O0 -Wall -std=c++11 -o ./Debug/main.cpp.o -I. -I.",
   "file": "/home/paris/.codelite/MPI/Ex2/main.cpp"
  }]

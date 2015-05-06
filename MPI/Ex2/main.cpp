@@ -18,34 +18,43 @@
 using namespace std;
 using namespace chrono;
 
-#define ITER_CHECK 50 //The program will check if we have converged every ITER_CHECK iterations 
+#ifndef ITER_CHECK
+	#define ITER_CHECK 50 //The program will check if we have converged every ITER_CHECK iterations 
+#endif
 
-//#define sqrtN 50 //The squre root of the number of elements in the grid
+#ifndef sqrtN
+	#define sqrtN 150 //The squre root of the number of elements in the grid
+#endif
 
-//When the total change occuring in the entire array is less than epsilon, the program stops solving
-#define epsilon 1e-5
+#ifndef epsilon
+	#define epsilon 1e-5 //When the total change occuring in the entire array is less than epsilon, the program stops solving
+#endif
 
-//#define qDef sqrt(nthreads)/4
-//#define qDef sqrt(nthreads)/2
-//#define qDef sqrt(nthreads)
-//#define qDef sqrt(nthreads)*2
-//#define qDef sqrt(nthreads)*4
+#ifndef qDef
+	//#define qDef sqrt(nthreads)/4
+	//#define qDef sqrt(nthreads)/2
+	#define qDef sqrt(nthreads)
+	//#define qDef sqrt(nthreads)*2
+	//#define qDef sqrt(nthreads)*4
+#endif
 
-//#define omegaRed 0.1
-//#define omegaRed 0.2
-//...
-//#define omegaRed 1.8
-//#define omegaRed 1.9
+#ifndef omegaRed
+	#define omegaRed 0.1
+	//#define omegaRed 0.2
+	//...
+	//#define omegaRed 1.8
+	//#define omegaRed 1.9
+#endif
 
-//#define MPI::BOOL MPI_CHAR
+#ifndef omegaBlack
+	#define omegaBlack 0.1
+	//#define omegaBlack 0.2
+	//...
+	//#define omegaBlack 1.8
+	//#define omegaBlack 1.9
+#endif
 
-//#define omegaBlack 0.1
-//#define omegaBlack 0.2
-//...
-//#define omegaBlack 1.8
-//#define omegaBlack 1.9
-
-//#define SINGLE_PROC //Used to testing with a single process
+//#define SINGLE_PROC //Used for testing with a single process
 
 #define INIT_TAG 1 //Used to send initialisation data
 #define BUFF_TAG 2 //Used to send data from block to block
