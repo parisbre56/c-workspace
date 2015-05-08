@@ -37,7 +37,7 @@ function conduct_test() {
 				for p in $2; do #for all numbers of processors
 					t=0.0
 					for j in $(seq 1 $1); do #execute the thing 20 times and use sum/20 to find the average time
-						>&2 echo -n "$w1:$w2:$sqrtN:$p:$j "
+						>&2 echo "$w1:$w2:$sqrtN:$p:$j "
 						mpi=$(./Ex2)
 						action="$t + $mpi"
 						t=$(float_eval "$action")
@@ -46,13 +46,21 @@ function conduct_test() {
 					tAv=$(float_eval "$t / $j")
 					>&2 echo "$tAv"
 					outTimes="$outTimes;$tAv"
-					outData="$outData;\'$w1:$w2:$sqrtN:$p\'"
+					outData="$outData;'$w1:$w2:$sqrtN:$p'"
+					outW1="$outW1;$w1"
+					outW2="$outW2;$w2"
+					outSqrtN="$outSqrtN;$sqrtN"
+					outP="$outP;$p"
 				done
 			done
 		done
 	done
 	echo "t=[$outTimes];"
-	echo "%Data is in the form of w1:w2:sqrtN:procs"
+	echo "w1=[$outW1];"	
+	echo "w2=[$outW2];"
+	echo "sqrtN=[$outSqrtN];"
+	echo "p=[$outP];"
+	echo "%Data is in the form of w1:w2:q:sqrtN:procs"
 	echo "d=[$outData];"
 }
 

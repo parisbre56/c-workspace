@@ -41,7 +41,9 @@ function conduct_test() {
 						t=0.0
 						for j in $(seq 1 $1); do #execute the thing 20 times and use sum/20 to find the average time
 							>&2 echo -n "$w1:$w2:$q:$sqrtN:$p:$j "
-							mpi=$(mpiexec --allow-run-as-root -n $p ./Ex2)
+							#timelimit is used because sometimes the MPIEXEC itself hangs even though the underlying process exits normally and produces a result
+							mpi=$(timelimit -q -t 30 -T 10 mpiexec --allow-run-as-root -n $p ./Ex2)
+							>&2 echo "$mpi"
 							action="$t + $mpi"
 							t=$(float_eval "$action")
 						done
@@ -49,13 +51,23 @@ function conduct_test() {
 						tAv=$(float_eval "$t / $j")
 						>&2 echo "$tAv"
 						outTimes="$outTimes;$tAv"
-						outData="$outData;\'$w1:$w2:$q:$sqrtN:$p\'"
+						outData="$outData;'$w1:$w2:$q:$sqrtN:$p'"
+						outW1="$outW1;$w1"
+						outW2="$outW2;$w2"
+						outQ="$outQ;$q"
+						outSqrtN="$outSqrtN;$sqrtN"
+						outP="$outP;$p"
 					done
 				done
 			done
 		done
 	done
 	echo "t=[$outTimes];"
+	echo "w1=[$outW1];"	
+	echo "w2=[$outW2];"
+	echo "q=[$outQ];"
+	echo "sqrtN=[$outSqrtN];"
+	echo "p=[$outP];"
 	echo "%Data is in the form of w1:w2:q:sqrtN:procs"
 	echo "d=[$outData];"
 }
