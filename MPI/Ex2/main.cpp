@@ -59,6 +59,14 @@ using namespace chrono;
 #define INIT_TAG 1 //Used to send initialisation data
 #define BUFF_TAG 2 //Used to send data from block to block
 
+//#define MULTI_BUFFER
+
+#ifdef MULTI_BUFFER
+	#ifndef BUFFERS
+		#define BUFFERS 2
+	#endif
+#endif
+
 /**
  * @brief Computes the value of elem[i][j] in the next iteration
  * @param omega the relaxation value
@@ -72,6 +80,9 @@ inline double equation(double omega, double** elems, int i, int j);
 int main(int argc, char **argv)
 {
 	#ifndef SINGLE_PROC
+		//Initialize the MPI environment
+		MPI::Init();
+	
 		MPI::Cartcomm cartComm; //Cartesian communicator
 	#endif
 	
@@ -82,7 +93,7 @@ int main(int argc, char **argv)
 	#ifndef SINGLE_PROC
 		double time_initial;
 		double time_end;
-	#else
+	#else //Instead of MPI Wtime we use the high resolution clock for single process mode
 		high_resolution_clock::time_point time_initial;
 		high_resolution_clock::time_point time_end;
 	#endif
@@ -112,25 +123,59 @@ int main(int argc, char **argv)
 		int destD; //Down neighbour
 		
 		//Send and receive buffers
-		double* bufSL;
-		double* bufRL;
-		double* bufSR;
-		double* bufRR;
-		double* bufSD;
-		double* bufRD;
-		double* bufSU;
-		double* bufRU;
+		#ifndef MULTI_BUFFER
+			double* bufSL;
+			double* bufRL;
+			double* bufSR;
+			double* bufRR;
+			double* bufSD;
+			double* bufRD;
+			double* bufSU;
+			double* bufRU;
+		#else //If we're using multiple buffers
+			double** bufSL;
+			double** bufRL;
+			double** bufSR;
+			double** bufRR;
+			double** bufSD;
+			double** bufRD;
+			double** bufSU;
+			double** bufRU;
+		#endif //End ifndef MULTI_BUFFER
 	
 		//Send and receive requests for asynchronous communication. Initializing as null lets us wait on them
 		//even when no request has been made (useful for the first iteration).
-		MPI::Request reqSL=MPI::REQUEST_NULL;
-		MPI::Request reqRL=MPI::REQUEST_NULL;
-		MPI::Request reqSU=MPI::REQUEST_NULL;
-		MPI::Request reqRU=MPI::REQUEST_NULL;
-		MPI::Request reqSD=MPI::REQUEST_NULL;
-		MPI::Request reqRD=MPI::REQUEST_NULL;
-		MPI::Request reqSR=MPI::REQUEST_NULL;
-		MPI::Request reqRR=MPI::REQUEST_NULL;
+		#ifndef MULTI_BUFFER
+			MPI::Request reqSL=MPI::REQUEST_NULL;
+			MPI::Request reqRL=MPI::REQUEST_NULL;
+			MPI::Request reqSU=MPI::REQUEST_NULL;
+			MPI::Request reqRU=MPI::REQUEST_NULL;
+			MPI::Request reqSD=MPI::REQUEST_NULL;
+			MPI::Request reqRD=MPI::REQUEST_NULL;
+			MPI::Request reqSR=MPI::REQUEST_NULL;
+			MPI::Request reqRR=MPI::REQUEST_NULL;
+		#else //If we're using multiple buffers
+			short sBuf=0; //Holds the currently selected buffer
+		
+			MPI::Request reqSL[BUFFERS];
+			MPI::Request reqRL[BUFFERS];
+			MPI::Request reqSU[BUFFERS];
+			MPI::Request reqRU[BUFFERS];
+			MPI::Request reqSD[BUFFERS];
+			MPI::Request reqRD[BUFFERS];
+			MPI::Request reqSR[BUFFERS];
+			MPI::Request reqRR[BUFFERS];
+			for(int i=0;i<BUFFERS;++i) {
+				reqSL[i]=MPI::REQUEST_NULL;
+				reqRL[i]=MPI::REQUEST_NULL;
+				reqSU[i]=MPI::REQUEST_NULL;
+				reqRU[i]=MPI::REQUEST_NULL;
+				reqSD[i]=MPI::REQUEST_NULL;
+				reqRD[i]=MPI::REQUEST_NULL;
+				reqSR[i]=MPI::REQUEST_NULL;
+				reqRR[i]=MPI::REQUEST_NULL;
+			}
+		#endif //End ifndef MULTI_BUFFER
 	
 	//Used for the asynchrous sum allreduce
 		MPI_Request reqSum;
@@ -143,9 +188,6 @@ int main(int argc, char **argv)
 	#endif
 	
 	#ifndef SINGLE_PROC
-		//Initialize the MPI environment
-		MPI::Init();
-		
 		//Get number of threads
 		nthreads=MPI::COMM_WORLD.Get_size();
 		
@@ -228,23 +270,80 @@ int main(int argc, char **argv)
 	#endif
 	
 	#ifndef SINGLE_PROC
-		//Allocate communication buffers if necessary
-		if(destR!=MPI::PROC_NULL) {
-			bufSR=new double[verElements](); //() means initialize to 0
-			bufRR=new double[verElements](); //() means initialize to 0
-		}
-		if(destL!=MPI::PROC_NULL) {
-			bufSL=new double[verElements](); //() means initialize to 0
-			bufRL=new double[verElements](); //() means initialize to 0
-		}
-		if(destU!=MPI::PROC_NULL) {
-			bufSU=new double[horElements](); //() means initialize to 0
-			bufRU=new double[horElements](); //() means initialize to 0
-		}
-		if(destD!=MPI::PROC_NULL) {
-			bufSD=new double[horElements](); //() means initialize to 0
-			bufRD=new double[horElements](); //() means initialize to 0
-		}
+		#ifndef MULTI_BUFFER
+			//Allocate communication buffers if necessary
+			if(destR!=MPI::PROC_NULL) {
+				bufSR=new double[verElements](); //() means initialize to 0
+				bufRR=new double[verElements](); //() means initialize to 0
+			}
+			if(destL!=MPI::PROC_NULL) {
+				bufSL=new double[verElements](); //() means initialize to 0
+				bufRL=new double[verElements](); //() means initialize to 0
+			}
+			if(destU!=MPI::PROC_NULL) {
+				bufSU=new double[horElements](); //() means initialize to 0
+				bufRU=new double[horElements](); //() means initialize to 0
+			}
+			if(destD!=MPI::PROC_NULL) {
+				bufSD=new double[horElements](); //() means initialize to 0
+				bufRD=new double[horElements](); //() means initialize to 0
+			}
+		#else
+			//Allocate communication buffers if necessary
+			if(destR!=MPI::PROC_NULL) {
+				bufSR=new double*[BUFFERS];
+				bufRR=new double*[BUFFERS];
+			}
+			if(destL!=MPI::PROC_NULL) {
+				bufSL=new double*[BUFFERS];
+				bufRL=new double*[BUFFERS];
+			}
+			if(destU!=MPI::PROC_NULL) {
+				bufSU=new double*[BUFFERS];
+				bufRU=new double*[BUFFERS];
+			}
+			if(destD!=MPI::PROC_NULL) {
+				bufSD=new double*[BUFFERS];
+				bufRD=new double*[BUFFERS];
+			}
+			for(int i = 0; i<BUFFERS; ++i) {
+				if(destR!=MPI::PROC_NULL) {
+					bufSR[i]=new double[verElements](); //() means initialize to 0
+					bufRR[i]=new double[verElements](); //() means initialize to 0
+				}
+				if(destL!=MPI::PROC_NULL) {
+					bufSL[i]=new double[verElements](); //() means initialize to 0
+					bufRL[i]=new double[verElements](); //() means initialize to 0
+				}
+				if(destU!=MPI::PROC_NULL) {
+					bufSU[i]=new double[horElements](); //() means initialize to 0
+					bufRU[i]=new double[horElements](); //() means initialize to 0
+				}
+				if(destD!=MPI::PROC_NULL) {
+					bufSD[i]=new double[horElements](); //() means initialize to 0
+					bufRD[i]=new double[horElements](); //() means initialize to 0
+				}
+			}
+			
+			//For all receive buffers other than the first, make a recv request
+			//Imagine we have another processes. When the other process sends something with its sBuf==0, we'll receive it in our sBuf==1 (because the 0th request is NULL)
+			//When the other process sends with its sBuf==1, we'll receive it in our sBuf==2, and so on
+			//That means that we will always get the correct data and not the previous or next data. The BUFF_TAG+i helps us further ensure that
+			for(int i=1;i<BUFFERS;++i) {
+				if(destR!=MPI::PROC_NULL) {
+					reqRR=cartComm.Irecv(bufRR,verElements,MPI::DOUBLE,destR,BUFF_TAG+i);
+				}
+				if(destL!=MPI::PROC_NULL) {
+					reqRL=cartComm.Irecv(bufRL,verElements,MPI::DOUBLE,destL,BUFF_TAG+i);
+				}
+				if(destU!=MPI::PROC_NULL) {
+					reqRU=cartComm.Irecv(bufRU,horElements,MPI::DOUBLE,destU,BUFF_TAG+i);
+				}
+				if(destD!=MPI::PROC_NULL) {
+					reqRD=cartComm.Irecv(bufRD,horElements,MPI::DOUBLE,destD,BUFF_TAG+i);
+				}
+			}
+		#endif
 		
 		//Compute if the upper left element (element, NOT edge) of this block is red or black
 		//then use that to tell the next block
@@ -317,59 +416,167 @@ int main(int argc, char **argv)
 		}
 		
 		#ifndef SINGLE_PROC
-			//wait for the data from the appropriate receive buffer each time the looop starts 
-			//and copy them to the edge. Then send a request for the next batch of edges 
-			//(that will complete on the next loop)
-			if(destR!=MPI::PROC_NULL) {
-				reqRR.Wait();
-				for(int j=1;j<verTotal-2;++j) {
-					elems[horTotal-1][j]=bufRR[j-1];
+			#ifndef MULTI_BUFFER
+				//wait for the data from the appropriate receive buffer each time the looop starts 
+				//and copy them to the edge. Then send a request for the next batch of edges 
+				//(that will complete on the next loop)
+				if(destR!=MPI::PROC_NULL) {
+					reqRR.Wait();
+					for(int j=1;j<verTotal-1;++j) {
+						elems[horTotal-1][j]=bufRR[j-1];
+					}
+					reqRR=cartComm.Irecv(bufRR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
 				}
-				reqRR=cartComm.Irecv(bufRR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
-			}
-			if(destL!=MPI::PROC_NULL) {
-				reqRL.Wait();
-				for(int j=1;j<verTotal-2;++j) {
-					elems[0][j]=bufRL[j-1];
+				if(destL!=MPI::PROC_NULL) {
+					reqRL.Wait();
+					for(int j=1;j<verTotal-1;++j) {
+						elems[0][j]=bufRL[j-1];
+					}
+					reqRL=cartComm.Irecv(bufRL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
 				}
-				reqRL=cartComm.Irecv(bufRL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
-			}
-			if(destU!=MPI::PROC_NULL) {
-				reqRU.Wait();
-				for(int i=1;i<horTotal-2;++i) {
-					elems[i][0]=bufRU[i-1];
+				if(destU!=MPI::PROC_NULL) {
+					reqRU.Wait();
+					for(int i=1;i<horTotal-1;++i) {
+						elems[i][0]=bufRU[i-1];
+					}
+					reqRU=cartComm.Irecv(bufRU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
 				}
-				reqRU=cartComm.Irecv(bufRU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
-			}
-			if(destD!=MPI::PROC_NULL) {
-				reqRD.Wait();
-				for(int i=1;i<horTotal-2;++i) {
-					elems[i][verTotal-1]=bufRD[i-1];
+				if(destD!=MPI::PROC_NULL) {
+					reqRD.Wait();
+					for(int i=1;i<horTotal-1;++i) {
+						elems[i][verTotal-1]=bufRD[i-1];
+					}
+					reqRD=cartComm.Irecv(bufRD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
 				}
-				reqRD=cartComm.Irecv(bufRD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
-			}
+			#else //If we are not a single process and are using multiple buffers
+				//Save the previous buffer and select the next buffer
+				short prevBuf=sBuf;
+				sBuf=(sBuf+1)%BUFFERS;
+				
+				//Receive the data. Copying is unnecessary, since they'll be copied during the main loop
+				//Make sure send buffers have been sent and we can safely write on them
+				if(destR!=MPI::PROC_NULL) {
+					reqRR[prevBuf].Wait();
+					reqSR[sBuf].Wait();
+				}
+				if(destL!=MPI::PROC_NULL) {
+					reqRL[prevBuf].Wait();
+					reqSL[sBuf].Wait();
+				}
+				if(destU!=MPI::PROC_NULL) {
+					reqRU[prevBuf].Wait();
+					reqSU[sBuf].Wait();
+				}
+				if(destD!=MPI::PROC_NULL) {
+					reqRD[prevBuf].Wait();
+					reqSU[sBuf].Wait();
+				}
+			#endif
 		#endif
 		
-		//Compute all red
-		for(int i=1;i<horTotal-1;++i) {
-			for(int j=(isFirstElemRed)?(i%2):((i%2)+1);j<verTotal-1;j+=2) {
-				double newVal=equation(omegaRed,elems,i,j);
-				if(checkIter) {
-					diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
+		#if defined(SINGLE_PROC) || !defined(MULTI_BUFFER) //If we are a single process or are not using multiple buffers
+			//Compute all red
+			for(int i=1;i<horTotal-1;++i) {
+				for(int j=(isFirstElemRed)?(i%2):((i%2)+1);j<verTotal-1;j+=2) {
+					double newVal=equation(omegaRed,elems,i,j);
+					if(checkIter) {
+						diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
+					}
+					elems[i][j]=newVal;
 				}
-				elems[i][j]=newVal;
 			}
-		}
-		//Do the same as above but for black
-		for(int i=1;i<horTotal-1;++i) {
-			for(int j=(isFirstElemRed)?((i%2)+1):(i%2);j<verTotal-1;j+=2) {
-				double newVal=equation(omegaBlack,elems,i,j);
-				if(checkIter) {
-					diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
+			//Do the same as above but for black
+			for(int i=1;i<horTotal-1;++i) {
+				for(int j=(isFirstElemRed)?((i%2)+1):(i%2);j<verTotal-1;j+=2) {
+					double newVal=equation(omegaBlack,elems,i,j);
+					if(checkIter) {
+						diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
+					}
+					elems[i][j]=newVal;
 				}
-				elems[i][j]=newVal;
 			}
-		}
+		#else //If we are not a single process and are using multiple buffers
+			//If the first element is red
+			if(isFirstElemRed) {
+				//We start with the red elements
+					//For the first element
+						//Get the data from the receive buffers for the first element
+				if(destL!=MPI::PROC_NULL) {
+					elems[0][1]=bufRL[prevBuf][0];
+				}
+				if(destU!=MPI::PROC_NULL) {
+					elems[1][0]=bufRU[prevBuf][0];
+				}
+						//Compute the new value for the first element
+				double newVal=equation(omegaRed,elems,1,1);
+				if(checkIter) {
+					diffSum=diffSum+((newVal-elems[1][1])*(newVal-elems[1][1]));
+				}
+				elems[1][1]=newVal;
+						//Put that value to the necessary send buffers
+				if(destL!=MPI::PROC_NULL) {
+					bufSL[sBuf][0]=elems[1][1];
+				}
+				if(destU!=MPI::PROC_NULL) {
+					bufSU[sBuf][0]=elems[1][1];
+				}
+					//For the rest of the first collumn
+				int j;
+				for(j=3;j<verTotal-2;j+=2) {
+					//Get the data from the receive buffers
+					if(destL!=MPI::PROC_NULL) {
+						elems[0][j]=bufRL[prevBuf][j-1];
+					}
+					//Compute the new value
+					newVal=equation(omegaRed,elems,1,j);
+					if(checkIter) {
+						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
+					}
+					elems[1][j]=newVal;
+					//Put that value in the necessary send buffers
+					if(destL!=MPI::PROC_NULL) {
+						bufSL[sBuf][j-1]=elems[1][j];
+					}
+				}
+					//For the last element of the first collumn, if it is red
+				if(j==verTotal-2) {
+					//Get the data from the receive buffers
+					if(destL!=MPI::PROC_NULL) {
+						elems[0][j]=bufRL[prevBuf][j-1];
+					}
+					if(destD!=MPI::PROC_NULL) {
+						elems[1][j+1]=bufRD[prevBuf][0];
+					}
+					//Compute the new value
+					newVal=equation(omegaRed,elems,1,j);
+					if(checkIter) {
+						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
+					}
+					elems[1][j]=newVal;
+					//Put the value in the necessary send buffers
+					
+				}
+				
+					//For all collumns until the last collumn
+					//((A loop for the first black, a check for end condition with a break, then a loop for the first red))
+					
+					//For the last collumn
+					
+				//We continue with the black elements
+					
+					
+			}
+			//If the first element is black
+			else {
+				//We start with the red elements
+				
+					//Start with the first column
+				
+				//We continue with the black elements
+					
+					//Get the data from the receive buffers for the first element
+			}
+		#endif
 		
 		#ifndef SINGLE_PROC
 			//Make a reduce request, now that we have all the data
@@ -377,37 +584,59 @@ int main(int argc, char **argv)
 			if(checkIter) {
 				MPI_Iallreduce(&diffSum,&allSum,1,MPI::DOUBLE,MPI::SUM,cartComm,&reqSum);
 			}
+		#endif
 		
-			//Finally, wait on the send buffers, copy new data there and 
-			//make the buffers availiable to the other processes 
-			if(destR!=MPI::PROC_NULL) {
-				reqSR.Wait();
-				for(int j=1;j<verTotal-2;++j) {
-					bufSR[j-1]=elems[horTotal-1][j];
+		#ifndef SINGLE_PROC
+			#ifndef MULTI_BUFFER
+				//Finally, wait on the send buffers, copy new data there and 
+				//make the buffers availiable to the other processes 
+				if(destR!=MPI::PROC_NULL) {
+					reqSR.Wait();
+					for(int j=1;j<verTotal-1;++j) {
+						bufSR[j-1]=elems[horTotal-2][j];
+					}
+					reqSR=cartComm.Isend(bufSR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
 				}
-				reqSR=cartComm.Isend(bufSR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
-			}
-			if(destL!=MPI::PROC_NULL) {
-				reqSL.Wait();
-				for(int j=1;j<verTotal-2;++j) {
-					bufSL[j-1]=elems[0][j];
+				if(destL!=MPI::PROC_NULL) {
+					reqSL.Wait();
+					for(int j=1;j<verTotal-1;++j) {
+						bufSL[j-1]=elems[1][j];
+					}
+					reqSL=cartComm.Isend(bufSL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
 				}
-				reqSL=cartComm.Isend(bufSL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
-			}
-			if(destU!=MPI::PROC_NULL) {
-				reqSU.Wait();
-				for(int i=1;i<horTotal-2;++i) {
-					bufSU[i-1]=elems[i][0];
+				if(destU!=MPI::PROC_NULL) {
+					reqSU.Wait();
+					for(int i=1;i<horTotal-1;++i) {
+						bufSU[i-1]=elems[i][1];
+					}
+					reqSU=cartComm.Isend(bufSU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
 				}
-				reqSU=cartComm.Isend(bufSU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
-			}
-			if(destD!=MPI::PROC_NULL) {
-				reqSD.Wait();
-				for(int i=1;i<horTotal-2;++i) {
-					bufSD[i-1]=elems[i][verTotal-1];
+				if(destD!=MPI::PROC_NULL) {
+					reqSD.Wait();
+					for(int i=1;i<horTotal-1;++i) {
+						bufSD[i-1]=elems[i][verTotal-2];
+					}
+					reqSD=cartComm.Isend(bufSD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
 				}
-				reqSD=cartComm.Isend(bufSD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
-			}
+			#else //If we are using multiple buffers
+				//Send buffers should already be filled, so we just send them over. Same with receive buffers
+				if(destR!=MPI::PROC_NULL) {
+					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
+					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
+				}
+				if(destL!=MPI::PROC_NULL) {
+					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
+					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
+				}
+				if(destU!=MPI::PROC_NULL) {
+					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
+					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
+				}
+				if(destD!=MPI::PROC_NULL) {
+					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
+					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
+				}
+			#endif
 		#endif
 		
 		#ifndef SINGLE_PROC
@@ -450,23 +679,61 @@ int main(int argc, char **argv)
 	delete[] elems;
 	
 	#ifndef SINGLE_PROC
-		//Allocate communication buffers if necessary
-		if(destR!=MPI::PROC_NULL) {
-			delete[] bufSR;
-			delete[] bufRR;
-		}
-		if(destL!=MPI::PROC_NULL) {
-			delete[] bufSL;
-			delete[] bufRL;
-		}
-		if(destU!=MPI::PROC_NULL) {
-			delete[] bufSU;
-			delete[] bufRU;
-		}
-		if(destD!=MPI::PROC_NULL) {
-			delete[] bufSD;
-			delete[] bufRD;
-		}
+		#ifndef MULTI_BUFFER
+			//Destroy communication buffers if necessary
+			if(destR!=MPI::PROC_NULL) {
+				delete[] bufSR;
+				delete[] bufRR;
+			}
+			if(destL!=MPI::PROC_NULL) {
+				delete[] bufSL;
+				delete[] bufRL;
+			}
+			if(destU!=MPI::PROC_NULL) {
+				delete[] bufSU;
+				delete[] bufRU;
+			}
+			if(destD!=MPI::PROC_NULL) {
+				delete[] bufSD;
+				delete[] bufRD;
+			}
+		#else //If we are using multiple buffers
+			for(int i=0;i<BUFFERS;++i) {
+				//Destroy communication buffers if necessary
+				if(destR!=MPI::PROC_NULL) {
+					delete[] bufSR[i];
+					delete[] bufRR[i];
+				}
+				if(destL!=MPI::PROC_NULL) {
+					delete[] bufSL[i];
+					delete[] bufRL[i];
+				}
+				if(destU!=MPI::PROC_NULL) {
+					delete[] bufSU[i];
+					delete[] bufRU[i];
+				}
+				if(destD!=MPI::PROC_NULL) {
+					delete[] bufSD[i];
+					delete[] bufRD[i];
+				}
+			}
+			if(destR!=MPI::PROC_NULL) {
+				delete[] bufSR;
+				delete[] bufRR;
+			}
+			if(destL!=MPI::PROC_NULL) {
+				delete[] bufSL;
+				delete[] bufRL;
+			}
+			if(destU!=MPI::PROC_NULL) {
+				delete[] bufSU;
+				delete[] bufRU;
+			}
+			if(destD!=MPI::PROC_NULL) {
+				delete[] bufSD;
+				delete[] bufRD;
+			}
+		#endif
 		
 		//Finalize the MPI environment
 		MPI::Finalize();
