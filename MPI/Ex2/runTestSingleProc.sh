@@ -37,8 +37,9 @@ function conduct_test() {
 				for p in $2; do #for all numbers of processors
 					t=0.0
 					for j in $(seq 1 $1); do #execute the thing 20 times and use sum/20 to find the average time
-						>&2 echo "$w1:$w2:$sqrtN:$p:$j "
+						>&2 echo -n "$w1:$w2:$sqrtN:$p:$j "
 						mpi=$(./Ex2)
+						>&2 echo "$mpi"
 						action="$t + $mpi"
 						t=$(float_eval "$action")
 					done

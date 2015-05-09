@@ -76,12 +76,12 @@ function conduct_test() {
  #		Script starts here			#
 ####################################
 
-tests=20;
-procs='50'
+tests=1;
+procs='16'
 w1s='0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9'
 w2s='0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0 1.1 1.2 1.3 1.4 1.5 1.6 1.7 1.8 1.9'
 qs='sqrt(nthreads)/4 sqrt(nthreads)/2 sqrt(nthreads) sqrt(nthreads)*2 sqrt(nthreads)*4'
-sqrtNs='150'
+sqrtNs='200'
 
 conduct_test $tests "$procs" "$w1s" "$w2s" "$qs" "$sqrtNs"
 
