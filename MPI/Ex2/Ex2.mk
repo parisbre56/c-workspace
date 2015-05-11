@@ -13,9 +13,9 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Paris
-Date                   :=05/06/15
+Date                   :=12/05/15
 CodeLitePath           :="/home/paris/.codelite"
-LinkerName             :=/home/paris/.openmpi/bin/mpic++ 
+LinkerName             :=/home/paris/.openmpi/bin/mpic++
 SharedObjectLinkerName :=/home/paris/.openmpi/bin/mpic++ -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
@@ -36,24 +36,24 @@ ObjectsFileList        :="Ex2.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
+IncludePath            := $(IncludeSwitch)/home/paris/.openmpi/bin/include/  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := 
 ArLibs                 :=  
-LibPath                := $(LibraryPathSwitch). 
+LibPath                :=$(LibraryPathSwitch)/home/paris/.openmpi/bin/lib/  $(LibraryPathSwitch). 
 
 ##
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
 AR       := /usr/bin/ar rcu
-CXX      := /home/paris/.openmpi/bin/mpic++ 
-CC       := /home/paris/.openmpi/bin/mpicc 
+CXX      := /home/paris/.openmpi/bin/mpic++
+CC       := /home/paris/.openmpi/bin/mpicc
 CXXFLAGS :=  -g -O0 -Wall -std=c++11 $(Preprocessors)
 CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
-AS       := /usr/bin/as 
+AS       := /usr/bin/as
 
 
 ##
