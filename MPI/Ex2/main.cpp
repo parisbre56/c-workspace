@@ -60,9 +60,9 @@ using namespace std;
 #endif
 
 #define INIT_TAG 1 //Used to send initialisation data
-#define BUFF_TAG 2 //Used to send data from block to block
+#define BUFF_TAG 2 //Used to send data from block to block. In multibuffer mode, BUFF_TAG+<buffer number> is sent used as the tag
 
-#define MULTI_BUFFER
+//#define MULTI_BUFFER
 
 #ifdef MULTI_BUFFER
 	#ifndef BUFFERS
@@ -768,14 +768,15 @@ int main(int argc, char **argv)
 					//Compute the new value
 					newVal=equation(omegaRed,elems,newI,1);
 					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
+						diffSum=diffSum+((newVal-elems[newI][1])*(newVal-elems[newI][1]));
 					}
+					elems[newI][1]=newVal;
 					//Put that value in the necessary send buffers
 					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[newI][j];
+						bufSR[sBuf][0]=elems[newI][1];
 					}
 					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][newI-1]=elems[newI][j];
+						bufSU[sBuf][newI-1]=elems[newI][1];
 					}
 					//Then we compute the rest of the elements normally and send them right
 					for(j=3;j<verTotal-2;j+=2) {
@@ -996,14 +997,15 @@ int main(int argc, char **argv)
 					//Compute the new value
 					newVal=equation(omegaRed,elems,i,1);
 					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
+						diffSum=diffSum+((newVal-elems[i][1])*(newVal-elems[i][1]));
 					}
+					elems[i][1]=newVal;
 					//Put that value in the necessary send buffers
 					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[i][j];
+						bufSR[sBuf][0]=elems[i][1];
 					}
 					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][i-1]=elems[i][j];
+						bufSU[sBuf][i-1]=elems[i][1];
 					}
 					//Then we compute the rest of the elements normally and send them right
 					for(j=3;j<verTotal-2;j+=2) {
@@ -1228,14 +1230,15 @@ int main(int argc, char **argv)
 					//Compute the new value
 					double newVal=equation(omegaRed,elems,i,1);
 					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
+						diffSum=diffSum+((newVal-elems[i][1])*(newVal-elems[i][1]));
 					}
+					elems[i][1]=newVal;
 					//Put that value in the necessary send buffers
 					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[i][j];
+						bufSR[sBuf][0]=elems[i][1];
 					}
 					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][i-1]=elems[i][j];
+						bufSU[sBuf][i-1]=elems[i][1];
 					}
 					//Then we compute the rest of the elements normally and send them right
 					for(j=3;j<verTotal-2;j+=2) {
@@ -1562,14 +1565,15 @@ int main(int argc, char **argv)
 					//Compute the new value
 					newVal=equation(omegaRed,elems,newI,1);
 					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
+						diffSum=diffSum+((newVal-elems[newI][1])*(newVal-elems[newI][1]));
 					}
+					elems[newI][1]=newVal;
 					//Put that value in the necessary send buffers
 					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[newI][j];
+						bufSR[sBuf][0]=elems[newI][1];
 					}
 					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][newI-1]=elems[newI][j];
+						bufSU[sBuf][newI-1]=elems[newI][1];
 					}
 					//Then we compute the rest of the elements normally and send them right
 					for(j=3;j<verTotal-2;j+=2) {
@@ -1795,8 +1799,12 @@ int main(int argc, char **argv)
 
 
 inline double equation(double omega, double** elems, int i, int j) {
+	#ifndef NDEBUG
+		//cout<<i<<','<<j<<endl;
+		//cin.ignore();
+	#endif
 	return (1.0-omega)*(elems[i][j])+(omega/4.0)*(elems[i-1][j]+elems[i][j-1]+elems[i][j+1]+elems[i+1][j]);
 }
 
-//TODO: Make inline functions for writing/reading to/from send/receive buffers during multi-buffer mode. Something like SendU,SendD,etc with (elems,buff,sBuf/prevBuf,i,j)
+//TODO: Make inline functions for writing/reading to/from send/receive buffers during multi-buffer mode. Something like SendU,SendD,etc with (elems,buff,sBuf/prevBuf,i,j). Or make a single inline function and use defines to make the left/right/up/down/etc.
 
