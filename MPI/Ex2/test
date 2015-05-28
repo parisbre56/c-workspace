@@ -1,0 +1,17 @@
+
+ Performance counter stats for 'mpiexec --allow-run-as-root -n 6 ./Ex2':
+
+     222056.547591      task-clock (msec)         #    5.968 CPUs utilized          
+             6,982      context-switches          #    0.031 K/sec                  
+                32      cpu-migrations            #    0.000 K/sec                  
+            10,753      page-faults               #    0.048 K/sec                  
+   673,008,303,942      cycles                    #    3.031 GHz                     [83.32%]
+    18,238,796,996      stalled-cycles-frontend   #    2.71% frontend cycles idle    [83.34%]
+    51,445,535,052      stalled-cycles-backend    #    7.64% backend  cycles idle    [33.35%]
+   834,338,661,485      instructions              #    1.24  insns per cycle        
+                                                  #    0.06  stalled cycles per insn [50.02%]
+    54,085,528,027      branches                  #  243.566 M/sec                   [66.67%]
+       596,807,948      branch-misses             #    1.10% of all branches         [83.33%]
+
+      37.209455397 seconds time elapsed
+

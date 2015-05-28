@@ -37,6 +37,7 @@ function conduct_test() {
 				t=0.0
 				for j in $(seq 1 $1); do #execute the thing 20 times and use sum/20 to find the average time
 					>&2 echo -n "$w1:$w2:$sqrtN:1:$j "
+					#sleep 2
 					mpi=$(./Ex2)
 					>&2 echo "$mpi"
 					action="$t + $mpi"

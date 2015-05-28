@@ -1,0 +1,2 @@
+mpic++ -O3 -std=c++11 -D NDEBUG -D "omegaRed=1.9" -D "omegaBlack=1.9" -D "qDef=sqrt(nthreads)/4" -D "sqrtN=1000" -o ./Ex2 ./main.cpp
+1.9:1.9:sqrt(nthreads)/4:1000:16:1 timelimit: terminated by signal 2 during the run period

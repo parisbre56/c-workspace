@@ -42,6 +42,7 @@ function conduct_test() {
 						for j in $(seq 1 $1); do #execute the thing 20 times and use sum/20 to find the average time
 							>&2 echo -n "$w1:$w2:$q:$sqrtN:$p:$j "
 							#timelimit is used because sometimes the MPIEXEC itself hangs even though the underlying process exits normally and produces a result
+							sleep 2
 							mpi=$(timelimit -q -t 120 -T 20 mpiexec --allow-run-as-root -n $p ./Ex2)
 							>&2 echo "$mpi"	
 							action="$t + $mpi"
@@ -76,7 +77,7 @@ function conduct_test() {
  #		Script starts here			#
 ####################################
 
-tests=20;
+tests=5;
 procs='16'
 w1s='1.9'
 w2s='1.9'

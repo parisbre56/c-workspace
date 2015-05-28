@@ -1,3 +1,5 @@
+//#define NDEBUG
+
 #include <iostream>
 #include <iomanip>
 
@@ -24,21 +26,21 @@ using namespace std;
 #endif
 
 #ifndef ITER_CHECK
-	#define ITER_CHECK 50 //The program will check if we have converged every ITER_CHECK iterations 
+	#define ITER_CHECK 500 //The program will check if we have converged every ITER_CHECK iterations 
 #endif
 
 #ifndef sqrtN
-	#define sqrtN 150 //The squre root of the number of elements in the grid
+	#define sqrtN 1000 //The squre root of the number of elements in the grid
 #endif
 
 #ifndef epsilon
-	#define epsilon 1e-5 //When the total change occuring in the entire array is less than epsilon, the program stops solving
+	#define epsilon 1e-10 //When the total change occuring in the entire array is less than epsilon, the program stops solving
 #endif
 
 #ifndef qDef
 	//#define qDef sqrt(nthreads)/4
-	//#define qDef sqrt(nthreads)/2
-	#define qDef sqrt(nthreads)
+	#define qDef sqrt(nthreads)/2
+	//#define qDef sqrt(nthreads)
 	//#define qDef sqrt(nthreads)*2
 	//#define qDef sqrt(nthreads)*4
 #endif
@@ -68,6 +70,15 @@ using namespace std;
 	#ifndef BUFFERS
 		#define BUFFERS 4
 	#endif
+	#define BUFF_NUM (BUFFERS*2)
+#endif
+
+#ifdef __GNUC__
+	#define likely(x)       __builtin_expect((x), true)
+	#define unlikely(x)     __builtin_expect((x), false)
+#else
+	#define likely(x)       (x)
+	#define unlikely(x)     (x)
 #endif
 
 /**
@@ -79,6 +90,31 @@ using namespace std;
  * @return the resulting value from the computation
  */
 inline double equation(double omega, double** elems, int i, int j);
+
+#ifdef MULTI_BUFFER
+
+	#define getFromRecRight(y,k) getFromRecLR(elems,bufRR,prevBuf,horTotal-2,y,+1,hasRight,k)
+	#define getFromRecLeft(y,k) getFromRecLR(elems,bufRL,prevBuf,1,y,-1,hasLeft,k)
+	#define getFromRecUp(x,k) getFromRecUD(elems,bufRU,prevBuf,x,1,-1,hasUp,k)
+	#define getFromRecDown(x,k) getFromRecUD(elems,bufRD,prevBuf,x,verTotal-2,+1,hasDown,k)
+
+	#define writeToSendRight(y,k) writeToSendLR(elems,bufSR,sBuf,horTotal-2,y,hasRight,k)
+	#define writeToSendLeft(y,k) writeToSendLR(elems,bufSL,sBuf,1,y,hasLeft,k)
+	#define writeToSendUp(x,k) writeToSendUD(elems,bufSU,sBuf,x,1,hasUp,k)
+	#define writeToSendDown(x,k) writeToSendUD(elems,bufSD,sBuf,x,verTotal-2,hasDown,k)
+
+	inline void writeToSendLR(double ** elems, double** buff, int sBuf, int i, int j, bool destExists, int k);
+
+	inline void writeToSendUD(double ** elems, double** buff, int sBuf, int i, int j, bool destExists, int k);
+
+	inline void getFromRecLR(double ** elems, double** buff, int prevBuf, int i, int j, int offsX, bool destExists, int k);
+
+	inline void getFromRecUD(double ** elems, double** buff, int prevBuf, int i, int j, int offsY, bool destExists, int k);
+#endif
+
+inline void proccessData(double ** elems, double& diffSum, double omega, bool checkIter, int i, int j);
+
+void deleteElements(double ** elems, int horTotal);
 
 int main(int argc, char **argv)
 {
@@ -108,10 +144,10 @@ int main(int argc, char **argv)
 	
 	int horElements; //Number of horizontal elements in this zone
 	int verElements; //Number of vertical elements in this zone
-	#ifndef SINGLE_PROC
+	/*#ifndef SINGLE_PROC
 		int horDeficit=0; //How many more horizontal elements this has compared to other zones
 		int verDeficit=0; //How mant more vertical elements this has compared to other zones
-	#endif
+	#endif*/
 	int verTotal; //Total number of vertical elements, including edges
 	int horTotal; //Total number of vertical edges, including edges
 	
@@ -128,17 +164,27 @@ int main(int argc, char **argv)
 		int destR; //Right neighbour
 		int destU; //Up neighbour
 		int destD; //Down neighbour
-		
+
 		//Send and receive buffers
 		#ifndef MULTI_BUFFER
-			double* bufSL;
-			double* bufRL;
-			double* bufSR;
-			double* bufRR;
-			double* bufSD;
-			double* bufRD;
-			double* bufSU;
-			double* bufRU;
+			//Red buffers
+			double* bufSLR;
+			double* bufRLR;
+			double* bufSRR;
+			double* bufRRR;
+			double* bufSDR;
+			double* bufRDR;
+			double* bufSUR;
+			double* bufRUR;
+			//Black buffers
+			double* bufSLB;
+			double* bufRLB;
+			double* bufSRB;
+			double* bufRRB;
+			double* bufSDB;
+			double* bufRDB;
+			double* bufSUB;
+			double* bufRUB;
 		#else //If we're using multiple buffers
 			double** bufSL;
 			double** bufRL;
@@ -153,26 +199,36 @@ int main(int argc, char **argv)
 		//Send and receive requests for asynchronous communication. Initializing as null lets us wait on them
 		//even when no request has been made (useful for the first iteration).
 		#ifndef MULTI_BUFFER
-			MPI::Request reqSL=MPI::REQUEST_NULL;
-			MPI::Request reqRL=MPI::REQUEST_NULL;
-			MPI::Request reqSU=MPI::REQUEST_NULL;
-			MPI::Request reqRU=MPI::REQUEST_NULL;
-			MPI::Request reqSD=MPI::REQUEST_NULL;
-			MPI::Request reqRD=MPI::REQUEST_NULL;
-			MPI::Request reqSR=MPI::REQUEST_NULL;
-			MPI::Request reqRR=MPI::REQUEST_NULL;
+			//Red buffers
+			MPI::Request reqSLR=MPI::REQUEST_NULL;
+			MPI::Request reqRLR=MPI::REQUEST_NULL;
+			MPI::Request reqSUR=MPI::REQUEST_NULL;
+			MPI::Request reqRUR=MPI::REQUEST_NULL;
+			MPI::Request reqSDR=MPI::REQUEST_NULL;
+			MPI::Request reqRDR=MPI::REQUEST_NULL;
+			MPI::Request reqSRR=MPI::REQUEST_NULL;
+			MPI::Request reqRRR=MPI::REQUEST_NULL;
+			//Black buffers
+			MPI::Request reqSLB=MPI::REQUEST_NULL;
+			MPI::Request reqRLB=MPI::REQUEST_NULL;
+			MPI::Request reqSUB=MPI::REQUEST_NULL;
+			MPI::Request reqRUB=MPI::REQUEST_NULL;
+			MPI::Request reqSDB=MPI::REQUEST_NULL;
+			MPI::Request reqRDB=MPI::REQUEST_NULL;
+			MPI::Request reqSRB=MPI::REQUEST_NULL;
+			MPI::Request reqRRB=MPI::REQUEST_NULL;
 		#else //If we're using multiple buffers
-			short sBuf=0; //Holds the currently selected buffer
+			short sBuf=0; //Holds the currently selected buffer. (odd for black, even for red)
 		
-			MPI::Request reqSL[BUFFERS];
-			MPI::Request reqRL[BUFFERS];
-			MPI::Request reqSU[BUFFERS];
-			MPI::Request reqRU[BUFFERS];
-			MPI::Request reqSD[BUFFERS];
-			MPI::Request reqRD[BUFFERS];
-			MPI::Request reqSR[BUFFERS];
-			MPI::Request reqRR[BUFFERS];
-			for(int i=0;i<BUFFERS;++i) {
+			MPI::Request reqSL[BUFF_NUM];
+			MPI::Request reqRL[BUFF_NUM];
+			MPI::Request reqSU[BUFF_NUM];
+			MPI::Request reqRU[BUFF_NUM];
+			MPI::Request reqSD[BUFF_NUM];
+			MPI::Request reqRD[BUFF_NUM];
+			MPI::Request reqSR[BUFF_NUM];
+			MPI::Request reqRR[BUFF_NUM];
+			for(int i=0;i<BUFF_NUM;++i) {
 				reqSL[i]=MPI::REQUEST_NULL;
 				reqRL[i]=MPI::REQUEST_NULL;
 				reqSU[i]=MPI::REQUEST_NULL;
@@ -229,27 +285,47 @@ int main(int argc, char **argv)
 		//Get neighbours
 		cartComm.Shift(0,1,destL,destR);
 		cartComm.Shift(1,1,destU,destD);
+		
+		bool hasLeft=(destL!=MPI::PROC_NULL);
+		bool hasRight=(destR!=MPI::PROC_NULL);
+		bool hasUp=(destU!=MPI::PROC_NULL);
+		bool hasDown=(destD!=MPI::PROC_NULL);
 	#endif //End ifndef SINGLE_PROC
 	
-	#ifndef SINGLE_PROC
-		//Find out how many elements this zone should have
-		horElements = sqrtN/horZones;
-		verElements = sqrtN/verZones;
-	#else
+	#ifdef SINGLE_PROC
 		horElements=sqrtN;
 		verElements=sqrtN;
 	#endif
 	
 	#ifndef SINGLE_PROC
+		//Find out how many elements this zone should have
+		if(sqrtN%horZones<=1) {
+			horElements = sqrtN/horZones;
+		} else {
+			horElements = sqrtN/horZones + 1;
+		}
+		if(sqrtN%verZones<=1) {
+			verElements = sqrtN/verZones;
+		} else {
+			verElements = sqrtN/verZones + 1;
+		}
+		
+		
 		//If this is in the right/bottom edge (which we can tell since we have no right/bottom neighbour)
 		//Find how many more elements we need and add them to the number of elements of this zone
-		if(destR==MPI::PROC_NULL) {
-			horDeficit=sqrtN%horZones;
-			horElements+=horDeficit;
+		if(!hasRight) {
+			if(sqrtN%horZones>1) {
+				horElements=(sqrtN/horZones)-(horZones-1);
+			} else {
+				horElements+=sqrtN%horZones;
+			}
 		}
-		if(destD==MPI::PROC_NULL) {
-			verDeficit=sqrtN%verZones;
-			verElements+=verDeficit;
+		if(!hasDown) {
+			if(sqrtN%verZones>1) {
+				verElements=(sqrtN/verZones)-(verZones-1);
+			} else {
+				verElements+=sqrtN%verZones;
+			}
 		}
 	#endif
 	
@@ -265,7 +341,7 @@ int main(int argc, char **argv)
 	
 	#ifndef SINGLE_PROC
 		//If this is on the right edge initialise the right edge to 1
-		if(destR==MPI::PROC_NULL) {
+		if(!hasRight) {
 			for(int i=0;i<verTotal;++i) {
 				elems[horTotal-1][i]=1.0;
 			}
@@ -277,97 +353,22 @@ int main(int argc, char **argv)
 	#endif
 	
 	#ifndef SINGLE_PROC
-		#ifndef MULTI_BUFFER
-			//Allocate communication buffers if necessary
-			if(destR!=MPI::PROC_NULL) {
-				bufSR=new double[verElements](); //() means initialize to 0
-				bufRR=new double[verElements](); //() means initialize to 0
-			}
-			if(destL!=MPI::PROC_NULL) {
-				bufSL=new double[verElements](); //() means initialize to 0
-				bufRL=new double[verElements](); //() means initialize to 0
-			}
-			if(destU!=MPI::PROC_NULL) {
-				bufSU=new double[horElements](); //() means initialize to 0
-				bufRU=new double[horElements](); //() means initialize to 0
-			}
-			if(destD!=MPI::PROC_NULL) {
-				bufSD=new double[horElements](); //() means initialize to 0
-				bufRD=new double[horElements](); //() means initialize to 0
-			}
-		#else
-			//Allocate communication buffers if necessary
-			if(destR!=MPI::PROC_NULL) {
-				bufSR=new double*[BUFFERS];
-				bufRR=new double*[BUFFERS];
-			}
-			if(destL!=MPI::PROC_NULL) {
-				bufSL=new double*[BUFFERS];
-				bufRL=new double*[BUFFERS];
-			}
-			if(destU!=MPI::PROC_NULL) {
-				bufSU=new double*[BUFFERS];
-				bufRU=new double*[BUFFERS];
-			}
-			if(destD!=MPI::PROC_NULL) {
-				bufSD=new double*[BUFFERS];
-				bufRD=new double*[BUFFERS];
-			}
-			for(int i = 0; i<BUFFERS; ++i) {
-				if(destR!=MPI::PROC_NULL) {
-					bufSR[i]=new double[verElements](); //() means initialize to 0
-					bufRR[i]=new double[verElements](); //() means initialize to 0
-				}
-				if(destL!=MPI::PROC_NULL) {
-					bufSL[i]=new double[verElements](); //() means initialize to 0
-					bufRL[i]=new double[verElements](); //() means initialize to 0
-				}
-				if(destU!=MPI::PROC_NULL) {
-					bufSU[i]=new double[horElements](); //() means initialize to 0
-					bufRU[i]=new double[horElements](); //() means initialize to 0
-				}
-				if(destD!=MPI::PROC_NULL) {
-					bufSD[i]=new double[horElements](); //() means initialize to 0
-					bufRD[i]=new double[horElements](); //() means initialize to 0
-				}
-			}
-			
-			//For all receive buffers other than the first, make a recv request
-			//Imagine we have another processes. When the other process sends something with its sBuf==0, we'll receive it in our sBuf==1 (because the 0th request is NULL)
-			//When the other process sends with its sBuf==1, we'll receive it in our sBuf==2, and so on
-			//That means that we will always get the correct data and not the previous or next data. The BUFF_TAG+i helps us further ensure that
-			for(int i=1;i<BUFFERS;++i) {
-				if(destR!=MPI::PROC_NULL) {
-					reqRR[i]=cartComm.Irecv(bufRR[i],verElements,MPI::DOUBLE,destR,BUFF_TAG+i);
-				}
-				if(destL!=MPI::PROC_NULL) {
-					reqRL[i]=cartComm.Irecv(bufRL[i],verElements,MPI::DOUBLE,destL,BUFF_TAG+i);
-				}
-				if(destU!=MPI::PROC_NULL) {
-					reqRU[i]=cartComm.Irecv(bufRU[i],horElements,MPI::DOUBLE,destU,BUFF_TAG+i);
-				}
-				if(destD!=MPI::PROC_NULL) {
-					reqRD[i]=cartComm.Irecv(bufRD[i],horElements,MPI::DOUBLE,destD,BUFF_TAG+i);
-				}
-			}
-		#endif
-		
 		//Compute if the upper left element (element, NOT edge) of this block is red or black
 		//then use that to tell the next block
 		//First we receive data from the previous block, if it exists
-		if(destU!=MPI::PROC_NULL) {
+		if(hasUp) {
 			cartComm.Recv(&isFirstElemRed,1,MPI::BOOL,destU,INIT_TAG);
 		}
-		if(destL!=MPI::PROC_NULL) {
+		if(hasLeft) {
 			cartComm.Recv(&isFirstElemRed,1,MPI::BOOL,destL,INIT_TAG);
 		}
 		//If the previous block doesn't exist, then we are at the upper left block and we
 		//know the upper left block starts red
-		if(destU==MPI::PROC_NULL && destL==MPI::PROC_NULL) {
+		if(!hasUp && !hasLeft) {
 			isFirstElemRed=true;
 		}
 		//Send data to the next block if it exists
-		if(destD!=MPI::PROC_NULL) {
+		if(hasDown) {
 			//verElements%2==0 when the first element is red and the next block's first element is also red
 			//So if isFirstElemRed==true and (verElements%2==0)==true then isNextFirstElemRed==true
 			//if isFirstElemRed==true and (verElements%2==0)==false then isNextFirstElemRed==false
@@ -375,13 +376,204 @@ int main(int argc, char **argv)
 			bool isNextFirstElemRed=(((verElements%2)==0)==isFirstElemRed);
 			cartComm.Send(&isNextFirstElemRed,1,MPI::BOOL,destD,INIT_TAG);
 		}
-		if(destR!=MPI::PROC_NULL) {
+		if(hasRight) {
 			bool isNextFirstElemRed=(((horElements%2)==0)==isFirstElemRed);
 			cartComm.Send(&isNextFirstElemRed,1,MPI::BOOL,destR,INIT_TAG);
 		}
 	#else
 		isFirstElemRed=true;
 	#endif
+	
+	bool isBottomLeftElementRed;
+	bool isTopRightElementRed;
+	bool isBottomRightElementRed;
+	if(isFirstElemRed) {
+		//If the first element (top left, elems[1][1]) is red, then all odd elements below it are red
+		//Therefore the bottom left element is red if it is odd
+		isBottomLeftElementRed=(((verTotal-2)%2)==1);
+		//Same for the horizontal
+		isTopRightElementRed=(((horTotal-2)%2)==1);
+		//If the top right element is red and the bottom left element is red, then the bottom right element is also red
+		//If the top right element is black and the bottom left element is red, then the bottom right element is black
+		//If the top right element is red and the bottom left element is black, then the bottom right element is black
+		//If the top right element is black and the bottom left element is black, then the bottom right element is red
+		//So we need them to be equal for the bottom right to be red
+		isBottomRightElementRed=(isBottomLeftElementRed==isTopRightElementRed);
+	} else {
+		//If the second element (top left, elems[1][2]) is red, then all even elements below it are red
+		isBottomLeftElementRed=(((verTotal-2)%2)==0);
+		//Same for the horizontal
+		isTopRightElementRed=(((horTotal-2)%2)==0);
+		//If the top right element is red and the bottom left element is red, then the bottom right element is black
+		//If the top right element is red and the bottom left element is black, then the bottom right element is red
+		//If the top right element is black and the bottom left element is red, then the bottom right element is red
+		//If the top right element is black and the bottom left element is black, then the bottom right element is black
+		//So we need them to be unequal for the bottom right to be red
+		isBottomRightElementRed=(isBottomLeftElementRed!=isTopRightElementRed);
+	}
+	
+	#ifndef SINGLE_PROC
+		//Find the number of red and black elements at the end (NOT the edges!)
+		int redElemsHorUp;
+		int redElemsHorDown;
+		int redElemsVerLeft;
+		int redElemsVerRight;
+		int blackElemsHorUp;
+		int blackElemsHorDown;
+		int blackElemsVerLeft;
+		int blackElemsVerRight;
+		if(isFirstElemRed) {
+			redElemsHorUp=horElements/2+horElements%2;
+			blackElemsHorUp=horElements/2;
+			redElemsVerLeft=verElements/2+verElements%2;
+			blackElemsVerLeft=verElements/2;
+		} 
+		else {
+			redElemsHorUp=horElements/2;
+			blackElemsHorUp=horElements/2+horElements%2;
+			redElemsVerLeft=verElements/2;
+			blackElemsVerLeft=verElements/2+verElements%2;
+		}
+		if(isTopRightElementRed) {
+			redElemsVerRight=verElements/2+verElements%2;
+			blackElemsVerRight=verElements/2;
+		}
+		else {
+			redElemsVerRight=verElements/2;
+			blackElemsVerRight=verElements/2+verElements%2;
+		}
+		if(isBottomLeftElementRed) {
+			redElemsHorDown=horElements/2+horElements%2;
+			blackElemsHorDown=horElements/2;
+		}
+		else {
+			redElemsHorDown=horElements/2;
+			blackElemsHorDown=horElements/2+horElements%2;
+		}
+		#ifndef MULTI_BUFFER
+			//Allocate communication buffers if necessary
+			if(hasRight) {
+				//The buffer is half the size because we're only taking the elements we need: half red, half black
+				bufSRR=new double[redElemsVerRight](); //() means initialize to 0
+				bufRRR=new double[blackElemsVerRight](); //() means initialize to 0
+				bufSRB=new double[blackElemsVerRight](); //() means initialize to 0
+				bufRRB=new double[redElemsVerRight](); //() means initialize to 0
+			}
+			if(hasLeft) {
+				bufSLR=new double[redElemsVerLeft](); //() means initialize to 0
+				bufRLR=new double[blackElemsVerLeft](); //() means initialize to 0
+				bufSLB=new double[blackElemsVerLeft](); //() means initialize to 0
+				bufRLB=new double[redElemsVerLeft](); //() means initialize to 0
+			}
+			if(hasUp) {
+				bufSUR=new double[redElemsHorUp](); //() means initialize to 0
+				bufRUR=new double[blackElemsHorUp](); //() means initialize to 0
+				bufSUB=new double[blackElemsHorUp](); //() means initialize to 0
+				bufRUB=new double[redElemsHorUp](); //() means initialize to 0
+			}
+			if(hasDown) {
+				bufSDR=new double[redElemsHorDown](); //() means initialize to 0
+				bufRDR=new double[blackElemsHorDown](); //() means initialize to 0
+				bufSDB=new double[blackElemsHorDown](); //() means initialize to 0
+				bufRDB=new double[redElemsHorDown](); //() means initialize to 0
+			}
+		#else //If we're using multiple buffers
+			//Allocate communication buffers if necessary
+			if(hasRight) {
+				bufSR=new double*[BUFF_NUM];
+				bufRR=new double*[BUFF_NUM];
+			}
+			if(hasLeft) {
+				bufSL=new double*[BUFF_NUM];
+				bufRL=new double*[BUFF_NUM];
+			}
+			if(hasUp) {
+				bufSU=new double*[BUFF_NUM];
+				bufRU=new double*[BUFF_NUM];
+			}
+			if(hasDown) {
+				bufSD=new double*[BUFF_NUM];
+				bufRD=new double*[BUFF_NUM];
+			}
+			for(int i = 0; i<BUFF_NUM; i+=2) {
+				//Odd for black, even for red. We know we'll always have an even number of buffers
+				if(hasRight) {
+					//The buffer is half the size because we're only taking the elements we need: half red, half black
+					bufSR[i]=new double[blackElemsVerRight](); //() means initialize to 0
+					bufRR[i]=new double[redElemsVerRight](); //() means initialize to 0
+					bufSR[i+1]=new double[redElemsVerRight](); //() means initialize to 0
+					bufRR[i+1]=new double[blackElemsVerRight](); //() means initialize to 0
+				}
+				if(hasLeft) {
+					bufSL[i]=new double[blackElemsVerLeft](); //() means initialize to 0
+					bufRL[i]=new double[redElemsVerLeft](); //() means initialize to 0
+					bufSL[i+1]=new double[redElemsVerLeft](); //() means initialize to 0
+					bufRL[i+1]=new double[blackElemsVerLeft](); //() means initialize to 0
+				}
+				if(hasUp) {
+					bufSU[i]=new double[blackElemsHorUp](); //() means initialize to 0
+					bufRU[i]=new double[redElemsHorUp](); //() means initialize to 0
+					bufSU[i+1]=new double[redElemsHorUp](); //() means initialize to 0
+					bufRU[i+1]=new double[blackElemsHorUp](); //() means initialize to 0
+				}
+				if(hasDown) {
+					bufSD[i]=new double[blackElemsHorDown](); //() means initialize to 0
+					bufRD[i]=new double[redElemsHorDown](); //() means initialize to 0
+					bufSD[i+1]=new double[redElemsHorDown](); //() means initialize to 0
+					bufRD[i+1]=new double[blackElemsHorDown](); //() means initialize to 0
+				}
+			}
+			
+			//For all receive buffers other than the first, make a recv request
+			//Imagine we have another processes. When the other process sends something with its sBuf==0, we'll receive it in our sBuf==1 (because the 0th request is NULL)
+			//When the other process sends with its sBuf==1, we'll receive it in our sBuf==2, and so on
+			//That means that we will always get the correct data and not the previous or next data. The BUFF_TAG+i helps us further ensure that
+			for(int i=1;i<BUFF_NUM;++i) {
+				//Remember, odd for black, even for red
+				if(i%2==0) {
+					if(hasRight) {
+						reqRR[i]=cartComm.Irecv(bufRR[i],redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+i);
+					}
+					if(hasLeft) {
+						reqRL[i]=cartComm.Irecv(bufRL[i],redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+i);
+					}
+					if(hasUp) {
+						reqRU[i]=cartComm.Irecv(bufRU[i],redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+i);
+					}
+					if(hasDown) {
+						reqRD[i]=cartComm.Irecv(bufRD[i],redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+i);
+					}
+				} else {
+					if(hasRight) {
+						reqRR[i]=cartComm.Irecv(bufRR[i],blackElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+i);
+					}
+					if(hasLeft) {
+						reqRL[i]=cartComm.Irecv(bufRL[i],blackElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+i);
+					}
+					if(hasUp) {
+						reqRU[i]=cartComm.Irecv(bufRU[i],blackElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+i);
+					}
+					if(hasDown) {
+						reqRD[i]=cartComm.Irecv(bufRD[i],blackElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+i);
+					}
+				}
+			}
+		#endif
+	#endif
+	
+	//Used for optimisation
+	int isFirstElemRedIndex=(isFirstElemRed)?(1):(2);
+	int isFirstElemRedIndexInverse=(isFirstElemRed)?(2):(1);
+	int isBottomLeftElementRedIndex=(isBottomLeftElementRed)?(1):(2);
+	int isBottomLeftElementRedIndexInverse=(isBottomLeftElementRed)?(2):(1);
+	int isTopRightElementRedIndex=(isTopRightElementRed)?(1):(2);
+	int isTopRightElementRedIndexInverse=(isTopRightElementRed)?(2):(1);
+	int isFirstElemRedKappa=isFirstElemRedIndex-1;
+	int isFirstElemRedKappaInverse=isFirstElemRedIndexInverse-1;
+	int isBottomLeftElementRedKappa=(isBottomLeftElementRed)?(1):(0);
+	int isBottomLeftElementRedKappaInverse=(isBottomLeftElementRed)?(0):(1);
+	int isTopRightElementRedKappa=(isTopRightElementRed)?(1):(0);
+	int isTopRightElementRedKappaInverse=(isTopRightElementRed)?(0):(1);
 	
 	#ifdef CUDA_ENABLED
 		//Set up cuda
@@ -418,7 +610,7 @@ int main(int argc, char **argv)
 		++iteration;
 		double diffSum; //Holds the sum for the end condition
 		bool checkIter=((iteration%ITER_CHECK)==0); //Tells us if we should check for convergance in this iteration
-		if(checkIter) {
+		if(unlikely(checkIter)) {
 			diffSum=0.0;
 		}
 		
@@ -427,56 +619,65 @@ int main(int argc, char **argv)
 				//wait for the data from the appropriate receive buffer each time the looop starts 
 				//and copy them to the edge. Then send a request for the next batch of edges 
 				//(that will complete on the next loop)
-				if(destR!=MPI::PROC_NULL) {
-					reqRR.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						elems[horTotal-1][j]=bufRR[j-1];
-					}
-					reqRR=cartComm.Irecv(bufRR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
+				//First we wait on the black data
+				if(hasRight) {
+					reqRRB.Wait();
+					//We want only the black elements. So if the top right element is red, 
+					//then we know that the edge element on its right it will be black
+					//and we start with it, else we start with the one below it which will be red
+					//(It's verTotal-1 because we don't care about the corners)
+					{int k,j; //Workaround for inability to declare multiple counters
+					for(k=0,j=isTopRightElementRedIndex;j<verTotal-1;++k,j+=2) {
+						elems[horTotal-1][j]=bufRRB[k];
+					}}
+					reqRRB=cartComm.Irecv(bufRRB,redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+1); //+1 for black
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqRL.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						elems[0][j]=bufRL[j-1];
-					}
-					reqRL=cartComm.Irecv(bufRL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
+				if(hasLeft) {
+					reqRLB.Wait();
+					{int k,j;
+					for(k=0,j=isFirstElemRedIndex;j<verTotal-1;++k,j+=2) {
+						elems[0][j]=bufRLB[k];
+					}}
+					reqRLB=cartComm.Irecv(bufRLB,redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+1);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqRU.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						elems[i][0]=bufRU[i-1];
-					}
-					reqRU=cartComm.Irecv(bufRU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
+				if(hasUp) {
+					reqRUB.Wait();
+					{int k,i;
+					for(k=0,i=isFirstElemRedIndex;i<horTotal-1;++k,i+=2) {
+						elems[i][0]=bufRUB[k];
+					}}
+					reqRUB=cartComm.Irecv(bufRUB,redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+1);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqRD.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						elems[i][verTotal-1]=bufRD[i-1];
-					}
-					reqRD=cartComm.Irecv(bufRD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
+				if(hasDown) {
+					reqRDB.Wait();
+					{int k,i;
+					for(k=0,i=isBottomLeftElementRedIndex;i<horTotal-1;++k,i+=2) {
+						elems[i][verTotal-1]=bufRDB[k];
+					}}
+					reqRDB=cartComm.Irecv(bufRDB,redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+1);
 				}
 			#else //If we are not a single process and are using multiple buffers
 				//Save the previous buffer and select the next buffer
 				short prevBuf=sBuf;
-				sBuf=(sBuf+1)%BUFFERS;
+				sBuf=(sBuf+1)%BUFF_NUM;
 				
 				//Receive the data. Copying is unnecessary, since they'll be copied during the main loop
 				//Make sure send buffers have been sent and we can safely write on them
-				if(destR!=MPI::PROC_NULL) {
+				if(hasRight) {
 					reqRR[prevBuf].Wait();
 					reqSR[sBuf].Wait();
 				}
-				if(destL!=MPI::PROC_NULL) {
+				if(hasLeft) {
 					reqRL[prevBuf].Wait();
 					reqSL[sBuf].Wait();
 				}
-				if(destU!=MPI::PROC_NULL) {
+				if(hasUp) {
 					reqRU[prevBuf].Wait();
 					reqSU[sBuf].Wait();
 				}
-				if(destD!=MPI::PROC_NULL) {
+				if(hasDown) {
 					reqRD[prevBuf].Wait();
-					reqSU[sBuf].Wait();
+					reqSD[sBuf].Wait();
 				}
 			#endif
 		#endif
@@ -485,11 +686,7 @@ int main(int argc, char **argv)
 			//Compute all red
 			for(int i=1;i<horTotal-1;++i) {
 				for(int j=((isFirstElemRed)?((i+1)%2):(i%2))+1;j<verTotal-1;j+=2) {
-					double newVal=equation(omegaRed,elems,i,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-					}
-					elems[i][j]=newVal;
+					proccessData(elems,diffSum,omegaRed,checkIter,i,j);
 				}
 			}
 			
@@ -497,75 +694,85 @@ int main(int argc, char **argv)
 			#ifndef SINGLE_PROC
 				//Finally, wait on the send buffers, copy new data there and 
 				//make the buffers availiable to the other processes 
-				if(destR!=MPI::PROC_NULL) {
-					reqSR.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						bufSR[j-1]=elems[horTotal-2][j];
-					}
-					reqSR=cartComm.Isend(bufSR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
+				//We send the red ones, since the others are going to need them to compute the black ones
+				if(hasRight) {
+					reqSRR.Wait();
+					{int k,j;
+					for(k=0,j=isTopRightElementRedIndex;j<verTotal-1;++k,j+=2) {
+						bufSRR[k]=elems[horTotal-2][j];
+					}}
+					reqSRR=cartComm.Isend(bufSRR,redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG);
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqSL.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						bufSL[j-1]=elems[1][j];
-					}
-					reqSL=cartComm.Isend(bufSL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
+				if(hasLeft) {
+					reqSLR.Wait();
+					{int k,j;
+					for(k=0,j=isFirstElemRedIndex;j<verTotal-1;++k,j+=2) {
+						bufSLR[k]=elems[1][j];
+					}}
+					reqSLR=cartComm.Isend(bufSLR,redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqSU.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						bufSU[i-1]=elems[i][1];
-					}
-					reqSU=cartComm.Isend(bufSU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
+				if(hasUp) {
+					reqSUR.Wait();
+					{int k,i;
+					for(k=0,i=isFirstElemRedIndex;i<horTotal-1;++k,i+=2) {
+						bufSUR[k]=elems[i][1];
+					}}
+					reqSUR=cartComm.Isend(bufSUR,redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqSD.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						bufSD[i-1]=elems[i][verTotal-2];
-					}
-					reqSD=cartComm.Isend(bufSD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
+				if(hasDown) {
+					reqSDR.Wait();
+					{int k,i;
+					for(k=0,i=isBottomLeftElementRedIndex;i<horTotal-1;++k,i+=2) {
+						bufSDR[k]=elems[i][verTotal-2];
+					}}
+					reqSDR=cartComm.Isend(bufSDR,redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG);
 				}
 				//wait for the data from the appropriate receive buffer
 				//and copy them to the edge. Then send a request for the next batch of edges 
 				//(that will complete on the next loop)
-				if(destR!=MPI::PROC_NULL) {
-					reqRR.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						elems[horTotal-1][j]=bufRR[j-1];
-					}
-					reqRR=cartComm.Irecv(bufRR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
+				//Now we want the red ones the others have computed, since we'll use them to do the black ones
+				if(hasRight) {
+					reqRRR.Wait();
+					//We want only the red elements. So if the top right element is red, 
+					//we know that the edge element on its right is going to be black, 
+					//so we start with the one below it, else we start with it
+					//(It's verTotal-1 because we don't care about the corners)
+					{int k,j;
+					for(k=0,j=isTopRightElementRedIndexInverse;j<verTotal-1;++k,j+=2) {
+						elems[horTotal-1][j]=bufRRR[k];
+					}}
+					reqRRR=cartComm.Irecv(bufRRR,blackElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG);
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqRL.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						elems[0][j]=bufRL[j-1];
-					}
-					reqRL=cartComm.Irecv(bufRL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
+				if(hasLeft) {
+					reqRLR.Wait();
+					{int k,j;
+					for(k=0,j=isFirstElemRedIndexInverse;j<verTotal-1;++k,j+=2) {
+						elems[0][j]=bufRLR[k];
+					}}
+					reqRLR=cartComm.Irecv(bufRLR,blackElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqRU.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						elems[i][0]=bufRU[i-1];
-					}
-					reqRU=cartComm.Irecv(bufRU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
+				if(hasUp) {
+					reqRUR.Wait();
+					{int k,i;
+					for(k=0,i=isFirstElemRedIndexInverse;i<horTotal-1;++k,i+=2) {
+						elems[i][0]=bufRUR[k];
+					}}
+					reqRUR=cartComm.Irecv(bufRUR,blackElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqRD.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						elems[i][verTotal-1]=bufRD[i-1];
-					}
-					reqRD=cartComm.Irecv(bufRD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
+				if(hasDown) {
+					reqRDR.Wait();
+					{int k,i;
+					for(k=0,i=isBottomLeftElementRedIndexInverse;i<horTotal-1;++k,i+=2) {
+						elems[i][verTotal-1]=bufRDR[k];
+					}}
+					reqRDR=cartComm.Irecv(bufRDR,blackElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG);
 				}
 			#endif
 			
 			//Do the same as above but for black
 			for(int i=1;i<horTotal-1;++i) {
 				for(int j=((isFirstElemRed)?(i%2):((i+1)%2))+1;j<verTotal-1;j+=2) {
-					double newVal=equation(omegaBlack,elems,i,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-					}
-					elems[i][j]=newVal;
+					proccessData(elems,diffSum,omegaBlack,checkIter,i,j);
 				}
 			}
 		#else //If we are not a single process and are using multiple buffers
@@ -576,291 +783,160 @@ int main(int argc, char **argv)
 				//We start with the red elements
 					//For the first element
 						//Get the data from the receive buffers for the first element
-				if(destL!=MPI::PROC_NULL) {
-					elems[0][1]=bufRL[prevBuf][0];
-				}
-				if(destU!=MPI::PROC_NULL) {
-					elems[1][0]=bufRU[prevBuf][0];
-				}
+				getFromRecLeft(1,0);
+				getFromRecUp(1,0);
 						//Compute the new value for the first element
-				double newVal=equation(omegaRed,elems,1,1);
-				if(checkIter) {
-					diffSum=diffSum+((newVal-elems[1][1])*(newVal-elems[1][1]));
-				}
-				elems[1][1]=newVal;
+				proccessData(elems,diffSum,omegaRed,checkIter,1,1);
+				
 						//Put that value to the necessary send buffers
-				if(destL!=MPI::PROC_NULL) {
-					bufSL[sBuf][0]=elems[1][1];
-				}
-				if(destU!=MPI::PROC_NULL) {
-					bufSU[sBuf][0]=elems[1][1];
-				}
-					//For the rest of the first collumn
-				int j;
-				for(j=3;j<verTotal-2;j+=2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put that value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-				}
+				writeToSendLeft(1,0);
+				writeToSendUp(1,0);
+				
+					//For the rest of the first collumn, get the data from the left, 
+					//compute the new value and put the new data left
+				{int kVer,j;
+				for(kVer=1,j=3;j<verTotal-2;++kVer,j+=2) {
+					getFromRecLeft(j,kVer);
+					proccessData(elems,diffSum,omegaRed,checkIter,1,j);
+					writeToSendLeft(j,kVer);
+				}}
 					//For the last element of the first collumn, if it is red
-				if(j==verTotal-2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						elems[1][j+1]=bufRD[prevBuf][0];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put the value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						bufSD[sBuf][0]=elems[1][j];
-					}
+				if(isBottomLeftElementRed) {
+					getFromRecLeft(verTotal-2,redElemsVerLeft-1);
+					getFromRecDown(1,0);
+					
+					proccessData(elems,diffSum,omegaRed,checkIter,1,verTotal-2);
+					
+					writeToSendLeft(verTotal-2,redElemsVerLeft-1);
+					writeToSendDown(1,0);
 				}
 					//For all collumns, except the end collumn
-					//((A loop for the first black, a check for end condition with a break, then a loop for the first red))
-				int i;
-				for(i=2;i<horTotal-2;i+=2) {
-					//We know the first (elem[i][1]) is black, so we start with the red and compute them normally (no need to retrieve data)
-					for(j=2;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
+				{int kTop,kBot,i;
+				for(kBot=isBottomLeftElementRedKappa, //Returns 1 for true, 0 for false. If it is true, we have already put the bottom left element in 0, so we need 1
+						kTop=1,i=2;i<horTotal-2;i+=2,
+						++kTop,++kBot) {
+					//We know the first (elems[i][1]) is black, so we start with the red (elems[i][2]) and compute them normally (no need to retrieve data)
+					for(int j=2;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaRed,checkIter,i,j);
 					}
-					//If the last collumn element is red, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
-					}
+					
 					//Check if we have reached the end 
 					//(horTotal-1 is the edge collumn, so we don't want to compute that or we get segfaults when trying to access elements beyond the edge)
 					//(horTotal-2 is the end collumn, and we don't want to compute that in the current loop because we want to send its results to the right)
 					int newI=i+1;
-					if(newI>=horTotal-2) {
+					if(unlikely(newI>=horTotal-2)) {
 						break;
 					}
 					
 					//We know the next collumn is going to have the first element be red, so we need to send/receive for that
-					if(destU!=MPI::PROC_NULL) {
-						elems[newI][0]=bufRU[prevBuf][newI-1];
-					}
-							//Compute the new value for the first element
-					double newVal=equation(omegaRed,elems,newI,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[newI][1])*(newVal-elems[newI][1]));
-					}
-					elems[newI][1]=newVal;
-							//Put that value to the necessary send buffers
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][newI-1]=elems[newI][1];
-					}
+					getFromRecUp(newI,kTop);
+					//Compute the new value for the first element
+					proccessData(elems,diffSum,omegaRed,checkIter,newI,1);
+					//Put that value to the necessary send buffers
+					writeToSendUp(newI,kTop);
+					
 					//Then we loop through all the others normally
-					for(j=3;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
+					for(int j=3;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaRed,checkIter,newI,j);
+					}
+					
+					//If the last collumn element is red, check for bottom process
+					//(If the bottom left element is red, then the one to the right of it is going to be black.
+					//So if the bottom left element is black, then the one to the right of it is going to be red.
+					if(!isBottomLeftElementRed) {
+						getFromRecDown(i,kBot);
+						proccessData(elems,diffSum,omegaRed,checkIter,i,verTotal-2);
+						writeToSendDown(i,kBot);
 					}
 					//If the last collumn element is red, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
+					//(If the bottom left element is red, then the element that is 2 spaces right of it is going to be red
+					else { //if(isBottomLeftElementRed)
+						getFromRecDown(newI,kBot);
+						proccessData(elems,diffSum,omegaRed,checkIter,newI,verTotal-2);
+						writeToSendDown(newI,kBot);
 					}
-				}
-				//Now we check if the loop ended during the red or during the black part
-				//If i==horTotal-2, then it ended during the black part and we know the first collumn element is black
-				if(i==horTotal-2) {
-					//So we simply compute all the elements and send them right
-					for(j=2;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-					}
-					//And down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
-					}
-				}
-				//Else if i+1==horTotal-2, then it ended during the red part amd we know the first collumn element is red
-				else {
-					//So first we send the first element up and right
-					int newI=i+1;
-					if(destR!=MPI::PROC_NULL) {
-						elems[newI+1][1]=bufRR[prevBuf][0];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						elems[newI][0]=bufRU[prevBuf][newI-1];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,newI,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[newI][1])*(newVal-elems[newI][1]));
-					}
-					elems[newI][1]=newVal;
-					//Put that value in the necessary send buffers
-					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[newI][1];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][newI-1]=elems[newI][1];
-					}
+				}}
+				//Now we do the final collumn. If its first element is red
+				if(isTopRightElementRed) {
+					//We compute the first element and send it up and right
+					getFromRecUp(horTotal-2,redElemsHorUp-1);
+					getFromRecRight(1,0);
+					
+					proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,1);
+					
+					writeToSendUp(horTotal-2,redElemsHorUp-1);
+					writeToSendRight(1,0);
+					
 					//Then we compute the rest of the elements normally and send them right
-					for(j=3;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-					}
-					//And send the final element down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
-					}
+					{int j,kVer;
+					for(kVer=1,j=3;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
+				}
+				//Else if the first element is black
+				else {
+					//We simply compute all the elements and send them right
+					{int j,kVer;
+					for(kVer=0,j=2;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
+					//And down if necessary
+					
+				}
+				//Finally, send the bottom right element down and right if necessary
+				if(isBottomRightElementRed) {
+					getFromRecRight(verTotal-2,redElemsVerRight-1);
+					getFromRecDown(horTotal-2,redElemsHorDown-1);
+					proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,verTotal-2);
+					writeToSendRight(verTotal-2,redElemsVerRight-1);
+					writeToSendDown(horTotal-2,redElemsHorDown-1);
 				}
 				
 				/////////////MID-POINT-DATA-TRANSFER////////////////
 				
 				//Send buffers should already be filled, so we just send them over. 
 				//Same with receive buffers. Their contents have been transferred so they are ready to receive
-				if(destR!=MPI::PROC_NULL) {
-					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
-					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
+				if(hasRight) {
+					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
+					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
-					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
+				if(hasLeft) {
+					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
+					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
-					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
+				if(hasUp) {
+					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
+					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
-					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
+				if(hasDown) { //sBuf=1,prevBuf=0
+					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
+					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
 				}
 				//Save the previous buffer and select the next buffer
 				prevBuf=sBuf;
-				sBuf=(sBuf+1)%BUFFERS;
+				sBuf=(sBuf+1)%BUFF_NUM;
 				
 				//Receive the data. Copying is unnecessary, since they'll be copied during the main loop
 				//Make sure send buffers have been sent and we can safely write on them
-				if(destR!=MPI::PROC_NULL) {
+				if(hasRight) {
 					reqRR[prevBuf].Wait();
 					reqSR[sBuf].Wait();
 				}
-				if(destL!=MPI::PROC_NULL) {
+				if(hasLeft) {
 					reqRL[prevBuf].Wait();
 					reqSL[sBuf].Wait();
 				}
-				if(destU!=MPI::PROC_NULL) {
+				if(hasUp) {
 					reqRU[prevBuf].Wait();
 					reqSU[sBuf].Wait();
 				}
-				if(destD!=MPI::PROC_NULL) {
+				if(hasDown) {
 					reqRD[prevBuf].Wait();
-					reqSU[sBuf].Wait();
+					reqSD[sBuf].Wait();
 				}
 				
 				
@@ -868,86 +944,34 @@ int main(int argc, char **argv)
 					
 				//We continue with the black elements
 					//For the black elements of the first collumn, we know elem[1][1] is red so we start with the black, elem[1][2]
-				for(j=2;j<verTotal-2;j+=2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put that value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-				}
-					//For the last element of the first collumn, if it is black
-				if(j==verTotal-2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						elems[1][j+1]=bufRD[prevBuf][0];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put the value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						bufSD[sBuf][0]=elems[1][j];
-					}
+				{int kVer,j;
+				for(kVer=0,j=2;j<verTotal-2;j+=2,++kVer) {
+					getFromRecLeft(j,kVer);
+					proccessData(elems,diffSum,omegaBlack,checkIter,1,j);
+					writeToSendLeft(j,kVer);
+				}}
+					//For the last element of the first collumn, if it is black, compute the new value and send it left and down
+				if(!isBottomLeftElementRed) {
+					getFromRecLeft(verTotal-2,blackElemsVerLeft-1);
+					getFromRecDown(1,0);
+					proccessData(elems,diffSum,omegaBlack,checkIter,1,verTotal-2);
+					writeToSendLeft(verTotal-2,blackElemsVerLeft-1);
+					writeToSendDown(1,0);
 				}
 				
 				//For all the collumns between first and last
-				for(i=2;i<horTotal-2;i+=2) {
+				{int kTop,kBot,i;
+				for(kTop=0,kBot=isBottomLeftElementRedKappaInverse,
+						i=2;i<horTotal-2;i+=2,++kTop,++kBot) {
 					//We know the first (elem[2][1]) is black, so we start with the black and compute them normally
 					//First we send/rcv for the first black element
-					if(destU!=MPI::PROC_NULL) {
-						elems[i][0]=bufRU[prevBuf][i-1];
-					}
-							//Compute the new value for the first element
-					double newVal=equation(omegaRed,elems,i,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][1])*(newVal-elems[i][1]));
-					}
-					elems[i][1]=newVal;
-							//Put that value to the necessary send buffers
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][i-1]=elems[i][1];
-					}
-					//Then we loop through all the others normally
-					for(j=3;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-					}
-					//If the last collumn element is black, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
+					getFromRecUp(i,kTop);
+					proccessData(elems,diffSum,omegaBlack,checkIter,i,1);
+					writeToSendUp(i,kTop);
+
+					//Then we loop through all the others normally (no need to retrieve data)
+					for(int j=3;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaBlack,checkIter,i,j);
 					}
 					
 					
@@ -955,232 +979,105 @@ int main(int argc, char **argv)
 					//(horTotal-1 is the edge collumn, so we don't want to compute that or we get segfaults when trying to access elements beyond the edge)
 					//(horTotal-2 is the end collumn, and we don't want to compute that in the current loop because we want to send its results to the right)
 					int newI=i+1;
-					if(newI>=horTotal-2) {
+					if(unlikely(newI>=horTotal-2)) {
 						break;
 					}
 					
 					//Now we know the first element of the collumn is red, so we start with the black
-					for(j=2;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
+					for(int j=2;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaBlack,checkIter,newI,j);
 					}
+					
 					//If the last collumn element is black, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
+					//(If the bottom left element is red, then the one to the right of it is going to be black)
+					if(isBottomLeftElementRed) {
+						getFromRecDown(i,kBot);
+						proccessData(elems,diffSum,omegaBlack,checkIter,i,verTotal-2);
+						writeToSendDown(i,kBot);
 					}
-				}
-				//Now we check if the loop ended during the red or during the black part
-				//If i==horTotal-2, then it ended during the black part and we know the first collumn element is black
-				if(i==horTotal-2) {
-					//So first we send the first element up and right
-					if(destR!=MPI::PROC_NULL) {
-						elems[i+1][1]=bufRR[prevBuf][0];
+					//If the bottom left element is black, then the one two elements right of it is going to be black
+					else { //if(!isBottomLeftElementRed) {
+						getFromRecDown(newI,kBot);
+						proccessData(elems,diffSum,omegaBlack,checkIter,newI,verTotal-2);
+						writeToSendDown(newI,kBot);
 					}
-					if(destU!=MPI::PROC_NULL) {
-						elems[i][0]=bufRU[prevBuf][i-1];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,i,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][1])*(newVal-elems[i][1]));
-					}
-					elems[i][1]=newVal;
-					//Put that value in the necessary send buffers
-					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[i][1];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][i-1]=elems[i][1];
-					}
+				}}
+				//If the top right is black
+				if(!isTopRightElementRed) {
+					//First we send the first element up and right
+					getFromRecRight(1,0);
+					getFromRecUp(horTotal-2,blackElemsHorUp-1);
+					proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,1);
+					writeToSendRight(1,0);
+					writeToSendUp(horTotal-2,blackElemsHorUp-1);
+					
 					//Then we compute the rest of the elements normally and send them right
-					for(j=3;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-					}
-					//And send the final element down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
-					}
+					{int kVer,j;
+					for(kVer=1,j=3;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
 				}
-				//Else if i+1==horTotal-2, then it ended during the red part amd we know the first collumn element is red
+				//Else if if the top right element is red
 				else {
-					int newI=i+1;
-					//So we simply compute all the black elements and send them right
-					for(j=2;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-					}
-					//And down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
-					}
+					//We simply compute all the black elements and send them right
+					{int kVer,j;
+					for(kVer=0,j=2;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
+				}
+				//And send the final element down if necessary
+				if(!isBottomRightElementRed) {
+					getFromRecRight(verTotal-2,blackElemsVerRight-1);
+					getFromRecDown(horTotal-2,blackElemsHorDown-1);
+					proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,verTotal-2);
+					writeToSendRight(verTotal-2,blackElemsVerRight-1);
+					writeToSendDown(horTotal-2,blackElemsHorDown-1);
 				}
 			}
-			//If the first element is black
+			
+			///////////////////////////////////
+			//
+			//Else if the first element is black
+			//
+			///////////////////////////////////
+			
 			else {
-				/////////////BLACK STARTS HERE//////////////
+				/////////////RED STARTS HERE//////////////
 					
-				//We continue with the black elements
-					//For the black elements of the first collumn, we know elem[1][1] is red so we start with the black, elem[1][2]
-				int j;
-				for(j=2;j<verTotal-2;j+=2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					//Compute the new value
-					double newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put that value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-				}
-					//For the last element of the first collumn, if it is black
-				if(j==verTotal-2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						elems[1][j+1]=bufRD[prevBuf][0];
-					}
-					//Compute the new value
-					double newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put the value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						bufSD[sBuf][0]=elems[1][j];
-					}
+				//We start with the red elements
+					//For the red elements of the first collumn, we know elem[1][1] is black so we start with the red, elem[1][2]
+				{int kVer,j;
+				for(kVer=0,j=2;j<verTotal-2;j+=2,++kVer) {
+					getFromRecLeft(j,kVer);
+					proccessData(elems,diffSum,omegaRed,checkIter,1,j);
+					writeToSendLeft(j,kVer);
+				}}
+					//For the last element of the first collumn, if it is red
+				if(isBottomLeftElementRed) {
+					getFromRecLeft(verTotal-2,redElemsVerLeft-1);
+					getFromRecDown(1,0);
+					proccessData(elems,diffSum,omegaRed,checkIter,1,verTotal-2);
+					writeToSendLeft(verTotal-2,redElemsVerLeft-1);
+					writeToSendDown(1,0);
 				}
 				
 				//For all the collumns between first and last
-				int i;
-				for(i=2;i<horTotal-2;i+=2) {
-					//We know the first (elem[2][1]) is black, so we start with the black and compute them normally
-					//First we send/rcv for the first black element
-					if(destU!=MPI::PROC_NULL) {
-						elems[i][0]=bufRU[prevBuf][i-1];
-					}
-							//Compute the new value for the first element
-					double newVal=equation(omegaRed,elems,i,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][1])*(newVal-elems[i][1]));
-					}
-					elems[i][1]=newVal;
-							//Put that value to the necessary send buffers
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][i-1]=elems[i][1];
-					}
-					//Then we loop through all the others normally
-					for(j=3;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-					}
-					//If the last collumn element is black, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
+				{int i,kTop,kBot;
+				for(i=2,kTop=0,kBot=isBottomLeftElementRedKappa;i<horTotal-2;i+=2,++kTop,++kBot) {
+					//We know the first (elem[2][1]) is red, so we start with the red and compute them normally
+					//First we send/rcv for the first red element
+					getFromRecUp(i,kTop);
+					proccessData(elems,diffSum,omegaRed,checkIter,i,1);
+					writeToSendUp(i,kTop);
+					
+					
+					//Then we loop through all the others normally (no need to receive any data)
+					for(int j=3;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaRed,checkIter,i,j);
 					}
 					
 					
@@ -1188,433 +1085,212 @@ int main(int argc, char **argv)
 					//(horTotal-1 is the edge collumn, so we don't want to compute that or we get segfaults when trying to access elements beyond the edge)
 					//(horTotal-2 is the end collumn, and we don't want to compute that in the current loop because we want to send its results to the right)
 					int newI=i+1;
-					if(newI>=horTotal-2) {
+					if(unlikely(newI>=horTotal-2)) {
 						break;
 					}
 					
-					//Now we know the first element of the collumn is red, so we start with the black
-					for(j=2;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
+					//Now we know the first element of the collumn is black, so we start with the red
+					for(int j=2;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaRed,checkIter,newI,j);
 					}
-					//If the last collumn element is black, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
+					
+					//If the last collumn element is red, check for bottom process
+					//(If the bottome left is black, then the one to the right of it will be red)
+					if(!isBottomLeftElementRed) {
+						getFromRecDown(i,kBot);
+						proccessData(elems,diffSum,omegaRed,checkIter,i,verTotal-2);
+						writeToSendDown(i,kBot);
 					}
-				}
-				//Now we check if the loop ended during the red or during the black part
-				//If i==horTotal-2, then it ended during the black part and we know the first collumn element is black
-				if(i==horTotal-2) {
+					//(If the bottom left element is red, then the one two spaces to the right of it will red)
+					else{ //if(isBottomLeftElementRed) {
+						getFromRecDown(newI,kBot);
+						proccessData(elems,diffSum,omegaRed,checkIter,newI,verTotal-2);
+						writeToSendDown(newI,kBot);
+					}
+				}}
+				//Now we check if the last collumn begins with red or black
+				//If it begins with red
+				if(isTopRightElementRed) {
 					//So first we send the first element up and right
-					if(destR!=MPI::PROC_NULL) {
-						elems[i+1][1]=bufRR[prevBuf][0];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						elems[i][0]=bufRU[prevBuf][i-1];
-					}
-					//Compute the new value
-					double newVal=equation(omegaRed,elems,i,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[i][1])*(newVal-elems[i][1]));
-					}
-					elems[i][1]=newVal;
-					//Put that value in the necessary send buffers
-					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[i][1];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][i-1]=elems[i][1];
-					}
+					getFromRecRight(1,0);
+					getFromRecUp(horTotal-2,redElemsHorUp-1);
+					proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,1);
+					writeToSendRight(1,0);
+					writeToSendUp(horTotal-2,redElemsHorUp-1);
+					
 					//Then we compute the rest of the elements normally and send them right
-					for(j=3;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-					}
-					//And send the final element down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
-					}
+					{int j,kVer;
+					for(j=3,kVer=1;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
 				}
-				//Else if i+1==horTotal-2, then it ended during the red part amd we know the first collumn element is red
+				//Else if the top right element is black
 				else {
-					int newI=i+1;
-					//So we simply compute all the black elements and send them right
-					for(j=2;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						double newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-					}
-					//And down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						double newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
-					}
+					//We simply compute all the black elements and send them right
+					{int j,kVer;
+					for(j=2,kVer=0;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
+				}
+				//Send the bottom right element down if necessary
+				if(isBottomRightElementRed) {
+					getFromRecRight(verTotal-2,redElemsVerRight-1);
+					getFromRecDown(horTotal-2,redElemsHorDown-1);
+					proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,verTotal-2);
+					writeToSendRight(verTotal-2,redElemsVerRight-1);
+					writeToSendDown(horTotal-2,redElemsHorDown-1);
 				}
 				
 				/////////////MID-POINT-DATA-TRANSFER////////////////
 				
-				//TODO: Can I further improve this by making the send/receive buffers half their size?
-				//Here we send and receive data so that we get the updated red and black edges
-				//Send buffers should already be filled, so we just send them over. Same with receive buffers
-				if(destR!=MPI::PROC_NULL) {
-					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
-					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
+				//Send buffers should already be filled, so we just send them over. 
+				//Same with receive buffers. Their contents have been transferred so they are ready to receive
+				if(hasRight) {
+					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
+					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
-					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
+				if(hasLeft) {
+					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
+					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],redElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
-					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
+				if(hasUp) {
+					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
+					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],redElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
-					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
+				if(hasDown) { //sBuf=1,prevBuf=0
+					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
+					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],redElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
 				}
 				//Save the previous buffer and select the next buffer
 				prevBuf=sBuf;
-				sBuf=(sBuf+1)%BUFFERS;
+				sBuf=(sBuf+1)%BUFF_NUM;
 				
 				//Receive the data. Copying is unnecessary, since they'll be copied during the main loop
 				//Make sure send buffers have been sent and we can safely write on them
-				if(destR!=MPI::PROC_NULL) {
+				if(hasRight) {
 					reqRR[prevBuf].Wait();
 					reqSR[sBuf].Wait();
 				}
-				if(destL!=MPI::PROC_NULL) {
+				if(hasLeft) {
 					reqRL[prevBuf].Wait();
 					reqSL[sBuf].Wait();
 				}
-				if(destU!=MPI::PROC_NULL) {
+				if(hasUp) {
 					reqRU[prevBuf].Wait();
 					reqSU[sBuf].Wait();
 				}
-				if(destD!=MPI::PROC_NULL) {
+				if(hasDown) {
 					reqRD[prevBuf].Wait();
-					reqSU[sBuf].Wait();
+					reqSD[sBuf].Wait();
 				}
 				
-				/////////////RED STARTS HERE//////////////
+				/////////////BLACK STARTS HERE//////////////
 				
-				//We start with the red elements
-					//For the first element
+				//We start with the black elements
+					//For the first element (which we know to be black)
 						//Get the data from the receive buffers for the first element
-				if(destL!=MPI::PROC_NULL) {
-					elems[0][1]=bufRL[prevBuf][0];
-				}
-				if(destU!=MPI::PROC_NULL) {
-					elems[1][0]=bufRU[prevBuf][0];
-				}
-						//Compute the new value for the first element
-				double newVal=equation(omegaRed,elems,1,1);
-				if(checkIter) {
-					diffSum=diffSum+((newVal-elems[1][1])*(newVal-elems[1][1]));
-				}
-				elems[1][1]=newVal;
-						//Put that value to the necessary send buffers
-				if(destL!=MPI::PROC_NULL) {
-					bufSL[sBuf][0]=elems[1][1];
-				}
-				if(destU!=MPI::PROC_NULL) {
-					bufSU[sBuf][0]=elems[1][1];
-				}
+				getFromRecUp(1,0);
+				getFromRecLeft(1,0);
+				proccessData(elems,diffSum,omegaBlack,checkIter,1,1);
+				writeToSendUp(1,0);
+				writeToSendLeft(1,0);
+						
 					//For the rest of the first collumn
-				for(j=3;j<verTotal-2;j+=2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put that value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
+				{int j,kVer;
+				for(j=3,kVer=1;j<verTotal-2;j+=2,++kVer) {
+					getFromRecLeft(j,kVer);
+					proccessData(elems,diffSum,omegaBlack,checkIter,1,j);
+					writeToSendLeft(j,kVer);
+				}}
+					//For the last element of the first collumn, if it is black
+				if(!isBottomLeftElementRed) {
+					getFromRecLeft(verTotal-2,blackElemsVerLeft-1);
+					getFromRecDown(1,0);
+					proccessData(elems,diffSum,omegaBlack,checkIter,1,verTotal-2);
+					writeToSendLeft(verTotal-2,blackElemsVerLeft-1);
+					writeToSendDown(1,0);
 				}
-					//For the last element of the first collumn, if it is red
-				if(j==verTotal-2) {
-					//Get the data from the receive buffers
-					if(destL!=MPI::PROC_NULL) {
-						elems[0][j]=bufRL[prevBuf][j-1];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						elems[1][j+1]=bufRD[prevBuf][0];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,1,j);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[1][j])*(newVal-elems[1][j]));
-					}
-					elems[1][j]=newVal;
-					//Put the value in the necessary send buffers
-					if(destL!=MPI::PROC_NULL) {
-						bufSL[sBuf][j-1]=elems[1][j];
-					}
-					if(destD!=MPI::PROC_NULL) {
-						bufSD[sBuf][0]=elems[1][j];
-					}
-				}
+				
 					//For all collumns, except the end collumn
-					//((A loop for the first black, a check for end condition with a break, then a loop for the first red))
-				for(i=2;i<horTotal-2;i+=2) {
-					//We know the first (elem[i][1]) is black, so we start with the red and compute them normally (no need to retrieve data)
-					for(j=2;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
+				{int i,kTop,kBot;
+				for(i=2,kTop=1,kBot=isBottomLeftElementRedKappaInverse
+						;i<horTotal-2;i+=2,++kTop,++kBot) {
+					//We know the first (elem[2][1]) is red, so we start with the black and compute them normally (no need to retrieve data)
+					for(int j=2;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaBlack,checkIter,i,j);
 					}
-					//If the last collumn element is red, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
-					}
+					//call debugPrint(elems,0,0,horTotal,verTotal)
 					//Check if we have reached the end 
 					//(horTotal-1 is the edge collumn, so we don't want to compute that or we get segfaults when trying to access elements beyond the edge)
 					//(horTotal-2 is the end collumn, and we don't want to compute that in the current loop because we want to send its results to the right)
 					int newI=i+1;
-					if(newI>=horTotal-2) {
+					if(unlikely(newI>=horTotal-2)) {
 						break;
 					}
 					
-					//We know the next collumn is going to have the first element be red, so we need to send/receive for that
-					if(destU!=MPI::PROC_NULL) {
-						elems[newI][0]=bufRU[prevBuf][newI-1];
-					}
-							//Compute the new value for the first element
-					double newVal=equation(omegaRed,elems,newI,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[newI][1])*(newVal-elems[newI][1]));
-					}
-					elems[newI][1]=newVal;
-							//Put that value to the necessary send buffers
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][newI-1]=elems[newI][1];
-					}
+					//We know the next collumn is going to have the first element be black, so we need to send/receive for that
+					getFromRecUp(newI,kTop);
+					proccessData(elems,diffSum,omegaBlack,checkIter,newI,verTotal-2);
+					writeToSendUp(newI,kTop);
+					
 					//Then we loop through all the others normally
-					for(j=3;j<verTotal-2;j+=2) {
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
+					for(int j=3;j<verTotal-2;j+=2) {
+						proccessData(elems,diffSum,omegaBlack,checkIter,newI,j);
 					}
-					//If the last collumn element is red, check for bottom process
-					if(j==verTotal-2) {
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
+					
+					//If the last collumn element is black, check for bottom process
+					//(If the bottom left element is red, then the one to the right of it is going to be black)
+					if(isBottomLeftElementRed) {
+						getFromRecDown(i,kBot);
+						proccessData(elems,diffSum,omegaBlack,checkIter,i,verTotal-2);
+						writeToSendDown(i,kBot);
 					}
+					//(If the bottom left element is black, then the one two spaces to the right of it is going to be black)
+					else { //if(!isBottomLeftElementRed) {
+						getFromRecDown(newI,kBot);
+						proccessData(elems,diffSum,omegaBlack,checkIter,newI,verTotal-2);
+						writeToSendDown(newI,kBot);
+					}
+				}}
+				//If the top right is red
+				if(isTopRightElementRed) {
+					//We simply compute all the black elements and send them right
+					{int j,kVer;
+					for(j=2,kVer=0;j<verTotal-2;j+=2,++kVer) {
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
 				}
-				//Now we check if the loop ended during the red or during the black part
-				//If i==horTotal-2, then it ended during the black part and we know the first collumn element is black
-				if(i==horTotal-2) {
-					//So we simply compute all the elements and send them right
-					for(j=2;j<verTotal-2;j+=2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-					}
-					//And down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[i+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[i][j+1]=bufRD[prevBuf][i-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,i,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[i][j])*(newVal-elems[i][j]));
-						}
-						elems[i][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[i][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][i-1]=elems[i][j];
-						}
-					}
-				}
-				//Else if i+1==horTotal-2, then it ended during the red part amd we know the first collumn element is red
+				//Else if the top right is black
 				else {
-					//So first we send the first element up and right
-					int newI=i+1;
-					if(destR!=MPI::PROC_NULL) {
-						elems[newI+1][1]=bufRR[prevBuf][0];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						elems[newI][0]=bufRU[prevBuf][newI-1];
-					}
-					//Compute the new value
-					newVal=equation(omegaRed,elems,newI,1);
-					if(checkIter) {
-						diffSum=diffSum+((newVal-elems[newI][1])*(newVal-elems[newI][1]));
-					}
-					elems[newI][1]=newVal;
-					//Put that value in the necessary send buffers
-					if(destR!=MPI::PROC_NULL) {
-						bufSR[sBuf][0]=elems[newI][1];
-					}
-					if(destU!=MPI::PROC_NULL) {
-						bufSU[sBuf][newI-1]=elems[newI][1];
-					}
+					//First we send the first element up and right
+					getFromRecUp(horTotal-2,blackElemsHorUp-1);
+					getFromRecRight(1,0);
+					proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,1);
+					writeToSendUp(horTotal-2,blackElemsHorUp-1);
+					writeToSendRight(1,0);
+					
 					//Then we compute the rest of the elements normally and send them right
-					for(j=3;j<verTotal-2;j+=2) {
+					{int j,kVer;
+					for(j=3,kVer=1;j<verTotal-2;j+=2,++kVer) {
 						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-					}
-					//And send the final element down if necessary
-					if(j==verTotal-2) {
-						//Get the data from the receive buffers
-						if(destR!=MPI::PROC_NULL) {
-							elems[newI+1][j]=bufRR[prevBuf][j-1];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							elems[newI][j+1]=bufRD[prevBuf][newI-1];
-						}
-						//Compute the new value
-						newVal=equation(omegaRed,elems,newI,j);
-						if(checkIter) {
-							diffSum=diffSum+((newVal-elems[newI][j])*(newVal-elems[newI][j]));
-						}
-						elems[newI][j]=newVal;
-						//Put that value in the necessary send buffers
-						if(destR!=MPI::PROC_NULL) {
-							bufSR[sBuf][j-1]=elems[newI][j];
-						}
-						if(destD!=MPI::PROC_NULL) {
-							bufSD[sBuf][newI-1]=elems[newI][j];
-						}
-					}
+						getFromRecRight(j,kVer);
+						proccessData(elems,diffSum,omegaBlack,checkIter,horTotal-2,j);
+						writeToSendRight(j,kVer);
+					}}
+				}
+				//Do the bottom right if it's black
+				if(!isBottomRightElementRed) {
+					getFromRecRight(verTotal-2,blackElemsVerRight-1);
+					getFromRecDown(horTotal-2,blackElemsHorDown-1);
+					proccessData(elems,diffSum,omegaRed,checkIter,horTotal-2,verTotal-2);
+					writeToSendRight(verTotal-2,blackElemsVerRight-1);
+					writeToSendDown(horTotal-2,blackElemsHorDown-1);
 				}
 			}
 		#endif
@@ -1622,7 +1298,7 @@ int main(int argc, char **argv)
 		#ifndef SINGLE_PROC
 			//Make a reduce request, now that we have all the data
 			double allSum;
-			if(checkIter) {
+			if(unlikely(checkIter)) {
 				MPI_Iallreduce(&diffSum,&allSum,1,MPI::DOUBLE,MPI::SUM,cartComm,&reqSum);
 			}
 		#endif
@@ -1631,60 +1307,65 @@ int main(int argc, char **argv)
 			#ifndef MULTI_BUFFER
 				//Finally, wait on the send buffers, copy new data there and 
 				//make the buffers availiable to the other processes 
-				if(destR!=MPI::PROC_NULL) {
-					reqSR.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						bufSR[j-1]=elems[horTotal-2][j];
-					}
-					reqSR=cartComm.Isend(bufSR,verElements,MPI::DOUBLE,destR,BUFF_TAG);
+				//Now we send the black ones, since the others will need them for the red ones
+				if(hasRight) {
+					reqSRB.Wait();
+					{int k,j;
+					for(k=0,j=isTopRightElementRedIndexInverse;j<verTotal-1;++k,j+=2) {
+						bufSRB[k]=elems[horTotal-2][j];
+					}}
+					reqSRB=cartComm.Isend(bufSRB,blackElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+1); //+1 for black
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqSL.Wait();
-					for(int j=1;j<verTotal-1;++j) {
-						bufSL[j-1]=elems[1][j];
-					}
-					reqSL=cartComm.Isend(bufSL,verElements,MPI::DOUBLE,destL,BUFF_TAG);
+				if(hasLeft) {
+					reqSLB.Wait();
+					{int k,j;
+					for(k=0,j=isFirstElemRedIndexInverse;j<verTotal-1;++k,j+=2) {
+						bufSLB[k]=elems[1][j];
+					}}
+					reqSLB=cartComm.Isend(bufSLB,blackElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+1);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqSU.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						bufSU[i-1]=elems[i][1];
-					}
-					reqSU=cartComm.Isend(bufSU,horElements,MPI::DOUBLE,destU,BUFF_TAG);
+				if(hasUp) {
+					reqSUB.Wait();
+					{int k,i;
+					for(k=0,i=isFirstElemRedIndexInverse;i<horTotal-1;++k,i+=2) {
+						bufSUB[k]=elems[i][1];
+					}}
+					reqSUB=cartComm.Isend(bufSUB,blackElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+1);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqSD.Wait();
-					for(int i=1;i<horTotal-1;++i) {
-						bufSD[i-1]=elems[i][verTotal-2];
-					}
-					reqSD=cartComm.Isend(bufSD,horElements,MPI::DOUBLE,destD,BUFF_TAG);
+				if(hasDown) {
+					reqSDB.Wait();
+					{int k,i;
+					for(k=0,i=isBottomLeftElementRedIndexInverse;i<horTotal-1;++k,i+=2) {
+						bufSDB[k]=elems[i][verTotal-2];
+					}}
+					reqSDB=cartComm.Isend(bufSDB,blackElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+1);
 				}
 			#else //If we are using multiple buffers
 				//Send buffers should already be filled, so we just send them over. Same with receive buffers
-				if(destR!=MPI::PROC_NULL) {
-					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
-					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],verElements,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
+				if(hasRight) {
+					reqSR[sBuf]=cartComm.Isend(bufSR[sBuf],blackElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+sBuf);
+					reqRR[prevBuf]=cartComm.Irecv(bufRR[prevBuf],blackElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+prevBuf);
 				}
-				if(destL!=MPI::PROC_NULL) {
-					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
-					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],verElements,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
+				if(hasLeft) {
+					reqSL[sBuf]=cartComm.Isend(bufSL[sBuf],blackElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+sBuf);
+					reqRL[prevBuf]=cartComm.Irecv(bufRL[prevBuf],blackElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG+prevBuf);
 				}
-				if(destU!=MPI::PROC_NULL) {
-					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
-					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],horElements,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
+				if(hasUp) {
+					reqSU[sBuf]=cartComm.Isend(bufSU[sBuf],blackElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+sBuf);
+					reqRU[prevBuf]=cartComm.Irecv(bufRU[prevBuf],blackElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG+prevBuf);
 				}
-				if(destD!=MPI::PROC_NULL) {
-					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
-					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],horElements,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
+				if(hasDown) {
+					reqSD[sBuf]=cartComm.Isend(bufSD[sBuf],blackElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+sBuf);
+					reqRD[prevBuf]=cartComm.Irecv(bufRD[prevBuf],blackElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG+prevBuf);
 				}
 			#endif
 		#endif
 		
 		#ifndef SINGLE_PROC
 			//Each ITER_CHECK times, check for the sum and exit if we have reached the required level of convergence
-			if(checkIter) {
+			if(unlikely(checkIter)) {
 				MPI_Wait(&reqSum,MPI_STATUS_IGNORE);
-				if(sqrt(allSum)<epsilon) {
+				if(unlikely(allSum<epsilon)) {
 					break;
 				}
 				#ifndef NDEBUG
@@ -1697,7 +1378,7 @@ int main(int argc, char **argv)
 				#endif
 			}
 		#else
-			if(checkIter && sqrt(diffSum)<epsilon) {
+			if(unlikely(checkIter && diffSum<epsilon)) {
 				break;
 			}
 			#ifndef NDEBUG
@@ -1716,6 +1397,9 @@ int main(int argc, char **argv)
 			//Output time taken to complete
 			cout<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
 			//cerr<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
+			#ifndef NDEBUG
+				cout<<"iter:"<<iteration<<endl;
+			#endif
 		}
 	#else
 		//Get end time
@@ -1724,66 +1408,74 @@ int main(int argc, char **argv)
 		//Output time taken to complete
 		cout<<fixed<<setprecision(20)<<dur.count()<<endl;
 		//cerr<<fixed<<setprecision(20)<<(time_end-time_initial)<<endl;
+		#ifndef NDEBUG
+			cout<<"iter:"<<iteration<<endl;
+		#endif
 	#endif
 	
 	//free memory
-	for(int i=0;i<horTotal;++i) {
-		delete[] elems[i];
-	}
-	delete[] elems;
+	deleteElements(elems,horTotal);
 	
 	#ifndef SINGLE_PROC
 		#ifndef MULTI_BUFFER
 			//Destroy communication buffers if necessary
-			if(destR!=MPI::PROC_NULL) {
-				delete[] bufSR;
-				delete[] bufRR;
+			if(hasRight) {
+				delete[] bufSRR;
+				delete[] bufRRR;
+				delete[] bufSRB;
+				delete[] bufRRB;
 			}
-			if(destL!=MPI::PROC_NULL) {
-				delete[] bufSL;
-				delete[] bufRL;
+			if(hasLeft) {
+				delete[] bufSLR;
+				delete[] bufRLR;
+				delete[] bufSLB;
+				delete[] bufRLB;
 			}
-			if(destU!=MPI::PROC_NULL) {
-				delete[] bufSU;
-				delete[] bufRU;
+			if(hasUp) {
+				delete[] bufSUR;
+				delete[] bufRUR;
+				delete[] bufSUB;
+				delete[] bufRUB;
 			}
-			if(destD!=MPI::PROC_NULL) {
-				delete[] bufSD;
-				delete[] bufRD;
+			if(hasDown) {
+				delete[] bufSDR;
+				delete[] bufRDR;
+				delete[] bufSDB;
+				delete[] bufRDB;
 			}
 		#else //If we are using multiple buffers
-			for(int i=0;i<BUFFERS;++i) {
+			for(int i=0;i<BUFF_NUM;++i) {
 				//Destroy communication buffers if necessary
-				if(destR!=MPI::PROC_NULL) {
+				if(hasRight) {
 					delete[] bufSR[i];
 					delete[] bufRR[i];
 				}
-				if(destL!=MPI::PROC_NULL) {
+				if(hasLeft) {
 					delete[] bufSL[i];
 					delete[] bufRL[i];
 				}
-				if(destU!=MPI::PROC_NULL) {
+				if(hasUp) {
 					delete[] bufSU[i];
 					delete[] bufRU[i];
 				}
-				if(destD!=MPI::PROC_NULL) {
+				if(hasDown) {
 					delete[] bufSD[i];
 					delete[] bufRD[i];
 				}
 			}
-			if(destR!=MPI::PROC_NULL) {
+			if(hasRight) {
 				delete[] bufSR;
 				delete[] bufRR;
 			}
-			if(destL!=MPI::PROC_NULL) {
+			if(hasLeft) {
 				delete[] bufSL;
 				delete[] bufRL;
 			}
-			if(destU!=MPI::PROC_NULL) {
+			if(hasUp) {
 				delete[] bufSU;
 				delete[] bufRU;
 			}
-			if(destD!=MPI::PROC_NULL) {
+			if(hasDown) {
 				delete[] bufSD;
 				delete[] bufRD;
 			}
@@ -1805,6 +1497,63 @@ inline double equation(double omega, double** elems, int i, int j) {
 	#endif
 	return (1.0-omega)*(elems[i][j])+(omega/4.0)*(elems[i-1][j]+elems[i][j-1]+elems[i][j+1]+elems[i+1][j]);
 }
+
+#ifdef MULTI_BUFFER
+	inline void writeToSendLR(double ** elems, double** buff, int sBuf, int i, int j, bool destExists, int k) {
+		if(destExists) {
+			buff[sBuf][k]=elems[i][j];
+		}
+	}
+
+	inline void writeToSendUD(double ** elems, double** buff, int sBuf, int i, int j, bool destExists, int k) {
+		if(destExists) {
+			buff[sBuf][k]=elems[i][j];
+		}
+	}
+
+	inline void getFromRecLR(double ** elems, double** buff, int prevBuf, int i, int j, int offsX, bool destExists, int k) {
+		if(destExists) {
+			elems[i+offsX][j]=buff[prevBuf][k];
+		}
+	}
+
+	inline void getFromRecUD(double ** elems, double** buff, int prevBuf, int i, int j, int offsY, bool destExists, int k) {
+		if(destExists) {
+			elems[i][j+offsY]=buff[prevBuf][k];
+		}
+	}
+#endif
+
+inline void proccessData(double ** elems, double& diffSum, double omega, bool checkIter, int i, int j) {
+	if(unlikely(checkIter)) {
+		double newVal=equation(omega,elems,i,j);
+		diffSum+=((newVal-elems[i][j])*(newVal-elems[i][j]));
+		elems[i][j]=newVal;
+	}
+	else {
+		elems[i][j]=equation(omega,elems,i,j);
+	}
+}
+
+inline void deleteElements(double ** elems, int horTotal) {
+	for(int i=0;i<horTotal;++i) {
+		delete[] elems[i];
+	}
+	delete[] elems;
+}
+
+#ifndef NDEBUG
+	void debugPrint(double ** elems, int startX, int startY, int endX, int endY) {
+		for(int j=startY;j<endY;++j) {
+			cout<<"{";
+			for(int i=startX;i<endX-1;++i) {
+				cout<<elems[i][j]<<", ";
+			}
+			cout<<elems[endX-1][j];
+			cout<<"}"<<endl;
+		}
+	}
+#endif
 
 //TODO: Make inline functions for writing/reading to/from send/receive buffers during multi-buffer mode. Something like SendU,SendD,etc with (elems,buff,sBuf/prevBuf,i,j). Or make a single inline function and use defines to make the left/right/up/down/etc.
 
