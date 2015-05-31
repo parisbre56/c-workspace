@@ -30,7 +30,7 @@ using namespace std;
 #endif
 
 #ifndef sqrtN
-	#define sqrtN 1000 //The squre root of the number of elements in the grid
+	#define sqrtN 200 //The squre root of the number of elements in the grid
 #endif
 
 #ifndef epsilon
@@ -39,26 +39,26 @@ using namespace std;
 
 #ifndef qDef
 	//#define qDef sqrt(nthreads)/4
-	#define qDef sqrt(nthreads)/2
-	//#define qDef sqrt(nthreads)
+	//#define qDef sqrt(nthreads)/2
+	#define qDef sqrt(nthreads)
 	//#define qDef sqrt(nthreads)*2
 	//#define qDef sqrt(nthreads)*4
 #endif
 
 #ifndef omegaRed
-	#define omegaRed 0.1
+	//#define omegaRed 0.1
 	//#define omegaRed 0.2
 	//...
 	//#define omegaRed 1.8
-	//#define omegaRed 1.9
+	#define omegaRed 1.9
 #endif
 
 #ifndef omegaBlack
-	#define omegaBlack 0.1
+	//#define omegaBlack 0.1
 	//#define omegaBlack 0.2
 	//...
 	//#define omegaBlack 1.8
-	//#define omegaBlack 1.9
+	#define omegaBlack 1.9
 #endif
 
 #define INIT_TAG 1 //Used to send initialisation data
@@ -299,29 +299,29 @@ int main(int argc, char **argv)
 	
 	#ifndef SINGLE_PROC
 		//Find out how many elements this zone should have
-		if(sqrtN%horZones<=1) {
+		if(sqrtN%horZones<=1 || ((sqrtN/horZones)-(horZones-1))<2) {
 			horElements = sqrtN/horZones;
 		} else {
-			horElements = sqrtN/horZones + 1;
+			horElements = (sqrtN/horZones) + 1;
 		}
-		if(sqrtN%verZones<=1) {
+		if(sqrtN%verZones<=1 || ((sqrtN/verZones)-(verZones-1))<2) {
 			verElements = sqrtN/verZones;
 		} else {
-			verElements = sqrtN/verZones + 1;
+			verElements = (sqrtN/verZones) + 1;
 		}
 		
 		
 		//If this is in the right/bottom edge (which we can tell since we have no right/bottom neighbour)
 		//Find how many more elements we need and add them to the number of elements of this zone
 		if(!hasRight) {
-			if(sqrtN%horZones>1) {
+			if(sqrtN%horZones>1 && ((sqrtN/horZones)-(horZones-1))>=2) {
 				horElements=(sqrtN/horZones)-(horZones-1);
 			} else {
 				horElements+=sqrtN%horZones;
 			}
 		}
 		if(!hasDown) {
-			if(sqrtN%verZones>1) {
+			if(sqrtN%verZones>1 && ((sqrtN/verZones)-(verZones-1))>=2) {
 				verElements=(sqrtN/verZones)-(verZones-1);
 			} else {
 				verElements+=sqrtN%verZones;
@@ -586,6 +586,24 @@ int main(int argc, char **argv)
 	#endif
 	
 	#ifndef SINGLE_PROC
+		#ifndef MULTI_BUFF
+			if(hasRight) {
+					reqRRR=cartComm.Irecv(bufRRR,blackElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG);
+				}
+				if(hasLeft) {
+					reqRLR=cartComm.Irecv(bufRLR,blackElemsVerLeft,MPI::DOUBLE,destL,BUFF_TAG);
+				}
+				if(hasUp) {
+					reqRUR=cartComm.Irecv(bufRUR,blackElemsHorUp,MPI::DOUBLE,destU,BUFF_TAG);
+				}
+				if(hasDown) {
+					reqRDR=cartComm.Irecv(bufRDR,blackElemsHorDown,MPI::DOUBLE,destD,BUFF_TAG);
+				}
+		#endif
+	#endif
+	
+	#ifndef SINGLE_PROC
+	
 		//Wait for all processes to get here
 		cartComm.Barrier();
 		
@@ -630,7 +648,7 @@ int main(int argc, char **argv)
 					for(k=0,j=isTopRightElementRedIndex;j<verTotal-1;++k,j+=2) {
 						elems[horTotal-1][j]=bufRRB[k];
 					}}
-					reqRRB=cartComm.Irecv(bufRRB,redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+1); //+1 for black
+					reqRRB=cartComm.Irecv(bufRRB,redElemsVerRight,MPI::DOUBLE,destR,BUFF_TAG+1); //+1 for black, +0 for red
 				}
 				if(hasLeft) {
 					reqRLB.Wait();
@@ -1554,6 +1572,4 @@ inline void deleteElements(double ** elems, int horTotal) {
 		}
 	}
 #endif
-
-//TODO: Make inline functions for writing/reading to/from send/receive buffers during multi-buffer mode. Something like SendU,SendD,etc with (elems,buff,sBuf/prevBuf,i,j). Or make a single inline function and use defines to make the left/right/up/down/etc.
 
